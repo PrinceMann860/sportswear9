@@ -38,7 +38,7 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = "auth_app.CustomUser"
 # Application definition
@@ -119,7 +119,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 #     }
 # }
 
-#postgrace Database
+# postgrace Database
 # Replace the DATABASES section of your settings.py with this
 tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
 
@@ -185,6 +185,11 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    # uncomment this if you want to restrict to JSON only responses
+    # 'DEFAULT_RENDERER_CLASSES': (
+    #     'rest_framework.renderers.JSONRenderer',
+    # ),
+
 }
 
 # ✅ Optional: Customize JWT behavior
