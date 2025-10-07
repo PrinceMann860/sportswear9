@@ -31,6 +31,13 @@ SECRET_KEY = 'django-insecure-fm3qlkfvp^o5v@ksd&lb501qe@60n0bm^5cg(k5tnop@n^ewoc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Allow frontend origin
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = "auth_app.CustomUser"
@@ -57,6 +64,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',  # since you use Google login
 
+    'corsheaders',
 
     # custom apps
     # 'cart',
@@ -69,6 +77,7 @@ INSTALLED_APPS = [
 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # <- Moved to the top
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -77,8 +86,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-
 ]
+
 
 ROOT_URLCONF = 'backend.urls'
 

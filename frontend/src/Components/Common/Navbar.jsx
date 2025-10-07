@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import AuthModal from "../Auth/Authmodal";
+import { useDispatch } from "react-redux";
+import { useAuth } from "../../context/AuthContext";
+import { logout } from "../../store/slices/auth/authSlice";
+import AuthModal from "../Auth/AuthModal";
 import {
   FiSearch,
   FiUser,
@@ -8,14 +11,18 @@ import {
   FiHeart,
   FiShoppingCart,
   FiX,
+  FiLogOut,
 } from "react-icons/fi";
 
 function Navbar() {
+  const dispatch = useDispatch();
+  const { isAuthenticated, profile } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
-  const [authMode, setAuthMode] = useState("signup"); // default to signup
-  const [open, setOpen] = useState(false); // mobile menu
-  const [showSearch, setShowSearch] = useState(false); // mobile search full page
+  const [authMode, setAuthMode] = useState("signup");
+  const [open, setOpen] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const suggestions = [
     "Running shoes",
@@ -84,15 +91,41 @@ function Navbar() {
               <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
             </form>
 
-            {/* USER ICON - opens signup modal */}
-            <button
-              onClick={() => {
-                setAuthMode("signup");
-                setAuthOpen(true);
-              }}
-            >
-              <FiUser className="text-lg cursor-pointer hover:text-red-500" />
-            </button>
+            {isAuthenticated ? (
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2 hover:text-red-500 transition"
+                >
+                  <FiUser className="text-lg" />
+                  <span className="text-sm font-medium">{profile?.full_name}</span>
+                </button>
+
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2">
+                    <button
+                      onClick={() => {
+                        dispatch(logout());
+                        setShowUserMenu(false);
+                      }}
+                      className="w-full px-4 py-2 text-left hover:bg-gray-100 flex items-center gap-2"
+                    >
+                      <FiLogOut />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setAuthMode("login");
+                  setAuthOpen(true);
+                }}
+              >
+                <FiUser className="text-lg cursor-pointer hover:text-red-500" />
+              </button>
+            )}
 
             <FiHeart className="text-lg cursor-pointer hover:text-red-500" />
             <FiShoppingCart className="text-lg cursor-pointer hover:text-red-500" />
@@ -146,17 +179,39 @@ function Navbar() {
               ))}
             </div>
 
-            <div className="mt-auto flex items-center space-x-6 pt-10 border-t">
-              <button
-                onClick={() => {
-                  setAuthMode("signup");
-                  setAuthOpen(true);
-                }}
-              >
-                <FiUser className="text-2xl hover:text-red-500" />
-              </button>
-              <FiHeart className="text-2xl cursor-pointer hover:text-red-500" />
-              <FiShoppingCart className="text-2xl cursor-pointer hover:text-red-500" />
+            <div className="mt-auto pt-10 border-t">
+              {isAuthenticated ? (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-sm">
+                    <FiUser className="text-xl" />
+                    <span className="font-medium">{profile?.full_name}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      dispatch(logout());
+                      setOpen(false);
+                    }}
+                    className="flex items-center gap-2 text-red-500 hover:text-red-600 transition"
+                  >
+                    <FiLogOut className="text-xl" />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-6">
+                  <button
+                    onClick={() => {
+                      setAuthMode("login");
+                      setAuthOpen(true);
+                      setOpen(false);
+                    }}
+                  >
+                    <FiUser className="text-2xl hover:text-red-500" />
+                  </button>
+                  <FiHeart className="text-2xl cursor-pointer hover:text-red-500" />
+                  <FiShoppingCart className="text-2xl cursor-pointer hover:text-red-500" />
+                </div>
+              )}
             </div>
           </div>
         )}
