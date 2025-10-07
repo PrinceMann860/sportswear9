@@ -4,6 +4,8 @@ import Navbar from "./Components/Common/Navbar";
 import Footer from "./Components/Common/Footer";
 import Home from "./Components/Home/Home";
 import Product from "./Components/Product/Product";
+import ProductInfo from "./Components/Product/ProductInfo";
+
 
 export default function App() {
   const router = createBrowserRouter([
@@ -23,6 +25,10 @@ export default function App() {
         {
           path: "/Product",
           element: <Product />,
+        },
+        {
+          path: '/ProductInfo',
+          element: <ProductInfo />
         },
       ],
     },

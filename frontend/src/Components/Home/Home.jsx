@@ -55,7 +55,7 @@ const products = [
     category: "Performance",
   },
   {
-    id: 1,
+    id: 2,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
     price: "₹2,499.00",
     original: "₹6,599.00",
@@ -64,7 +64,16 @@ const products = [
     category: "Performance",
   },
   {
-    id: 1,
+    id: 3,
+    img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+    price: "₹2,499.00",
+    original: "₹6,599.00",
+    discount: "-65%",
+    title: "Compression T-shirt",
+    category: "Performance",
+  },
+  {
+    id: 4,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
     price: "₹2,499.00",
     original: "₹6,599.00",
@@ -73,7 +82,7 @@ const products = [
     category: "Performance",
   },
   {
-    id: 1,
+    id: 5,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
     price: "₹2,499.00",
     original: "₹6,599.00",
@@ -90,70 +99,70 @@ const menProducts = [
     title: "Duramo 10 Shoes",
     subtitle: "Performance",
     price: 2499,
-    originalPrice: 6599,
+    original: 6599,
     discount: "-65%",
   },
   {
     id: 2,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
     title: "Galaxy 6 Shoes",
-    subtitle: "Performance",
+    category: "Performance",
     price: 2400,
-    originalPrice: 5999,
+    original: 5999,
     discount: "-60%",
   },
   {
     id: 3,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
     title: "Samba OG Shoes",
-    subtitle: "Originals",
+    category: "Originals",
     price: 4400,
-    originalPrice: 10999,
+    original: 10999,
     discount: "-60%",
   },
   {
     id: 4,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
     title: "Ultraboost 20 Shoes",
-    subtitle: "Performance",
+    category: "Performance",
     price: 7600,
-    originalPrice: 18999,
+    original: 18999,
     discount: "-60%",
   },
   {
     id: 5,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
     title: "Duramo 10 Shoes",
-    subtitle: "Performance",
+    category: "Performance",
     price: 2499,
-    originalPrice: 6599,
+    original: 6599,
     discount: "-65%",
   },
   {
     id: 6,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
     title: "Galaxy 6 Shoes",
-    subtitle: "Performance",
+    category: "Performance",
     price: 2400,
-    originalPrice: 5999,
+    original: 5999,
     discount: "-60%",
   },
   {
     id: 7,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
     title: "Samba OG Shoes",
-    subtitle: "Originals",
+    category: "Originals",
     price: 4400,
-    originalPrice: 10999,
+    original: 10999,
     discount: "-60%",
   },
   {
     id: 8,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
     title: "Ultraboost 20 Shoes",
-    subtitle: "Performance",
+    category: "Performance",
     price: 7600,
-    originalPrice: 18999,
+    original: 18999,
     discount: "-60%",
   },
 ];
@@ -163,72 +172,72 @@ const womenProducts = [
     id: 1,
     img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
     title: "Running Top",
-    subtitle: "Performance",
+    category: "Performance",
     price: 1499,
-    originalPrice: 2999,
+    original: 2999,
     discount: "-50%",
   },
   {
     id: 2,
     img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
     title: "Yoga Tee",
-    subtitle: "Training",
+    category: "Training",
     price: 1999,
-    originalPrice: 3999,
+    original: 3999,
     discount: "-50%",
   },
   {
     id: 3,
     img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
     title: "Winter Jacket",
-    subtitle: "Originals",
+    category: "Originals",
     price: 3499,
-    originalPrice: 6999,
+    original: 6999,
     discount: "-50%",
   },
   {
     id: 4,
     img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
     title: "Compression Top",
-    subtitle: "Performance",
+    category: "Performance",
     price: 2299,
-    originalPrice: 4599,
+    original: 4599,
     discount: "-50%",
   },
   {
     id: 5,
     img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
     title: "Running Top",
-    subtitle: "Performance",
+    category: "Performance",
     price: 1499,
-    originalPrice: 2999,
+    original: 2999,
     discount: "-50%",
   },
   {
     id: 6,
     img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
     title: "Yoga Tee",
-    subtitle: "Training",
+    category: "Training",
     price: 1999,
-    originalPrice: 3999,
+    original: 3999,
     discount: "-50%",
   },
   {
     id: 7,
     img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
     title: "Winter Jacket",
-    subtitle: "Originals",
+    category: "Originals",
     price: 3499,
-    originalPrice: 6999,
+    original: 6999,
     discount: "-50%",
   },
   {
     id: 8,
     img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
     title: "Compression Top",
-    subtitle: "Performance",
+    category: "Performance",
     price: 2299,
-    originalPrice: 4599,
+    original: 4599,
     discount: "-50%",
   },
 ];
@@ -340,12 +349,12 @@ function Home() {
           <span className="bg-black text-white px-3 py-1 text-xs rounded">
             FLAT 60% OFF
           </span>
-          <span className="bg-yellow-400 text-black px-3 py-1 text-xs rounded font-medium">
+          <span className="bg-gray-100 text-black px-3 py-1 text-xs rounded font-medium">
             BEST SELLERS ⚡
           </span>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
@@ -353,7 +362,7 @@ function Home() {
 
         {/* Trending */}
         <div className="flex justify-between mt-10 items-center">
-          <h2 className="font-bold text-xl lg:text-3xl underline underline-offset-4 decoration-4">
+          <h2 className="font-bold text-xl lg:text-2xl underline underline-offset-4 decoration-4">
             TRENDING PRODUCTS
           </h2>
           <Link
@@ -363,7 +372,7 @@ function Home() {
             Shop now
           </Link>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 py-6">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
@@ -390,7 +399,7 @@ function Home() {
           </div>
 
           {/* Category Products */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {currentProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -453,7 +462,7 @@ function Home() {
       <section className="max-w-7xl mx-auto px-6 py-12">
         {/* Discount Banner */}
         <div className="bg-[#fdf9f3] border border-dashed border-red-400 text-center py-4 rounded-md mb-10">
-          <p className="text-lg">
+          <p className="lg:text-lg text-sm">
             Super discount for your{" "}
             <span className="font-semibold text-red-500">first purchase.</span>{" "}
             <span className="inline-block mx-2 px-3 py-1 border-2 border-dashed border-red-400 text-red-500 font-bold rounded">
