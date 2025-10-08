@@ -1,6 +1,8 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { ProductCard } from "../Product/Product";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ProductCard } from '../Product/Product';
+import CategoryCarousel from './CategoryCarousel';
+import PromoCarousel from './PromoCarousel';
 
 // Assets
 import banner1 from "../../assets/homebanner.png";
@@ -267,12 +269,12 @@ const festiveDeals = [
 ];
 
 function Home() {
-  const [activeCategory, setActiveCategory] = useState("men");
+  const [activeCategory, setActiveCategory] = useState('men');
   const currentProducts =
-    activeCategory === "men" ? menProducts : womenProducts;
+    activeCategory === 'men' ? menProducts : womenProducts;
 
   return (
-    <main className="w-full bg-white">
+    <main className="w-full bg-white pb-20 md:pb-0">
       {/* Banner */}
       <div className="w-full lg:h-[80vh] md:h-[50vh] h-[30vh] pt-[60px]">
         <img
@@ -281,6 +283,16 @@ function Home() {
           className="w-full h-full object-fill"
         />
       </div>
+
+
+      {/* Promo Carousel - Mobile */}
+      <div className="">
+        <PromoCarousel />
+      </div>
+
+      
+      {/* Category Carousel - Mobile */}
+      <CategoryCarousel />
 
       {/* Festive Deals */}
       <section className="mt-5 p-5 max-w-7xl mx-auto">
@@ -338,7 +350,12 @@ function Home() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-3">
           {[yoga, running, compression, gloves].map((img, i) => (
-            <img key={i} src={img} alt="sport" className="mb-2 hover:scale-102 transition hover:shadow-lg" />
+            <img
+              key={i}
+              src={img}
+              alt="sport"
+              className="mb-2 hover:scale-102 transition hover:shadow-lg"
+            />
           ))}
         </div>
       </section>
@@ -378,19 +395,23 @@ function Home() {
           ))}
         </div>
 
-        <img src={banner} alt="Promo Banner" className="w-full h-auto hover:scale-102 transition" />
+        <img
+          src={banner}
+          alt="Promo Banner"
+          className="w-full h-auto hover:scale-102 transition"
+        />
 
         {/* Toggle Buttons */}
         <div className="py-10">
           <div className="flex gap-4 mb-8">
-            {["men", "women"].map((cat) => (
+            {['men', 'women'].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 className={`px-6 py-2 rounded-full font-semibold ${
                   activeCategory === cat
-                    ? "bg-black text-white"
-                    : "bg-gray-200 text-black"
+                    ? 'bg-black text-white'
+                    : 'bg-gray-200 text-black'
                 }`}
               >
                 {cat.toUpperCase()}
@@ -405,11 +426,15 @@ function Home() {
             ))}
           </div>
         </div>
-          <Link to={'#'} className="flex justify-center"><button className="px-4 py-2 bg-black text-white font-semibold text-xl hover:shadow-lg">View All</button></Link>
+        <Link to={'#'} className="flex justify-center">
+          <button className="px-4 py-2 bg-black text-white font-semibold text-xl hover:shadow-lg">
+            View All
+          </button>
+        </Link>
       </section>
       {/* big banner */}
       <div className="max-w-7xl mx-auto hover:scale-110 lg:mt-10 transition cursor-pointer p-5 lg:p-0">
-          <img src={bigbanner} alt="" />
+        <img src={bigbanner} alt="" />
       </div>
       {/* Customer Reviews */}
       <section className="max-w-7xl mx-auto px-6 py-12">
@@ -423,19 +448,19 @@ function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
-              quote: "Reliable product, consistently delivers.",
-              text: "Generation many variations of passages of even blievable lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-              name: "Stefanie Rashford",
+              quote: 'Reliable product, consistently delivers.',
+              text: 'Generation many variations of passages of even blievable lorem Ipsum is simply dummy text of the printing and typesetting industry.',
+              name: 'Stefanie Rashford',
             },
             {
-              quote: "Excellent product, A+ customer service.",
+              quote: 'Excellent product, A+ customer service.',
               text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry lorem Ipsum has been the industry's standard dummy text ever since.",
-              name: "Augusta Wind",
+              name: 'Augusta Wind',
             },
             {
-              quote: "Impressive quality, durable and reliable.",
-              text: "Lorem Ipsum many variations of passages of there are available but they have alteration in some form by injected humour or randomised.",
-              name: "Reema Ghurde",
+              quote: 'Impressive quality, durable and reliable.',
+              text: 'Lorem Ipsum many variations of passages of there are available but they have alteration in some form by injected humour or randomised.',
+              name: 'Reema Ghurde',
             },
           ].map((review, i) => (
             <div
@@ -463,8 +488,8 @@ function Home() {
         {/* Discount Banner */}
         <div className="bg-[#fdf9f3] border border-dashed border-red-400 text-center py-4 rounded-md mb-10">
           <p className="lg:text-lg text-sm">
-            Super discount for your{" "}
-            <span className="font-semibold text-red-500">first purchase.</span>{" "}
+            Super discount for your{' '}
+            <span className="font-semibold text-red-500">first purchase.</span>{' '}
             <span className="inline-block mx-2 px-3 py-1 border-2 border-dashed border-red-400 text-red-500 font-bold rounded">
               FREE15FIRST
             </span>

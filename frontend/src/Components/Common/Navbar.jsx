@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { useAuth } from "../../context/AuthContext";
 import { logout } from "../../store/slices/auth/authSlice";
 import AuthModal from "../Auth/AuthModal";
+import MobileSidebar from "./MobileSidebar";
 import {
   FiSearch,
   FiUser,
@@ -144,77 +145,8 @@ function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Full Page Menu */}
-        {open && (
-          <div
-            className={`fixed inset-0 bg-white z-50 flex flex-col p-6 transform transition-transform duration-700 ease-in-out ${
-              open ? "translate-x-0" : "-translate-x-full"
-            }`}
-          >
-            <div className="flex justify-between items-center mb-8">
-              <div className="text-xl font-bold">Menu</div>
-              <FiX
-                size={24}
-                className="cursor-pointer"
-                onClick={() => setOpen(false)}
-              />
-            </div>
-
-            <div className="flex flex-col space-y-6 text-lg">
-              {[
-                "Home",
-                "Men",
-                "Women",
-                "Kids",
-                "Sports&Lifestyle",
-                "Outlet",
-              ].map((item) => (
-                <a
-                  key={item}
-                  href="#"
-                  className="hover:text-red-500 transition"
-                >
-                  {item}
-                </a>
-              ))}
-            </div>
-
-            <div className="mt-auto pt-10 border-t">
-              {isAuthenticated ? (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-sm">
-                    <FiUser className="text-xl" />
-                    <span className="font-medium">{profile?.full_name}</span>
-                  </div>
-                  <button
-                    onClick={() => {
-                      dispatch(logout());
-                      setOpen(false);
-                    }}
-                    className="flex items-center gap-2 text-red-500 hover:text-red-600 transition"
-                  >
-                    <FiLogOut className="text-xl" />
-                    <span>Logout</span>
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-6">
-                  <button
-                    onClick={() => {
-                      setAuthMode("login");
-                      setAuthOpen(true);
-                      setOpen(false);
-                    }}
-                  >
-                    <FiUser className="text-2xl hover:text-red-500" />
-                  </button>
-                  <FiHeart className="text-2xl cursor-pointer hover:text-red-500" />
-                  <FiShoppingCart className="text-2xl cursor-pointer hover:text-red-500" />
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+        {/* Mobile Sidebar */}
+        <MobileSidebar isOpen={open} onClose={() => setOpen(false)} />
 
         {/* Mobile Full Page Search */}
         {showSearch && (

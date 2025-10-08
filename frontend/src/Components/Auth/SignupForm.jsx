@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { signUp, clearError } from '../../store/slices/auth/authSlice';
 
 export default function SignupForm({ onSwitchToLogin, onSwitchToOTP }) {
@@ -11,11 +12,16 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP }) {
     email: '',
     password: '',
     confirmPassword: '',
+    agreeToTerms: false,
   });
   const [validationError, setValidationError] = useState('');
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === 'checkbox' ? checked : value
+    });
     setValidationError('');
     if (error) dispatch(clearError());
   };
@@ -23,6 +29,11 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setValidationError('');
+
+    if (!formData.agreeToTerms) {
+      setValidationError('You must agree to the Terms of Use and Privacy Policy');
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       setValidationError('Passwords do not match');
@@ -78,10 +89,10 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP }) {
           className="border border-gray-300 rounded-lg p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
         >
           <option value="">Select Gender</option>
-          <option value="M">Male</option>
-          <option value="F">Female</option>
-          <option value="O">Other</option>
-          <option value="N">Prefer not to say</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+          <option value="Prefer not to say">Prefer not to say</option>
         </select>
 
         <input
@@ -114,6 +125,29 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP }) {
           className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
         />
 
+        <div className="flex items-start gap-2 text-sm">
+          <input
+            type="checkbox"
+            id="agreeToTerms"
+            name="agreeToTerms"
+            checked={formData.agreeToTerms}
+            onChange={handleChange}
+            required
+            className="mt-1 w-4 h-4 text-red-500 focus:ring-red-500 border-gray-300 rounded"
+          />
+          <label htmlFor="agreeToTerms" className="text-gray-600">
+            By continuing, I agree to the{' '}
+            <Link to="/terms" className="text-red-500 hover:underline font-medium">
+              Terms of Use
+            </Link>
+            {' '}&{' '}
+            <Link to="/privacy" className="text-red-500 hover:underline font-medium">
+              Privacy Policy
+            </Link>
+            {' '}and I am above 18 years old.
+          </label>
+        </div>
+
         <button
           type="submit"
           disabled={loading}
@@ -131,6 +165,13 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP }) {
         >
           Login
         </button>
+      </p>
+
+      <p className="text-center text-sm text-gray-600 mt-3">
+        Have trouble logging in?{' '}
+        <Link to="/contact" className="text-red-500 hover:underline font-semibold">
+          Get help
+        </Link>
       </p>
     </>
   );
