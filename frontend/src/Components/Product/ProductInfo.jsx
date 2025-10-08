@@ -87,7 +87,7 @@ const ProductInfo = () => {
   ];
 
   return (
-    <div className="pt-24 bg-[#F4EFE7] text-gray-900">
+    <div className="pt-24 bg-gradient-to-b from-gray-200 to-white text-gray-900">
       {/* Product Section */}
       <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 py-10">
         {/* Left: Image Gallery */}

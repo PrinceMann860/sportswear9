@@ -9,6 +9,7 @@ import ProductInfo from "./Components/Product/ProductInfo";
 import PrivacyPolicy from "./Components/Pages/PrivacyPolicy";
 import TermsOfUse from "./Components/Pages/TermsOfUse";
 import ContactUs from "./Components/Pages/ContactUs";
+import ScrollToTop from "./Components/fix/ScrollToTop";
 
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
       path: "/",
       element:
         <>
+          <ScrollToTop />
           <Navbar />
           <Outlet />
           <Footer />

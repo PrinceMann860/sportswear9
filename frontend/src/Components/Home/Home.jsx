@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ProductCard } from '../Product/Product';
-import CategoryCarousel from './CategoryCarousel';
-import PromoCarousel from './PromoCarousel';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { ProductCard } from "../Product/Product";
+import CategoryCarousel from "./CategoryCarousel";
+import PromoCarousel from "./PromoCarousel";
 
 // Assets
 import banner1 from "../../assets/homebanner.png";
@@ -15,34 +15,28 @@ import running from "../../assets/running.png";
 import compression from "../../assets/compression.png";
 import gloves from "../../assets/gloves.png";
 import banner from "../../assets/productbanner.png";
-import bigbanner from "../../assets/Bigbanner.png"
+import bigbanner from "../../assets/Bigbanner.png";
+import logo1 from "../../assets/1.svg";
+import logo2 from "../../assets/2.svg";
+import logo3 from "../../assets/3.svg";
+import logo4 from "../../assets/4.svg";
+import logo5 from "../../assets/5.svg";
+import logo6 from "../../assets/6.svg";
+import logo7 from "../../assets/7.svg";
+import logo8 from "../../assets/8.svg";
+import logo9 from "../../assets/9.svg";
 
 // Categories
 const categories = [
-  {
-    img: "https://letsdressup.in/cdn/shop/articles/5-must-have-winter-wear-for-women_1100x.jpg?v=1654519311",
-    title: "Women Clothes",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80",
-    title: "Bridal Watch",
-  },
-  {
-    img: "https://thesparkshop.in/wp-content/uploads/2022/10/2018-New-Fashion-Casual-Men-Shirt-Long-Sleeve-Europe-Style-Slim-Fit-Shirt-Men-High-Quality__90065.1537167939.jpg",
-    title: "Men Clothes",
-  },
-  {
-    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfvpJCXiWAGqOjNifs11AV3f0yhFDbsnBryw&s",
-    title: "Sneakers",
-  },
-  {
-    img: "https://sunglassic.com/cdn/shop/files/IMG_6269.jpg?v=1699335144&width=2000",
-    title: "Sunglasses",
-  },
-  {
-    img: "https://images.jdmagicbox.com/quickquotes/images_main/fashi-tech-women-s-stylish-hand-bag-2187874925-7iox8oxq.jpg",
-    title: "Stylish Bag",
-  },
+  logo1,
+  logo2,
+  logo3,
+  logo4,
+  logo5,
+  logo6,
+  logo7,
+  logo8,
+  logo9,
 ];
 
 // Products (example placeholders)
@@ -269,9 +263,9 @@ const festiveDeals = [
 ];
 
 function Home() {
-  const [activeCategory, setActiveCategory] = useState('men');
+  const [activeCategory, setActiveCategory] = useState("men");
   const currentProducts =
-    activeCategory === 'men' ? menProducts : womenProducts;
+    activeCategory === "men" ? menProducts : womenProducts;
 
   return (
     <main className="w-full bg-white pb-20 md:pb-0">
@@ -284,19 +278,11 @@ function Home() {
         />
       </div>
 
-
-      {/* Promo Carousel - Mobile */}
-      <div className="">
-        <PromoCarousel />
-      </div>
-
-      
-      {/* Category Carousel - Mobile */}
-      <CategoryCarousel />
-
       {/* Festive Deals */}
       <section className="mt-5 p-5 max-w-7xl mx-auto">
-        <h2 className="text-center text-2xl font-bold">TOP FESTIVE DEALS</h2>
+        <h2 className="text-center text-3xl font-bold">
+          Curated Deals for Every Mood
+        </h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
           {festiveDeals.map((deal, i) => (
             <div
@@ -317,38 +303,41 @@ function Home() {
       </section>
 
       {/* Categories */}
-      <section className="mt-12 px-6 max-w-7xl mx-auto">
+      <section className="mt-12 lg:max-w-7xl px-6 mx-auto">
         <h2 className="font-semibold text-3xl md:text-4xl text-center">
-          Best For Your Categories
+          Trusted by Iconic Brands
         </h2>
         <p className="text-center text-gray-500 mt-2">
-          Mauris quis nisi elit curabitur sodales libero ac interdum finibus.
+          Discover collections from globally loved athletic and lifestyle
+          brands.
         </p>
-        <div className="my-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
+        <div className="my-8 grid grid-cols-4 md:grid-cols-6 xl:grid-cols-9 gap-6">
           {categories.map((cat, i) => (
             <div
               key={i}
               className="flex flex-col items-center text-center hover:scale-105 transition"
             >
-              <div className="w-28 h-28 sm:w-40 sm:h-40 rounded-full overflow-hidden">
+              <div className="w-20 h-20 sm:w-30 sm:h-30 rounded-full overflow-hidden border">
                 <img
-                  src={cat.img}
-                  alt={cat.title}
-                  className="w-full h-full object-cover"
+                  src={cat}
+                  className="w-full h-full object-cover object-center"
                 />
               </div>
-              <p className="mt-3 font-semibold">{cat.title}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Sports */}
-      <section className="px-6 max-w-7xl mx-auto text-center">
+      <section className="lg:px-6 mx-auto text-center lg:max-w-7xl">
         <h2 className="font-semibold text-xl md:text-4xl">
-          SELECT YOUR SPORT, FIND YOUR GEAR, AND GET IN THE GAME!
+          Your Passion. Your Performance.
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-3">
+        <p className="text-gray-500 mt-2">
+          Whether it’s yoga, running, or training — find gear that moves with
+          you.
+        </p>
+        <div className="grid grid-cols-2 gap-2 p-3">
           {[yoga, running, compression, gloves].map((img, i) => (
             <img
               key={i}
@@ -361,76 +350,84 @@ function Home() {
       </section>
 
       {/* Product Section */}
-      <section className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex items-center gap-2 mb-6">
-          <span className="bg-black text-white px-3 py-1 text-xs rounded">
-            FLAT 60% OFF
-          </span>
-          <span className="bg-gray-100 text-black px-3 py-1 text-xs rounded font-medium">
-            BEST SELLERS ⚡
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-
-        {/* Trending */}
-        <div className="flex justify-between mt-10 items-center">
-          <h2 className="font-bold text-xl lg:text-2xl underline underline-offset-4 decoration-4">
-            TRENDING PRODUCTS
-          </h2>
-          <Link
-            to="#"
-            className="text-sm font-bold underline decoration-2 underline-offset-4"
-          >
-            Shop now
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 py-6">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-
-        <img
-          src={banner}
-          alt="Promo Banner"
-          className="w-full h-auto hover:scale-102 transition"
-        />
-
-        {/* Toggle Buttons */}
-        <div className="py-10">
-          <div className="flex gap-4 mb-8">
-            {['men', 'women'].map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-6 py-2 rounded-full font-semibold ${
-                  activeCategory === cat
-                    ? 'bg-black text-white'
-                    : 'bg-gray-200 text-black'
-                }`}
-              >
-                {cat.toUpperCase()}
-              </button>
-            ))}
+      <section className="py-8">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="bg-black text-white px-3 py-1 text-xs rounded">
+              FLAT 60% OFF
+            </span>
+            <span className="bg-gray-100 text-black px-3 py-1 text-xs rounded font-medium">
+              BEST SELLERS ⚡
+            </span>
           </div>
 
-          {/* Category Products */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {currentProducts.map((product) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>
-        <Link to={'#'} className="flex justify-center">
-          <button className="px-4 py-2 bg-black text-white font-semibold text-xl hover:shadow-lg">
-            View All
-          </button>
-        </Link>
+
+        {/* Promo Carousel - Mobile */}
+        <div className="w-[100vw] pt-10">
+          <PromoCarousel />
+        </div>
+        <div className="max-w-7xl mx-auto px-4">
+          {/* Trending */}
+          <div className="flex justify-between mt-10 items-center">
+            <h2 className="font-bold text-xl lg:text-2xl underline underline-offset-4 decoration-4">
+              TRENDING PRODUCTS
+            </h2>
+            <Link
+              to="#"
+              className="text-sm font-bold underline decoration-2 underline-offset-4"
+            >
+              Shop now
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 py-6">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+
+          <img
+            src={banner}
+            alt="Promo Banner"
+            className="w-full h-auto hover:scale-102 transition"
+          />
+
+          {/* Toggle Buttons */}
+          <div className="py-10">
+            <div className="flex gap-4 mb-8">
+              {["men", "women"].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`px-6 py-2 rounded-full font-semibold ${
+                    activeCategory === cat
+                      ? "bg-black text-white"
+                      : "bg-gray-200 text-black"
+                  }`}
+                >
+                  {cat.toUpperCase()}
+                </button>
+              ))}
+            </div>
+
+            {/* Category Products */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {currentProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </div>
+          <Link to={"#"} className="flex justify-center">
+            <button className="px-4 py-2 bg-black text-white font-semibold text-xl hover:shadow-lg">
+              View All
+            </button>
+          </Link>
+        </div>
       </section>
       {/* big banner */}
       <div className="max-w-7xl mx-auto hover:scale-110 lg:mt-10 transition cursor-pointer p-5 lg:p-0">
@@ -439,28 +436,28 @@ function Home() {
       {/* Customer Reviews */}
       <section className="max-w-7xl mx-auto px-6 py-12">
         <h2 className="text-3xl md:text-4xl font-semibold text-center">
-          Customer Review
+          Hear from Our Community
         </h2>
         <p className="text-center text-gray-500 mt-2 mb-10">
-          Mauris quis nisi elit curabitur sodales libero ac interdum finibus.
+          Real people. Real stories. Designed to move with your life.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
-              quote: 'Reliable product, consistently delivers.',
-              text: 'Generation many variations of passages of even blievable lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-              name: 'Stefanie Rashford',
+              quote: "Reliable product, consistently delivers.",
+              text: "Beautifully made and incredibly soft. My go-to for yoga and travel days.",
+              name: "Anaya Verma",
             },
             {
-              quote: 'Excellent product, A+ customer service.',
-              text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry lorem Ipsum has been the industry's standard dummy text ever since.",
-              name: 'Augusta Wind',
+              quote: "Excellent product, A+ customer service.",
+              text: "These leggings are perfection - supportive, breathable, and stylish.",
+              name: "Ritika Joshi",
             },
             {
-              quote: 'Impressive quality, durable and reliable.',
-              text: 'Lorem Ipsum many variations of passages of there are available but they have alteration in some form by injected humour or randomised.',
-              name: 'Reema Ghurde',
+              quote: "Impressive quality, durable and reliable.",
+              text: "I wear their tees everywhere - gym, coffee runs, even brunch.",
+              name: "Reema Ghurde",
             },
           ].map((review, i) => (
             <div
@@ -488,8 +485,8 @@ function Home() {
         {/* Discount Banner */}
         <div className="bg-[#fdf9f3] border border-dashed border-red-400 text-center py-4 rounded-md mb-10">
           <p className="lg:text-lg text-sm">
-            Super discount for your{' '}
-            <span className="font-semibold text-red-500">first purchase.</span>{' '}
+            Super discount for your{" "}
+            <span className="font-semibold text-red-500">first purchase.</span>{" "}
             <span className="inline-block mx-2 px-3 py-1 border-2 border-dashed border-red-400 text-red-500 font-bold rounded">
               FREE15FIRST
             </span>

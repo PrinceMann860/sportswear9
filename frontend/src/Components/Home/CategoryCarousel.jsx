@@ -1,5 +1,5 @@
-import HorizontalScrollCarousel from '../Common/HorizontalScrollCarousel';
-import SkeletonLoader from '../Common/SkeletonLoader';
+import HorizontalScrollCarousel from '../Banner&Carousels/HorizontalScrollCarousel';
+import SkeletonLoader from './SkeletonLoader';
 
 const CategoryCarousel = ({ loading }) => {
   const categoryItems = [

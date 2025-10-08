@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { X, ChevronRight, User, Heart, ShoppingBag, Gift, HelpCircle, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import ad1 from '../../assets/ad1.png'
+import ad2 from '../../assets/ad2.png'
 
 const MobileSidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -44,12 +47,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
   ];
 
   const menuItems = [
-    { icon: User, label: 'My Profile', path: '/profile' },
-    { icon: ShoppingBag, label: 'Orders', path: '/orders' },
-    { icon: Heart, label: 'Wishlist', path: '/wishlist' },
-    { icon: Gift, label: 'Gift Cards', path: '/gift-cards' },
     { icon: HelpCircle, label: 'Help Center', path: '/help' },
-    { icon: Settings, label: 'Settings', path: '/settings' }
   ];
 
   const handleNavigation = (path) => {
@@ -149,21 +147,21 @@ const MobileSidebar = ({ isOpen, onClose }) => {
             </div>
 
             <div className="py-2 border-t border-gray-200">
-              {menuItems.map((item) => {
-                const Icon = item.icon;
-                return (
                   <button
-                    key={item.label}
-                    onClick={() => handleNavigation(item.path)}
+                    key={'Help Center'}
+                    onClick={() => handleNavigation('/contact')}
                     className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors"
                   >
-                    <Icon className="w-5 h-5 text-gray-600" />
-                    <span className="text-gray-900">{item.label}</span>
+                    <HelpCircle className="w-5 h-5 text-gray-600" />
+                    <span className="text-gray-900">Help Center</span>
                   </button>
-                );
-              })}
+            </div>
+            <div className='flex flex-col gap-4 '>
+              <Link><img src={ad2} alt="" className='w-full h-40 cursor-pointer'/></Link>
+              <Link><img src={ad1} alt="" className='w-full h-40 cursor-pointer'/></Link>
             </div>
           </div>
+
 
           {user && (
             <div className="p-4 border-t border-gray-200">

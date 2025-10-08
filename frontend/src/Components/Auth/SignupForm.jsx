@@ -1,49 +1,36 @@
-import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { signUp, clearError } from '../../store/slices/auth/authSlice';
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { signUp, clearError, googleLogin } from "../../store/slices/auth/authSlice";
+import { GoogleLogin } from "@react-oauth/google";
 
-export default function SignupForm({ onSwitchToLogin, onSwitchToOTP }) {
+export default function SignupForm({ onSwitchToLogin, onSwitchToOTP, onClose }) {
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.auth);
   const [formData, setFormData] = useState({
-    fullName: '',
-    gender: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    fullName: "",
+    gender: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
     agreeToTerms: false,
   });
-  const [validationError, setValidationError] = useState('');
+  const [validationError, setValidationError] = useState("");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    });
-    setValidationError('');
+    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
+    setValidationError("");
     if (error) dispatch(clearError());
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setValidationError('');
-
-    if (!formData.agreeToTerms) {
-      setValidationError('You must agree to the Terms of Use and Privacy Policy');
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setValidationError('Passwords do not match');
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setValidationError('Password must be at least 6 characters');
-      return;
-    }
+    if (!formData.agreeToTerms) return setValidationError("Please agree to the Terms & Policy");
+    if (formData.password !== formData.confirmPassword)
+      return setValidationError("Passwords do not match");
+    if (formData.password.length < 6)
+      return setValidationError("Password must be at least 6 characters");
 
     const result = await dispatch(
       signUp({
@@ -51,26 +38,22 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP }) {
         gender: formData.gender,
         email: formData.email,
         password: formData.password,
-        confirmPassword: formData.confirmPassword,
       })
     );
-
-    if (!result.error) {
-      onSwitchToOTP();
-    }
+    if (!result.error) onSwitchToOTP();
   };
 
   return (
-    <>
-      <h3 className="text-xl sm:text-2xl font-bold text-center mb-6">Sign Up</h3>
+    <div className="w-full max-w-sm sm:max-w-md mx-auto px-3 py-4 overflow-y-auto max-h-[80vh]">
+      <h3 className="text-lg sm:text-2xl font-bold text-center mb-4">Create Account ✨</h3>
 
       {(error || validationError) && (
-        <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">
+        <div className="bg-red-50 text-red-600 p-2 rounded-lg mb-3 text-xs sm:text-sm text-center">
           {validationError || error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <input
           type="text"
           name="fullName"
@@ -78,7 +61,7 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP }) {
           value={formData.fullName}
           onChange={handleChange}
           required
-          className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500 focus:shadow-md transition"
         />
 
         <select
@@ -86,13 +69,12 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP }) {
           value={formData.gender}
           onChange={handleChange}
           required
-          className="border border-gray-300 rounded-lg p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500 transition"
         >
           <option value="">Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Other">Other</option>
-          <option value="Prefer not to say">Prefer not to say</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
         </select>
 
         <input
@@ -102,7 +84,7 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP }) {
           value={formData.email}
           onChange={handleChange}
           required
-          className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500 transition"
         />
 
         <input
@@ -112,7 +94,7 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP }) {
           value={formData.password}
           onChange={handleChange}
           required
-          className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500 transition"
         />
 
         <input
@@ -122,43 +104,58 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP }) {
           value={formData.confirmPassword}
           onChange={handleChange}
           required
-          className="border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500 transition"
         />
 
-        <div className="flex items-start gap-2 text-sm">
+        <label className="flex items-start gap-2 text-xs sm:text-sm">
           <input
             type="checkbox"
-            id="agreeToTerms"
             name="agreeToTerms"
             checked={formData.agreeToTerms}
             onChange={handleChange}
-            required
-            className="mt-1 w-4 h-4 text-red-500 focus:ring-red-500 border-gray-300 rounded"
+            className="mt-0.5 w-4 h-4 text-red-500 focus:ring-red-500 border-gray-300 rounded"
           />
-          <label htmlFor="agreeToTerms" className="text-gray-600">
-            By continuing, I agree to the{' '}
-            <Link to="/terms" className="text-red-500 hover:underline font-medium">
-              Terms of Use
+          <span className="text-gray-600 leading-snug">
+            By continuing, I agree to the{" "}
+            <Link to="/terms" className="text-red-500 hover:underline">
+              Terms
+            </Link>{" "}
+            &{" "}
+            <Link to="/privacy" className="text-red-500 hover:underline">
+              Policy
             </Link>
-            {' '}&{' '}
-            <Link to="/privacy" className="text-red-500 hover:underline font-medium">
-              Privacy Policy
-            </Link>
-            {' '}and I am above 18 years old.
-          </label>
-        </div>
+            .
+          </span>
+        </label>
 
         <button
           type="submit"
           disabled={loading}
-          className="bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+          className="bg-black text-white py-2.5 rounded-lg hover:bg-gray-800 transition font-semibold text-sm sm:text-base disabled:opacity-50"
         >
-          {loading ? 'Creating Account...' : 'Continue'}
+          {loading ? "Creating Account..." : "Continue"}
         </button>
       </form>
 
-      <p className="text-center text-sm text-gray-600 mt-4">
-        Already have an account?{' '}
+      <div className="flex items-center gap-3 my-3">
+        <div className="flex-1 h-px bg-gray-300"></div>
+        <span className="text-xs text-gray-500">or</span>
+        <div className="flex-1 h-px bg-gray-300"></div>
+      </div>
+
+      <div className="w-full flex justify-center">
+        <GoogleLogin
+          onSuccess={(res) => dispatch(googleLogin({ accessToken: res.credential }))}
+          onError={() => dispatch(clearError())}
+          theme="outline"
+          size="medium"
+          text="continue_with"
+          width="100%"
+        />
+      </div>
+
+      <p className="text-center text-xs sm:text-sm text-gray-600 mt-3">
+        Already have an account?{" "}
         <button
           onClick={onSwitchToLogin}
           className="text-red-500 hover:underline font-semibold"
@@ -166,13 +163,6 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP }) {
           Login
         </button>
       </p>
-
-      <p className="text-center text-sm text-gray-600 mt-3">
-        Have trouble logging in?{' '}
-        <Link to="/contact" className="text-red-500 hover:underline font-semibold">
-          Get help
-        </Link>
-      </p>
-    </>
+    </div>
   );
 }

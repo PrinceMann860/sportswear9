@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useAuth } from "../../context/AuthContext";
 import { logout } from "../../store/slices/auth/authSlice";
@@ -14,6 +14,7 @@ import {
   FiX,
   FiLogOut,
 } from "react-icons/fi";
+import { ShoppingBag } from "lucide-react";
 
 function Navbar() {
   const dispatch = useDispatch();
@@ -48,6 +49,9 @@ function Navbar() {
         <div className="px-6 lg:px-10 mx-auto flex items-center justify-between py-3 lg:py-4 h-[60px]">
           {/* Logo + Links */}
           <div className="flex items-center gap-8">
+             <button onClick={() => setOpen(true)} className="lg:hidden">
+              <FiMenu size={22} />
+            </button>
             <div className="text-xl font-bold tracking-tighter">
               SPORTSWEAR<span className="text-red-500">9</span>
             </div>
@@ -139,9 +143,8 @@ function Navbar() {
               className="cursor-pointer"
               onClick={() => setShowSearch(true)}
             />
-            <button onClick={() => setOpen(true)}>
-              <FiMenu size={22} />
-            </button>
+            <Link><ShoppingBag className="cursor-pointer" size={20}/></Link>
+           
           </div>
         </div>
 

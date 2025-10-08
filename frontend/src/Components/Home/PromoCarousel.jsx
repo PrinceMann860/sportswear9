@@ -1,5 +1,5 @@
-import FullWidthBanner from '../Common/FullWidthBanner';
-import SkeletonLoader from '../Common/SkeletonLoader';
+import FullWidthBanner from '../Banner&Carousels/FullWidthBanner';
+import SkeletonLoader from './SkeletonLoader';
 
 const PromoCarousel = ({ loading }) => {
   const promoBanners = [
