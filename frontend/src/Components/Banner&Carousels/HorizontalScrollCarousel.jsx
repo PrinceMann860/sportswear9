@@ -1,71 +1,49 @@
-import { useRef, useState } from 'react';
+import React, { useState } from "react";
 
-const HorizontalScrollCarousel = ({ items, itemWidth = 91, itemHeight = 182, gap = 12 }) => {
-  const scrollContainerRef = useRef(null);
-  const [scrollPosition, setScrollPosition] = useState(0);
-
-  const handleScroll = () => {
-    if (scrollContainerRef.current) {
-      const scrollLeft = scrollContainerRef.current.scrollLeft;
-      const maxScroll = scrollContainerRef.current.scrollWidth - scrollContainerRef.current.clientWidth;
-      const scrollPercentage = (scrollLeft / maxScroll) * 100;
-      setScrollPosition(scrollPercentage);
-    }
-  };
+const HorizontalScrollCarousel = ({ items = [] }) => {
+  const [paused, setPaused] = useState(false);
+  const loopedItems = [...items, ...items]; // duplicate for smooth infinite effect
 
   return (
-    <div className="relative w-full">
+    <div
+      className="relative w-full overflow-hidden"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
       <div
-        ref={scrollContainerRef}
-        onScroll={handleScroll}
-        className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+        className="flex w-max whitespace-nowrap"
         style={{
-          scrollBehavior: 'smooth',
-          WebkitOverflowScrolling: 'touch'
+          animation: `scroll 20s linear infinite`,
+          animationPlayState: paused ? "paused" : "running",
         }}
       >
-        <div className="flex gap-3 px-4">
-          {items.map((item, index) => (
-            <div
-              key={item.id || index}
-              className="flex-shrink-0 snap-start rounded-xl overflow-hidden cursor-pointer transition-transform active:scale-95"
-              style={{
-                width: `${itemWidth}px`,
-                height: `${itemHeight}px`
-              }}
-            >
-              <div
-                className="w-full h-full relative"
-                style={{ backgroundColor: item.bgColor || '#f5f5f5' }}
-              >
-                <picture className="w-full h-full">
-                  <source type="image/webp" srcSet={item.imageWebp || item.image} />
-                  <img
-                    src={item.image}
-                    alt={item.alt || ''}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                    draggable="false"
-                  />
-                </picture>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex justify-center items-center mt-3 gap-1">
-        {Array.from({ length: Math.ceil(items.length / 3) }).map((_, index) => (
+        {loopedItems.map((item, i) => (
           <div
-            key={index}
-            className={`h-1 rounded-full transition-all duration-300 ${
-              scrollPosition >= (index * 33.33) && scrollPosition < ((index + 1) * 33.33)
-                ? 'w-4 bg-blue-400'
-                : 'w-1 bg-gray-300'
-            }`}
-          />
+            key={i}
+            className="flex flex-col items-center text-center flex-shrink-0 w-[160px] lg:w-[220px] mx-3"
+          >
+            <div className="w-full h-[220px] lg:h-[300px] rounded-lg overflow-hidden shadow-md hover:shadow-lg transition">
+              <img
+                src={item.image || item.img}
+                alt={item.title || ""}
+                className="w-full h-full object-cover"
+                draggable="false"
+              />
+            </div>
+            <p className="mt-3 text-sm lg:text-base text-black font-bold underline decoration-2">
+              {item.title}
+            </p>
+          </div>
         ))}
       </div>
+
+      {/* Inline keyframes for scroll animation */}
+      <style>{`
+        @keyframes scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+      `}</style>
     </div>
   );
 };

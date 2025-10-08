@@ -25,6 +25,7 @@ import logo6 from "../../assets/6.svg";
 import logo7 from "../../assets/7.svg";
 import logo8 from "../../assets/8.svg";
 import logo9 from "../../assets/9.svg";
+import HorizontalScrollCarousel from "../Banner&Carousels/HorizontalScrollCarousel";
 
 // Categories
 const categories = [
@@ -241,22 +242,50 @@ const womenProducts = [
 // Deals
 const festiveDeals = [
   {
-    img: footwear,
+    id: 1,
+    image: footwear,
     title: "SHOES UNDER ₹3999",
     subtitle: "Epic Shoe Deals for Men & Women",
   },
-  {
-    img: tshirts,
+  { 
+    id: 2,
+    image: tshirts,
     title: "T-SHIRTS UNDER ₹999",
     subtitle: "Unbeatable Tees Under 999",
   },
   {
-    img: tops,
+    id: 3,
+    image: tops,
     title: "TOPS STARTING ₹799",
     subtitle: "Wardrobe Refresh. Tops from 799",
   },
+  { 
+    id: 4,
+    image: jacket,
+    title: "JACKETS STARTING ₹1599",
+    subtitle: "Seasonal Must-Haves from 1599",
+  },
   {
-    img: jacket,
+    id: 5,
+    image: footwear,
+    title: "SHOES UNDER ₹3999",
+    subtitle: "Epic Shoe Deals for Men & Women",
+  },
+  { 
+    id: 6,
+    image: tshirts,
+    title: "T-SHIRTS UNDER ₹999",
+    subtitle: "Unbeatable Tees Under 999",
+  },
+  {
+    id: 7,
+    image: tops,
+    title: "TOPS STARTING ₹799",
+    subtitle: "Wardrobe Refresh. Tops from 799",
+  },
+  { 
+    id: 8,
+    image: jacket,
     title: "JACKETS STARTING ₹1599",
     subtitle: "Seasonal Must-Haves from 1599",
   },
@@ -283,22 +312,8 @@ function Home() {
         <h2 className="text-center text-3xl font-bold">
           Curated Deals for Every Mood
         </h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-          {festiveDeals.map((deal, i) => (
-            <div
-              key={i}
-              className="flex flex-col items-center text-center transition"
-            >
-              <img
-                src={deal.img}
-                alt={deal.title}
-                className="w-full h-auto rounded-md hover:shadow-md "
-              />
-              <p className="mt-1 text-xs sm:text-sm lg:text-lg font-extrabold lg:underline decoration-4 underline-offset-4">
-                {deal.subtitle}
-              </p>
-            </div>
-          ))}
+        <div className="mt-10">
+          <HorizontalScrollCarousel items={festiveDeals} speed={0.4} />
         </div>
       </section>
 
@@ -343,7 +358,7 @@ function Home() {
               key={i}
               src={img}
               alt="sport"
-              className="mb-2 hover:scale-102 transition hover:shadow-lg"
+              className="mb-1 hover:scale-102 transition hover:shadow-lg"
             />
           ))}
         </div>
@@ -430,7 +445,7 @@ function Home() {
         </div>
       </section>
       {/* big banner */}
-      <div className="max-w-7xl mx-auto hover:scale-110 lg:mt-10 transition cursor-pointer p-5 lg:p-0">
+      <div className="max-w-7xl mx-auto hover:shadow-lg lg:mt-10 transition cursor-pointer p-5 lg:p-0">
         <img src={bigbanner} alt="" />
       </div>
       {/* Customer Reviews */}

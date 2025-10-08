@@ -117,13 +117,13 @@ const FullWidthBanner = ({ banners }) => {
         <>
           <button
             onClick={prevSlide}
-            className="hidden group-hover:flex items-center justify-center absolute top-1/2 left-6 -translate-y-1/2  text-white rounded-full bg-black/30 p-2 transition-opacity"
+            className="hidden lg:group-hover:flex items-center justify-center absolute top-1/2 left-6 -translate-y-1/2  text-white rounded-full bg-black/30 p-2 transition-opacity"
           >
             <ChevronLeft size={40} />
           </button>
           <button
             onClick={nextSlide}
-            className="hidden group-hover:flex items-center justify-center absolute top-1/2 right-6 -translate-y-1/2 text-white rounded-full bg-black/30 p-2 transition-opacity"
+            className="hidden lg:group-hover:flex items-center justify-center absolute top-1/2 right-6 -translate-y-1/2 text-white rounded-full bg-black/30 p-2 transition-opacity"
           >
             <ChevronRight size={40} />
           </button>
