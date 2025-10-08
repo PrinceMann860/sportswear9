@@ -69,7 +69,7 @@ const FullWidthBanner = ({ banners }) => {
         {banners.map((banner, index) => (
           <div
             key={banner.id || index}
-            className="flex-shrink-0 w-full snap-start cursor-pointer"
+            className="flex-shrink-0 w-full snap-start cursor-pointer border border-gray-200 shadow-md"
           >
             <div
               className="w-full relative overflow-hidden"

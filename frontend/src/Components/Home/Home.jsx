@@ -287,12 +287,12 @@ function Home() {
           {festiveDeals.map((deal, i) => (
             <div
               key={i}
-              className="flex flex-col items-center text-center hover:-translate-y-2 transition"
+              className="flex flex-col items-center text-center transition"
             >
               <img
                 src={deal.img}
                 alt={deal.title}
-                className="w-full h-auto rounded-md"
+                className="w-full h-auto rounded-md hover:shadow-md "
               />
               <p className="mt-1 text-xs sm:text-sm lg:text-lg font-extrabold lg:underline decoration-4 underline-offset-4">
                 {deal.subtitle}
