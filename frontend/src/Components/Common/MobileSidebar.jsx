@@ -157,8 +157,8 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                   </button>
             </div>
             <div className='flex flex-col gap-4 '>
-              <Link><img src={ad2} alt="" className='w-full h-40 cursor-pointer'/></Link>
-              <Link><img src={ad1} alt="" className='w-full h-40 cursor-pointer'/></Link>
+              <Link><img src={ad2} alt="" className='w-full h-27 cursor-pointer'/></Link>
+              {/* <Link><img src={ad1} alt="" className='w-full h-40 cursor-pointer'/></Link> */}
             </div>
           </div>
 
