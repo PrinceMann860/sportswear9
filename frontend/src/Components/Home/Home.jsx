@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ProductCard } from "../Product/Product";
 import CategoryCarousel from "./CategoryCarousel";
 import PromoCarousel from "./PromoCarousel";
+import LandscapeCarousel from '../Banner&Carousels/LandscapeCarousel';
 
 // Assets
 import banner1 from "../../assets/homebanner.png";
@@ -291,6 +292,27 @@ const festiveDeals = [
   },
 ];
 
+const landscapeBannerItems = [
+  {
+    id: 1,
+    image: 'https://media.wellmed.workers.dev/?file=JZMHCSZZOY3DETT2JZWDG4LQGC63Y&mode=inline',
+    title: 'Summer Sale',
+    subtitle: 'Up to 65% Off on Selected Items',
+  },
+  {
+    id: 2,
+    image: 'https://media.wellmed.workers.dev/?file=O5JHA4SFMZDHGY2NHBEGMS3PLDXCI&mode=inline',
+    title: 'New Arrivals',
+    subtitle: 'Discover the Latest Collection',
+  },
+  {
+    id: 3,
+    image: 'https://media.wellmed.workers.dev/?file=PFGWC22TNZSEM5LVG5JFCNTQK6M3K&mode=inline',
+    title: 'Performance Gear',
+    subtitle: 'Built for Athletes',
+  },
+];
+
 function Home() {
   const [activeCategory, setActiveCategory] = useState("men");
   const currentProducts =
@@ -299,13 +321,16 @@ function Home() {
   return (
     <main className="w-full bg-white pb-20 md:pb-0">
       {/* Banner */}
-      <div className="w-full lg:h-[80vh] md:h-[50vh] h-[30vh] pt-[60px] lg:pt-[80px]">
+      {/* <div className="w-full lg:h-[80vh] md:h-[50vh] h-[30vh] pt-[60px]">
         <img
           src={banner1}
           alt="Sale Banner"
           className="w-full h-full object-fill"
         />
-      </div>
+      </div> */}
+      <section className="w-full pt-[60px] px-0 md:px-4 lg:px-6 max-w-[1920px] mx-auto">
+        <LandscapeCarousel items={landscapeBannerItems} />
+      </section>
 
       {/* Festive Deals */}
       <section className="mt-5 p-5 max-w-7xl mx-auto">
