@@ -328,7 +328,7 @@ function Home() {
           className="w-full h-full object-fill"
         />
       </div> */}
-      <section className="w-full pt-[60px] px-0 md:px-4 lg:px-6 max-w-[1920px] mx-auto">
+      <section className="w-full pt-[100px] px-0 md:px-4 lg:px-6 max-w-[1920px] mx-auto">
         <LandscapeCarousel items={landscapeBannerItems} />
       </section>
 
