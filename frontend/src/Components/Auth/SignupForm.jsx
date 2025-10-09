@@ -32,10 +32,17 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP, onClose }) 
     if (formData.password.length < 6)
       return setValidationError("Password must be at least 6 characters");
 
+    const genderMap = {
+      Male: "m",
+      Female: "f",
+      Other: "o",
+      "Prefer not to say": "n",
+    };
+
     const result = await dispatch(
       signUp({
         fullName: formData.fullName,
-        gender: formData.gender,
+        gender: genderMap[formData.gender] || "",
         email: formData.email,
         password: formData.password,
       })
@@ -75,6 +82,7 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP, onClose }) 
           <option>Male</option>
           <option>Female</option>
           <option>Other</option>
+          <option>Prefer not to say</option>
         </select>
 
         <input
