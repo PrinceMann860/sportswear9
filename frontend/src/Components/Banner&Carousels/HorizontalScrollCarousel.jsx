@@ -13,7 +13,7 @@ const HorizontalScrollCarousel = ({ items = [] }) => {
       <div
         className="flex w-max whitespace-nowrap"
         style={{
-          animation: `scroll 20s linear infinite`,
+          animation: `scroll 30s linear infinite`,
           animationPlayState: paused ? "paused" : "running",
         }}
       >

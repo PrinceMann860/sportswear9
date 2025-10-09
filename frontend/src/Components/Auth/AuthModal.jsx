@@ -6,6 +6,7 @@ import OTPForm from "./OTPForm";
 import SetPasswordForm from "./SetPasswordForm";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 import ResetPasswordForm from "./ResetPasswordForm";
+import logo from "../../assets/blacklogo.svg"
 
 export default function AuthModal({ isOpen, onClose, mode = "login", setMode }) {
   const [currentPage, setCurrentPage] = useState(mode);
@@ -58,9 +59,7 @@ export default function AuthModal({ isOpen, onClose, mode = "login", setMode }) 
         </button>
 
         {/* Brand */}
-        <h2 className="text-lg sm:text-2xl font-bold text-center text-black mb-5">
-          SPORTSWEAR<span className="text-red-500">9</span>
-        </h2>
+        <img src={logo} alt="SPORTSWEAR9" className="w-40 mx-auto"/>
 
         {/* Form Switch Logic */}
         {currentPage === "login" && (
