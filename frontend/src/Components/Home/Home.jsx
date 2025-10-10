@@ -1,22 +1,22 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { ProductCard } from "../Product/Product";
-import CategoryCarousel from "./CategoryCarousel";
-import PromoCarousel from "./PromoCarousel";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ProductCard } from '../Product/Product';
+import CategoryCarousel from './CategoryCarousel';
+import PromoCarousel from './PromoCarousel';
 import LandscapeCarousel from '../Banner&Carousels/LandscapeCarousel';
-import HorizontalScrollCarousel from "../Banner&Carousels/HorizontalScrollCarousel";
+import HorizontalScrollCarousel from '../Banner&Carousels/HorizontalScrollCarousel';
+
+import logo1 from '../../assets/1.svg';
+import logo2 from '../../assets/2.svg';
+import logo3 from '../../assets/3.svg';
+import logo4 from '../../assets/4.svg';
+import logo5 from '../../assets/5.svg';
+import logo6 from '../../assets/6.svg';
+import logo7 from '../../assets/7.svg';
+import logo8 from '../../assets/8.svg';
+import logo9 from '../../assets/9.svg';
 
 // Assets
-import logo1 from "../../assets/1.svg";
-import logo2 from "../../assets/2.svg";
-import logo3 from "../../assets/3.svg";
-import logo4 from "../../assets/4.svg";
-import logo5 from "../../assets/5.svg";
-import logo6 from "../../assets/6.svg";
-import logo7 from "../../assets/7.svg";
-import logo8 from "../../assets/8.svg";
-import logo9 from "../../assets/9.svg";
-
 import banner1 from "../../assets/homebanner.png";
 import footwear from "../../assets/footwear.png";
 import jacket from "../../assets/jacket.png";
@@ -29,7 +29,7 @@ import gloves from "../../assets/gloves.png";
 import sportvid from "../../assets/sportvid.mp4";
 import sportbanner from "../../assets/sportbanner.mp4";
 
-
+// Categories
 const categories = [
   { logo: logo1, name: 'adidas', path: '/brand/adidas' },
   { logo: logo2, name: 'nike', path: '/brand/nike' },
@@ -46,198 +46,198 @@ const categories = [
 const products = [
   {
     id: 1,
-    img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-    price: "₹2,499.00",
-    original: "₹6,599.00",
-    discount: "-65%",
-    title: "Duramo 10 Shoes",
-    category: "Performance",
+    img: 'https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg',
+    price: '₹2,499.00',
+    original: '₹6,599.00',
+    discount: '-65%',
+    title: 'Duramo 10 Shoes',
+    category: 'Performance',
   },
   {
     id: 2,
-    img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-    price: "₹2,499.00",
-    original: "₹6,599.00",
-    discount: "-65%",
-    title: "Duramo 10 Shoes",
-    category: "Performance",
+    img: 'https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg',
+    price: '₹2,499.00',
+    original: '₹6,599.00',
+    discount: '-65%',
+    title: 'Duramo 10 Shoes',
+    category: 'Performance',
   },
   {
     id: 3,
-    img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-    price: "₹2,499.00",
-    original: "₹6,599.00",
-    discount: "-65%",
-    title: "Compression T-shirt",
-    category: "Performance",
+    img: 'https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg',
+    price: '₹2,499.00',
+    original: '₹6,599.00',
+    discount: '-65%',
+    title: 'Compression T-shirt',
+    category: 'Performance',
   },
   {
     id: 4,
-    img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-    price: "₹2,499.00",
-    original: "₹6,599.00",
-    discount: "-65%",
-    title: "Duramo 10 Shoes",
-    category: "Performance",
+    img: 'https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg',
+    price: '₹2,499.00',
+    original: '₹6,599.00',
+    discount: '-65%',
+    title: 'Duramo 10 Shoes',
+    category: 'Performance',
   },
   {
     id: 5,
-    img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-    price: "₹2,499.00",
-    original: "₹6,599.00",
-    discount: "-65%",
-    title: "Duramo 10 Shoes",
-    category: "Performance",
+    img: 'https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg',
+    price: '₹2,499.00',
+    original: '₹6,599.00',
+    discount: '-65%',
+    title: 'Duramo 10 Shoes',
+    category: 'Performance',
   },
 ];
 
 const menProducts = [
   {
     id: 1,
-    img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-    title: "Duramo 10 Shoes",
-    subtitle: "Performance",
+    img: 'https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg',
+    title: 'Duramo 10 Shoes',
+    subtitle: 'Performance',
     price: 2499,
     original: 6599,
-    discount: "-65%",
+    discount: '-65%',
   },
   {
     id: 2,
-    img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-    title: "Galaxy 6 Shoes",
-    category: "Performance",
+    img: 'https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg',
+    title: 'Galaxy 6 Shoes',
+    category: 'Performance',
     price: 2400,
     original: 5999,
-    discount: "-60%",
+    discount: '-60%',
   },
   {
     id: 3,
-    img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-    title: "Samba OG Shoes",
-    category: "Originals",
+    img: 'https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg',
+    title: 'Samba OG Shoes',
+    category: 'Originals',
     price: 4400,
     original: 10999,
-    discount: "-60%",
+    discount: '-60%',
   },
   {
     id: 4,
-    img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-    title: "Ultraboost 20 Shoes",
-    category: "Performance",
+    img: 'https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg',
+    title: 'Ultraboost 20 Shoes',
+    category: 'Performance',
     price: 7600,
     original: 18999,
-    discount: "-60%",
+    discount: '-60%',
   },
   {
     id: 5,
-    img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-    title: "Duramo 10 Shoes",
-    category: "Performance",
+    img: 'https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg',
+    title: 'Duramo 10 Shoes',
+    category: 'Performance',
     price: 2499,
     original: 6599,
-    discount: "-65%",
+    discount: '-65%',
   },
   {
     id: 6,
-    img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-    title: "Galaxy 6 Shoes",
-    category: "Performance",
+    img: 'https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg',
+    title: 'Galaxy 6 Shoes',
+    category: 'Performance',
     price: 2400,
     original: 5999,
-    discount: "-60%",
+    discount: '-60%',
   },
   {
     id: 7,
-    img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-    title: "Samba OG Shoes",
-    category: "Originals",
+    img: 'https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg',
+    title: 'Samba OG Shoes',
+    category: 'Originals',
     price: 4400,
     original: 10999,
-    discount: "-60%",
+    discount: '-60%',
   },
   {
     id: 8,
-    img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-    title: "Ultraboost 20 Shoes",
-    category: "Performance",
+    img: 'https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg',
+    title: 'Ultraboost 20 Shoes',
+    category: 'Performance',
     price: 7600,
     original: 18999,
-    discount: "-60%",
+    discount: '-60%',
   },
 ];
 
 const womenProducts = [
   {
     id: 1,
-    img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
-    title: "Running Top",
-    category: "Performance",
+    img: 'https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277',
+    title: 'Running Top',
+    category: 'Performance',
     price: 1499,
     original: 2999,
-    discount: "-50%",
+    discount: '-50%',
   },
   {
     id: 2,
-    img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
-    title: "Yoga Tee",
-    category: "Training",
+    img: 'https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277',
+    title: 'Yoga Tee',
+    category: 'Training',
     price: 1999,
     original: 3999,
-    discount: "-50%",
+    discount: '-50%',
   },
   {
     id: 3,
-    img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
-    title: "Winter Jacket",
-    category: "Originals",
+    img: 'https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277',
+    title: 'Winter Jacket',
+    category: 'Originals',
     price: 3499,
     original: 6999,
-    discount: "-50%",
+    discount: '-50%',
   },
   {
     id: 4,
-    img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
-    title: "Compression Top",
-    category: "Performance",
+    img: 'https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277',
+    title: 'Compression Top',
+    category: 'Performance',
     price: 2299,
     original: 4599,
-    discount: "-50%",
+    discount: '-50%',
   },
   {
     id: 5,
-    img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
-    title: "Running Top",
-    category: "Performance",
+    img: 'https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277',
+    title: 'Running Top',
+    category: 'Performance',
     price: 1499,
     original: 2999,
-    discount: "-50%",
+    discount: '-50%',
   },
   {
     id: 6,
-    img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
-    title: "Yoga Tee",
-    category: "Training",
+    img: 'https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277',
+    title: 'Yoga Tee',
+    category: 'Training',
     price: 1999,
     original: 3999,
-    discount: "-50%",
+    discount: '-50%',
   },
   {
     id: 7,
-    img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
-    title: "Winter Jacket",
-    category: "Originals",
+    img: 'https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277',
+    title: 'Winter Jacket',
+    category: 'Originals',
     price: 3499,
     original: 6999,
-    discount: "-50%",
+    discount: '-50%',
   },
   {
     id: 8,
-    img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
-    title: "Compression Top",
-    category: "Performance",
+    img: 'https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277',
+    title: 'Compression Top',
+    category: 'Performance',
     price: 2299,
     original: 4599,
-    discount: "-50%",
+    discount: '-50%',
   },
 ];
 
@@ -246,69 +246,72 @@ const festiveDeals = [
   {
     id: 1,
     image: footwear,
-    title: "SHOES UNDER ₹3999",
-    subtitle: "Epic Shoe Deals for Men & Women",
+    title: 'SHOES UNDER ₹3999',
+    subtitle: 'Epic Shoe Deals for Men & Women',
   },
   {
     id: 2,
     image: tshirts,
-    title: "T-SHIRTS UNDER ₹999",
-    subtitle: "Unbeatable Tees Under 999",
+    title: 'T-SHIRTS UNDER ₹999',
+    subtitle: 'Unbeatable Tees Under 999',
   },
   {
     id: 3,
     image: tops,
-    title: "TOPS STARTING ₹799",
-    subtitle: "Wardrobe Refresh. Tops from 799",
+    title: 'TOPS STARTING ₹799',
+    subtitle: 'Wardrobe Refresh. Tops from 799',
   },
   {
     id: 4,
     image: jacket,
-    title: "JACKETS STARTING ₹1599",
-    subtitle: "Seasonal Must-Haves from 1599",
+    title: 'JACKETS STARTING ₹1599',
+    subtitle: 'Seasonal Must-Haves from 1599',
   },
   {
     id: 5,
     image: footwear,
-    title: "SHOES UNDER ₹3999",
-    subtitle: "Epic Shoe Deals for Men & Women",
+    title: 'SHOES UNDER ₹3999',
+    subtitle: 'Epic Shoe Deals for Men & Women',
   },
   {
     id: 6,
     image: tshirts,
-    title: "T-SHIRTS UNDER ₹999",
-    subtitle: "Unbeatable Tees Under 999",
+    title: 'T-SHIRTS UNDER ₹999',
+    subtitle: 'Unbeatable Tees Under 999',
   },
   {
     id: 7,
     image: tops,
-    title: "TOPS STARTING ₹799",
-    subtitle: "Wardrobe Refresh. Tops from 799",
+    title: 'TOPS STARTING ₹799',
+    subtitle: 'Wardrobe Refresh. Tops from 799',
   },
   {
     id: 8,
     image: jacket,
-    title: "JACKETS STARTING ₹1599",
-    subtitle: "Seasonal Must-Haves from 1599",
+    title: 'JACKETS STARTING ₹1599',
+    subtitle: 'Seasonal Must-Haves from 1599',
   },
 ];
 
 const landscapeBannerItems = [
   {
     id: 1,
-    image: 'https://media.wellmed.workers.dev/?file=JZMHCSZZOY3DETT2JZWDG4LQGC63Y&mode=inline',
+    image:
+      'https://media.wellmed.workers.dev/?file=JZMHCSZZOY3DETT2JZWDG4LQGC63Y&mode=inline',
     title: 'Summer Sale',
     subtitle: 'Up to 65% Off on Selected Items',
   },
   {
     id: 2,
-    image: 'https://media.wellmed.workers.dev/?file=O5JHA4SFMZDHGY2NHBEGMS3PLDXCI&mode=inline',
+    image:
+      'https://media.wellmed.workers.dev/?file=O5JHA4SFMZDHGY2NHBEGMS3PLDXCI&mode=inline',
     title: 'New Arrivals',
     subtitle: 'Discover the Latest Collection',
   },
   {
     id: 3,
-    image: 'https://media.wellmed.workers.dev/?file=PFGWC22TNZSEM5LVG5JFCNTQK6M3K&mode=inline',
+    image:
+      'https://media.wellmed.workers.dev/?file=PFGWC22TNZSEM5LVG5JFCNTQK6M3K&mode=inline',
     title: 'Performance Gear',
     subtitle: 'Built for Athletes',
   },
@@ -361,9 +364,9 @@ function Home() {
             >
               <div className="w-20 h-20 sm:w-30 sm:h-30 rounded-full overflow-hidden border border-gray-400 p-4 shadow-md">
                 <img
-                  src={logo}
+                  src={cat.logo}
                   className="w-full h-full object-cover object-center"
-                  alt={catname}
+                  alt={cat.name}
                 />
               </div>
             </Link>
