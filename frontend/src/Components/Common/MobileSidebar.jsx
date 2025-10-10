@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { X, ChevronRight, User, Heart, ShoppingBag, Gift, HelpCircle, Settings } from 'lucide-react';
+import { X, ChevronRight, User, Heart, ShoppingBag, Gift, Circle as HelpCircle, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import ad1 from '../../assets/ad1.png'
-import ad2 from '../../assets/ad2.png'
+const ad1 =
+  'https://media.wellmed.workers.dev/?file=MZSWWSRXGI3G62JWJZAXOMSCMJLW4&mode=inline';
+const ad2 =
+  'https://media.wellmed.workers.dev/?file=KZBVGM2UGJDVASTYGVRG23JRG3TV2&mode=inline';
 
 const MobileSidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -27,28 +29,48 @@ const MobileSidebar = ({ isOpen, onClose }) => {
     {
       id: 'men',
       name: 'Men',
-      subcategories: ['T-Shirts', 'Casual Shirts', 'Formal Shirts', 'Jeans', 'Casual Trousers', 'Sports Shoes', 'Casual Shoes']
+      subcategories: [
+        'T-Shirts',
+        'Casual Shirts',
+        'Formal Shirts',
+        'Jeans',
+        'Casual Trousers',
+        'Sports Shoes',
+        'Casual Shoes',
+      ],
     },
     {
       id: 'women',
       name: 'Women',
-      subcategories: ['Kurtas & Suits', 'Tops', 'T-Shirts', 'Dresses', 'Jeans', 'Heels', 'Flats']
+      subcategories: [
+        'Kurtas & Suits',
+        'Tops',
+        'T-Shirts',
+        'Dresses',
+        'Jeans',
+        'Heels',
+        'Flats',
+      ],
     },
     {
       id: 'kids',
       name: 'Kids',
-      subcategories: ['T-Shirts', 'Shirts', 'Jeans', 'Dresses', 'Tops', 'Toys']
+      subcategories: ['T-Shirts', 'Shirts', 'Jeans', 'Dresses', 'Tops', 'Toys'],
     },
     {
       id: 'sports',
       name: 'Sports',
-      subcategories: ['Running Shoes', 'Gym Wear', 'Sports Equipment', 'Tracksuits', 'Swimwear']
-    }
+      subcategories: [
+        'Running Shoes',
+        'Gym Wear',
+        'Sports Equipment',
+        'Tracksuits',
+        'Swimwear',
+      ],
+    },
   ];
 
-  const menuItems = [
-    { icon: HelpCircle, label: 'Help Center', path: '/help' },
-  ];
+  const menuItems = [{ icon: HelpCircle, label: 'Help Center', path: '/help' }];
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -62,22 +84,24 @@ const MobileSidebar = ({ isOpen, onClose }) => {
   return (
     <>
       <div
-        className={`fixed inset-0 bg-black transition-opacity duration-300 z-40 md:hidden ${
+        className={`fixed inset-0 bg-black transition-opacity duration-300 z-[60] md:hidden ${
           isOpen ? 'opacity-50 visible' : 'opacity-0 invisible'
         }`}
         onClick={onClose}
       />
 
       <div
-        className={`fixed top-0 left-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-out md:hidden ${
+        className={`fixed top-0 left-0 h-full w-80 bg-white shadow-2xl z-[70] transform transition-transform duration-300 ease-out md:hidden overflow-y-auto ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="flex flex-col h-full">
-            <div className='flex flex-col gap-4 '>
-              <Link><img src={ad2} alt="" className='w-full h-27 cursor-pointer'/></Link>
-              {/* <Link><img src={ad1} alt="" className='w-full h-40 cursor-pointer'/></Link> */}
-            </div>
+          <div className="flex flex-col gap-4 ">
+            <Link>
+              <img src={ad2} alt="" className="w-full h-27 cursor-pointer" />
+            </Link>
+            {/* <Link><img src={ad1} alt="" className='w-full h-40 cursor-pointer'/></Link> */}
+          </div>
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
@@ -86,7 +110,9 @@ const MobileSidebar = ({ isOpen, onClose }) => {
               <div>
                 {user ? (
                   <>
-                    <p className="font-semibold text-sm text-gray-900">{user.email}</p>
+                    <p className="font-semibold text-sm text-gray-900">
+                      {user.email}
+                    </p>
                     <p className="text-xs text-gray-500">Welcome back!</p>
                   </>
                 ) : (
@@ -121,7 +147,9 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                     onClick={() => toggleCategory(category.id)}
                     className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
                   >
-                    <span className="font-medium text-gray-900">{category.name}</span>
+                    <span className="font-medium text-gray-900">
+                      {category.name}
+                    </span>
                     <ChevronRight
                       className={`w-5 h-5 text-gray-400 transition-transform ${
                         expandedCategory === category.id ? 'rotate-90' : ''
@@ -138,7 +166,11 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                       {category.subcategories.map((sub) => (
                         <button
                           key={sub}
-                          onClick={() => handleNavigation(`/category/${category.id}/${sub.toLowerCase()}`)}
+                          onClick={() =>
+                            handleNavigation(
+                              `/category/${category.id}/${sub.toLowerCase()}`
+                            )
+                          }
                           className="w-full text-left px-8 py-2 text-sm text-gray-700 hover:text-red-500 hover:bg-white transition-colors"
                         >
                           {sub}
@@ -151,17 +183,16 @@ const MobileSidebar = ({ isOpen, onClose }) => {
             </div>
 
             <div className="py-2 border-t border-gray-200">
-                  <button
-                    key={'Help Center'}
-                    onClick={() => handleNavigation('/contact')}
-                    className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors"
-                  >
-                    <HelpCircle className="w-5 h-5 text-gray-600" />
-                    <span className="text-gray-900">Help Center</span>
-                  </button>
+              <button
+                key={'Help Center'}
+                onClick={() => handleNavigation('/contact')}
+                className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+              >
+                <HelpCircle className="w-5 h-5 text-gray-600" />
+                <span className="text-gray-900">Help Center</span>
+              </button>
             </div>
           </div>
-
 
           {user && (
             <div className="p-4 border-t border-gray-200">

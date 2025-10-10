@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Home, Search, Heart, ShoppingBag, User } from "lucide-react";
+import { Hop as Home, Search, Heart, ShoppingBag, User } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useAuth } from "../../context/AuthContext";
@@ -105,35 +105,20 @@ const BottomNav = () => {
           {isAuthenticated ? (
             <div className="relative flex flex-col items-center justify-center flex-1 h-full">
               <button
-                onClick={() => setShowUserMenu(!showUserMenu)}
+                onClick={() => navigate("/profile")}
                 className="flex flex-col items-center justify-center"
               >
                 <User
                   size={22}
-                  className={`${
-                    showUserMenu ? "text-red-500" : "text-gray-600"
-                  } transition-colors`}
-                  strokeWidth={showUserMenu ? 2.5 : 2}
+                  className={`${isActive("/profile") ? "text-red-500" : "text-gray-600"} transition-colors`}
+                  strokeWidth={isActive("/profile") ? 2.5 : 2}
                 />
-                <span className="text-[10px] mt-1 font-medium text-gray-700">
+                <span className={`text-[10px] mt-1 font-medium ${
+                  isActive("/profile") ? "text-red-500" : "text-gray-600"
+                }`}>
                   {profile?.full_name?.split(" ")[0] || "Profile"}
                 </span>
               </button>
-
-              {showUserMenu && (
-                <div className="absolute bottom-16 right-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-2">
-                  <button
-                    onClick={() => {
-                      dispatch(logout());
-                      setShowUserMenu(false);
-                    }}
-                    className="w-full px-4 py-2 text-left hover:bg-gray-100 flex items-center gap-2 text-sm"
-                  >
-                    <FiLogOut />
-                    Logout
-                  </button>
-                </div>
-              )}
             </div>
           ) : (
             <button

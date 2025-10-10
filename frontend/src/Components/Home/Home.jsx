@@ -4,8 +4,19 @@ import { ProductCard } from "../Product/Product";
 import CategoryCarousel from "./CategoryCarousel";
 import PromoCarousel from "./PromoCarousel";
 import LandscapeCarousel from '../Banner&Carousels/LandscapeCarousel';
+import HorizontalScrollCarousel from "../Banner&Carousels/HorizontalScrollCarousel";
 
 // Assets
+import logo1 from "../../assets/1.svg";
+import logo2 from "../../assets/2.svg";
+import logo3 from "../../assets/3.svg";
+import logo4 from "../../assets/4.svg";
+import logo5 from "../../assets/5.svg";
+import logo6 from "../../assets/6.svg";
+import logo7 from "../../assets/7.svg";
+import logo8 from "../../assets/8.svg";
+import logo9 from "../../assets/9.svg";
+
 import banner1 from "../../assets/homebanner.png";
 import footwear from "../../assets/footwear.png";
 import jacket from "../../assets/jacket.png";
@@ -17,16 +28,7 @@ import compression from "../../assets/compression.png";
 import gloves from "../../assets/gloves.png";
 import sportvid from "../../assets/sportvid.mp4";
 import sportbanner from "../../assets/sportbanner.mp4";
-import logo1 from "../../assets/1.svg";
-import logo2 from "../../assets/2.svg";
-import logo3 from "../../assets/3.svg";
-import logo4 from "../../assets/4.svg";
-import logo5 from "../../assets/5.svg";
-import logo6 from "../../assets/6.svg";
-import logo7 from "../../assets/7.svg";
-import logo8 from "../../assets/8.svg";
-import logo9 from "../../assets/9.svg";
-import HorizontalScrollCarousel from "../Banner&Carousels/HorizontalScrollCarousel";
+
 
 // Categories
 const categories = [
@@ -314,9 +316,9 @@ const landscapeBannerItems = [
 ];
 
 function Home() {
-  const [activeCategory, setActiveCategory] = useState("men");
+  const [activeCategory, setActiveCategory] = useState('men');
   const currentProducts =
-    activeCategory === "men" ? menProducts : womenProducts;
+    activeCategory === 'men' ? menProducts : womenProducts;
 
   return (
     <main className="w-full bg-white pb-20 md:pb-0">
@@ -328,7 +330,7 @@ function Home() {
           className="w-full h-full object-fill"
         />
       </div> */}
-      <section className="w-full pt-[100px] px-0 md:px-4 lg:px-6 max-w-[1920px] mx-auto">
+      <section className="w-full pt-[100px] px-0 md:px-4 lg:px-6 max-w-[1250px] mx-auto">
         <LandscapeCarousel items={landscapeBannerItems} />
       </section>
 
@@ -353,17 +355,19 @@ function Home() {
         </p>
         <div className="my-8 grid grid-cols-4 md:grid-cols-6 xl:grid-cols-9 gap-6">
           {categories.map((cat, i) => (
-            <div
+            <Link
+              to={cat.path}
               key={i}
               className="flex flex-col items-center text-center hover:scale-105 transition"
             >
               <div className="w-20 h-20 sm:w-30 sm:h-30 rounded-full overflow-hidden border border-gray-400 p-4 shadow-md">
                 <img
-                  src={cat}
+                  src={cat.logo}
                   className="w-full h-full object-cover object-center"
+                  alt={cat.name}
                 />
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
@@ -468,14 +472,14 @@ function Home() {
           {/* Toggle Buttons */}
           <div className="py-10">
             <div className="flex gap-4 mb-8">
-              {["men", "women"].map((cat) => (
+              {['men', 'women'].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
                   className={`px-6 py-2 rounded-full font-semibold ${
                     activeCategory === cat
-                      ? "bg-black text-white"
-                      : "bg-gray-200 text-black"
+                      ? 'bg-black text-white'
+                      : 'bg-gray-200 text-black'
                   }`}
                 >
                   {cat.toUpperCase()}
@@ -490,7 +494,7 @@ function Home() {
               ))}
             </div>
           </div>
-          <Link to={"#"} className="flex justify-center">
+          <Link to={'#'} className="flex justify-center">
             <button className="px-4 py-2 bg-black text-white font-semibold text-xl hover:shadow-lg">
               View All
             </button>
@@ -500,13 +504,13 @@ function Home() {
       {/* big banner */}
       <div className="max-w-7xl mx-auto hover:shadow-lg lg:mt-10 transition cursor-pointer p-5 lg:p-0">
         <video
-              src='https://m.media-amazon.com/images/S/al-eu-726f4d26-7fdb/02e119b0-4f00-4880-b41e-abf86212eeb6.mp4'
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover transition-transform duration-500"
-            />
+          src="https://m.media-amazon.com/images/S/al-eu-726f4d26-7fdb/02e119b0-4f00-4880-b41e-abf86212eeb6.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover transition-transform duration-500"
+        />
       </div>
       {/* Customer Reviews */}
       <section className="max-w-7xl mx-auto px-6 py-12">
@@ -520,19 +524,19 @@ function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
-              quote: "Reliable product, consistently delivers.",
-              text: "Beautifully made and incredibly soft. My go-to for yoga and travel days.",
-              name: "Anaya Verma",
+              quote: 'Reliable product, consistently delivers.',
+              text: 'Beautifully made and incredibly soft. My go-to for yoga and travel days.',
+              name: 'Anaya Verma',
             },
             {
-              quote: "Excellent product, A+ customer service.",
-              text: "These leggings are perfection - supportive, breathable, and stylish.",
-              name: "Ritika Joshi",
+              quote: 'Excellent product, A+ customer service.',
+              text: 'These leggings are perfection - supportive, breathable, and stylish.',
+              name: 'Ritika Joshi',
             },
             {
-              quote: "Impressive quality, durable and reliable.",
-              text: "I wear their tees everywhere - gym, coffee runs, even brunch.",
-              name: "Reema Ghurde",
+              quote: 'Impressive quality, durable and reliable.',
+              text: 'I wear their tees everywhere - gym, coffee runs, even brunch.',
+              name: 'Reema Ghurde',
             },
           ].map((review, i) => (
             <div
@@ -560,8 +564,8 @@ function Home() {
         {/* Discount Banner */}
         <div className="bg-[#fdf9f3] px-4 lg:px-0 border border-dashed border-red-400 text-center py-4 rounded-md mb-10">
           <p className="lg:text-lg text-sm">
-            Super discount for your{" "}
-            <span className="font-semibold text-red-500">first purchase.</span>{" "}
+            Super discount for your{' '}
+            <span className="font-semibold text-red-500">first purchase.</span>{' '}
             <span className="inline-block mx-2 px-3 py-1 border-2 border-dashed border-red-400 text-red-500 font-bold rounded">
               FREE15FIRST
             </span>
@@ -575,8 +579,7 @@ function Home() {
             WE ARE AVAILABLE ON
           </h2>
 
-          <div
-            className="flex items-center justify-center flex-wrap gap-3 sm:gap-8 md:gap-12 lg:gap-16 w-full  mx-auto">
+          <div className="flex items-center justify-center flex-wrap gap-3 sm:gap-8 md:gap-12 lg:gap-16 w-full  mx-auto">
             <img
               src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
               alt="Amazon"

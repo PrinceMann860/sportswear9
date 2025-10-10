@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useAuth } from "../../context/AuthContext";
 import { logout } from "../../store/slices/auth/authSlice";
@@ -19,6 +19,7 @@ import { ShoppingBag } from "lucide-react";
 
 function Navbar() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { isAuthenticated, profile } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState("signup");
@@ -77,7 +78,8 @@ function Navbar() {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      console.log("Searching for:", searchQuery);
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery('');
     }
   };
 
@@ -459,12 +461,12 @@ function Navbar() {
               </button>
             )}
 
-            <button className="p-2 rounded-full hover:bg-red-50 transition-colors" aria-label="Wishlist">
+            <Link to="/wishlist" className="p-2 rounded-full hover:bg-red-50 transition-colors" aria-label="Wishlist">
               <FiHeart className="text-lg cursor-pointer hover:text-red-500 transition-colors" />
-            </button>
-            <button className="p-2 rounded-full hover:bg-red-50 transition-colors" aria-label="Shopping Cart">
+            </Link>
+            <Link to="/cart" className="p-2 rounded-full hover:bg-red-50 transition-colors" aria-label="Shopping Cart">
               <FiShoppingCart className="text-lg cursor-pointer hover:text-red-500 transition-colors" />
-            </button>
+            </Link>
           </div>
 
           {/* Mobile Icons */}
@@ -487,16 +489,18 @@ function Navbar() {
 
         {/* Mobile Search */}
         {showSearch && (
-          <div className="fixed inset-0 bg-white z-50 flex flex-col p-4 md:p-6 animate-slideDown">
+          <div className="fixed inset-0 bg-white z-[80] flex flex-col p-4 md:p-6 animate-slideDown">
             <div className="flex items-center mb-6 gap-3">
-              <input
-                type="text"
-                placeholder={placeholders[currentPlaceholder]}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                autoFocus
-              />
+              <form onSubmit={handleSearch} className="flex-1">
+                <input
+                  type="text"
+                  placeholder={placeholders[currentPlaceholder]}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  autoFocus
+                />
+              </form>
               <button
                 onClick={() => setShowSearch(false)}
                 className="p-2 rounded-full hover:bg-gray-100 transition-colors"
@@ -514,7 +518,11 @@ function Navbar() {
                   <div
                     key={i}
                     className="p-3 rounded-lg cursor-pointer hover:bg-red-50 transition-colors flex items-center gap-3 border-b border-gray-100 last:border-0"
-                    onClick={() => setSearchQuery(s)}
+                    onClick={() => {
+                      setSearchQuery(s);
+                      navigate(`/search?q=${encodeURIComponent(s)}`);
+                      setShowSearch(false);
+                    }}
                   >
                     <FiSearch size={16} className="text-gray-400" />
                     <span className="text-gray-700">{s}</span>
