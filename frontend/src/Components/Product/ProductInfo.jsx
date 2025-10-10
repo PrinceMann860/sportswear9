@@ -95,9 +95,9 @@ const ProductInfo = () => {
           <img
             src={product.images[selectedImage]}
             alt="product"
-            className="w-full rounded-2xl shadow-md transition-transform duration-300 hover:scale-105"
+            className="w-full rounded-2xl shadow-md transition-transform duration-300 hover:scale-101"
           />
-          <div className="flex gap-3 mt-4">
+          <div className="flex gap-3 mt-10">
             {product.images.map((img, i) => (
               <img
                 key={i}

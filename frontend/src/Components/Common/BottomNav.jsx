@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Hop as Home, Search, Heart, ShoppingBag, User } from "lucide-react";
+import { Home as Home, Search, Heart, ShoppingBag, User } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useAuth } from "../../context/AuthContext";
 import { logout } from "../../store/slices/auth/authSlice";
-import AuthModal from "../Auth/AuthModal";
 import { FiLogOut } from "react-icons/fi";
+import AuthModal from "../Auth/Authmodal";
 
 const BottomNav = () => {
   const navigate = useNavigate();

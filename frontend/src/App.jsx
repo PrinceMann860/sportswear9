@@ -18,6 +18,7 @@ import OrdersPage from "./Components/Orders/OrdersPage";
 import BrandPage from "./Components/Brands/BrandPage";
 import ProfilePage from "./Components/Profile/ProfilePage";
 import CheckoutPage from "./Components/Checkout/CheckoutPage";
+import Error404 from "./Components/Pages/Error404page";
 
 
 export default function App() {
@@ -36,6 +37,10 @@ export default function App() {
         {
           path: "/",
           element: <Home />,
+        },
+        {
+          path: "*",
+          element: <Error404 />
         },
         {
           path: "/Product",

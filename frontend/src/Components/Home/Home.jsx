@@ -357,14 +357,14 @@ function Home() {
           Discover collections from globally loved athletic and lifestyle
           brands.
         </p>
-        <div className="my-8 grid grid-cols-4 md:grid-cols-6 xl:grid-cols-9 gap-6">
+        <div className="my-8 grid grid-cols-5 md:grid-cols-6 xl:grid-cols-9 gap-6">
           {categories.map((cat, i) => (
             <Link
               to={cat.path}
               key={i}
               className="flex flex-col items-center text-center hover:scale-105 transition"
             >
-              <div className="w-20 h-20 sm:w-30 sm:h-30 rounded-full overflow-hidden border border-gray-400 p-4 shadow-md">
+              <div className="w-16 h-16 sm:w-30 sm:h-30 rounded-full overflow-hidden border border-gray-400 p-1 md:p-4 shadow-md">
                 <img
                   src={cat.logo}
                   className="w-full h-full object-cover object-center"

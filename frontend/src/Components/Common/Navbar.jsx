@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { useAuth } from "../../context/AuthContext";
 import { logout } from "../../store/slices/auth/authSlice";
 import logo from "../../assets/blacklogo.svg";
-import AuthModal from "../Auth/AuthModal";
+import AuthModal from "../Auth/Authmodal";
 import MobileSidebar from "./MobileSidebar";
 import {
   FiSearch,
@@ -16,6 +16,7 @@ import {
   FiLogOut,
 } from "react-icons/fi";
 import { ShoppingBag } from "lucide-react";
+import PortraitCarousel from "../Banner&Carousels/PortraitCarousel";
 
 function Navbar() {
   const dispatch = useDispatch();
@@ -614,7 +615,7 @@ function Navbar() {
 
         {/* Mobile Search */}
         {showSearch && (
-          <div className="fixed inset-0 bg-white z-[80] flex flex-col p-4 md:p-6 animate-slideDown">
+          <div className="fixed inset-0 bg-white z-[80] flex flex-col p-4 md:p-6 animate-slideDown overflow-scroll">
             <div className="flex items-center mb-6 gap-3">
               <form onSubmit={handleSearch} className="flex-1">
                 <input
@@ -634,7 +635,9 @@ function Navbar() {
                 <FiX size={24} className="cursor-pointer" />
               </button>
             </div>
-
+            <div className="mt-4">
+              <PortraitCarousel />
+            </div>
             <div className="space-y-2">
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 px-2">
                 Popular Searches
