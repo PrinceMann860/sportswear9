@@ -175,6 +175,7 @@ function Navbar() {
                     <span className={`absolute bottom-0 left-0 w-0 h-0.5 bg-red-500 transition-all duration-300 group-hover:w-full`}></span>
                   </NavLink>
 
+                  {/* MEN */}
                   {link.name === "Men" && (
                     <div
                       onMouseEnter={() => setHoveredLink("Men")}
