@@ -1,23 +1,23 @@
 import React from "react";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import ScrollToTop from "./Components/fix/ScrollToTop";
 import Navbar from "./Components/Common/Navbar";
 import Footer from "./Components/Common/Footer";
 import BottomNav from "./Components/Common/BottomNav";
 import Home from "./Components/Home/Home";
 import Product from "./Components/Product/Product";
 import ProductInfo from "./Components/Product/ProductInfo";
-import PrivacyPolicy from "./Components/Pages/PrivacyPolicy";
-import TermsOfUse from "./Components/Pages/TermsOfUse";
-import ContactUs from "./Components/Pages/ContactUs";
+import PrivacyPolicy from "./Components/Terms&Policy/PrivacyPolicy";
+import TermsOfUse from "./Components/Terms&Policy/TermsOfUse";
+import ContactUs  from "./Components/Pages/ContactUs";
 import SearchPage from "./Components/Pages/SearchPage";
-import CategoriesPage from "./Components/Pages/CategoriesPage";
-import WishlistPage from "./Components/Pages/WishlistPage";
-import OrdersPage from "./Components/Pages/OrdersPage";
-import BrandPage from "./Components/Pages/BrandPage";
-import ProfilePage from "./Components/Pages/ProfilePage";
-import CartPage from "./Components/Pages/CartPage";
-import CheckoutPage from "./Components/Pages/CheckoutPage";
-import ScrollToTop from "./Components/fix/ScrollToTop";
+import CartPage from "./Components/Cart/CartPage";
+import CategoriesPage from "./Components/Categories/CategoriesPage";
+import WishlistPage from "./Components/Wishlist/WishlistPage";
+import OrdersPage from "./Components/Orders/OrdersPage";
+import BrandPage from "./Components/Brands/BrandPage";
+import ProfilePage from "./Components/Profile/ProfilePage";
+import CheckoutPage from "./Components/Checkout/CheckoutPage";
 
 
 export default function App() {

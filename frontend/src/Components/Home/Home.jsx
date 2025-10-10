@@ -331,7 +331,7 @@ function Home() {
   return (
     <main className="w-full bg-white pb-20 md:pb-0">
       {/* Banner */}
-      <div className="w-full lg:h-[80vh] md:h-[50vh] h-[30vh] pt-[60px]">
+      <div className="w-full lg:h-[80vh] md:h-[50vh] h-[30vh] pt-[60px] lg:pt-[80px]">
         <img
           src={banner1}
           alt="Sale Banner"
