@@ -337,8 +337,8 @@ function Home() {
           alt="Sale Banner"
           className="w-full h-full object-fill"
         />
-      </div>
-      {/* <section className="w-full pt-[100px] px-0 md:px-4 lg:px-6 max-w-[1250px] mx-auto">
+      </div> */}
+      <section className="w-full pt-[100px] px-0 md:px-4 lg:px-6 max-w-[1250px] mx-auto">
         <LandscapeCarousel items={landscapeBannerItems} />
       </section> */}
 
