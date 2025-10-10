@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ProductCard } from '../Product/Product';
 import CategoryCarousel from './CategoryCarousel';
-import PromoCarousel from './PromoCarousel';
 import LandscapeCarousel from '../Banner&Carousels/LandscapeCarousel';
 import HorizontalScrollCarousel from '../Banner&Carousels/HorizontalScrollCarousel';
 
@@ -293,29 +292,36 @@ const festiveDeals = [
   },
 ];
 
-const landscapeBannerItems = [
+const promoBanners = [
+    {
+      id: 1,
+      image: 'https://media.wellmed.workers.dev/?file=MFXFCWSNJ5JVQZKIKFUVSMLWJXQ3U&mode=inline',
+      title: 'Fashion Sale',
+      Subtitle: 'banner'
+    },
+    {
+      id: 2,
+      image: 'https://media.wellmed.workers.dev/?file=I52VCN2FNZWHUZZRO5HE6TJZKYP5Q&mode=inline',
+      title: 'New Collection',
+    },
+    {
+      id: 3,
+      image: 'https://media.wellmed.workers.dev/?file=GBFHMM2QGFTEQMTWIF2XERLKJEHPY&mode=inline',
+      title: 'Sports Collection',
+    }
+    ,
   {
-    id: 1,
-    image:
-      'https://media.wellmed.workers.dev/?file=JZMHCSZZOY3DETT2JZWDG4LQGC63Y&mode=inline',
-    title: 'Summer Sale',
-    subtitle: 'Up to 65% Off on Selected Items',
+    id: 4,
+    image: 'https://media.wellmed.workers.dev/?file=MZTDIWBTIZQWQ2TPOR4TM6LUMRKH6&mode=inline',
+    title: 'Outdoor Gear',
+    
   },
   {
-    id: 2,
-    image:
-      'https://media.wellmed.workers.dev/?file=O5JHA4SFMZDHGY2NHBEGMS3PLDXCI&mode=inline',
-    title: 'New Arrivals',
-    subtitle: 'Discover the Latest Collection',
-  },
-  {
-    id: 3,
-    image:
-      'https://media.wellmed.workers.dev/?file=PFGWC22TNZSEM5LVG5JFCNTQK6M3K&mode=inline',
-    title: 'Performance Gear',
-    subtitle: 'Built for Athletes',
-  },
-];
+    id: 5,
+    image: 'https://media.wellmed.workers.dev/?file=JFLESTCQJZTUUNLHLFNGCSSNGTEY4&mode=inline',
+    title: 'Winter Favorites',
+  }
+]
 
 function Home() {
   const [activeCategory, setActiveCategory] = useState('men');
@@ -325,16 +331,16 @@ function Home() {
   return (
     <main className="w-full bg-white pb-20 md:pb-0">
       {/* Banner */}
-      {/* <div className="w-full lg:h-[80vh] md:h-[50vh] h-[30vh] pt-[60px]">
+      <div className="w-full lg:h-[80vh] md:h-[50vh] h-[30vh] pt-[60px]">
         <img
           src={banner1}
           alt="Sale Banner"
           className="w-full h-full object-fill"
         />
-      </div> */}
-      <section className="w-full pt-[100px] px-0 md:px-4 lg:px-6 max-w-[1250px] mx-auto">
+      </div>
+      {/* <section className="w-full pt-[100px] px-0 md:px-4 lg:px-6 max-w-[1250px] mx-auto">
         <LandscapeCarousel items={landscapeBannerItems} />
-      </section>
+      </section> */}
 
       {/* Festive Deals */}
       <section className="mt-5 p-5 max-w-7xl mx-auto">
@@ -415,8 +421,8 @@ function Home() {
         </div>
 
         {/* Promo Carousel - Mobile */}
-        <div className="w-[100vw] pt-10">
-          <PromoCarousel />
+        <div className="w-[100vw] max-w-7xl mx-auto pt-10">
+          <LandscapeCarousel items={promoBanners} />
         </div>
         <div className="max-w-7xl mx-auto px-4">
           {/* Trending */}
@@ -504,7 +510,7 @@ function Home() {
         </div>
       </section>
       {/* big banner */}
-      <div className="max-w-7xl mx-auto hover:shadow-lg lg:mt-10 transition cursor-pointer p-5 lg:p-0">
+      <div className="max-w-7xl mx-auto hover:shadow-lg border border-gray-200 lg:mt-10 transition cursor-pointer p-5 lg:p-0">
         <video
           src="https://m.media-amazon.com/images/S/al-eu-726f4d26-7fdb/02e119b0-4f00-4880-b41e-abf86212eeb6.mp4"
           autoPlay
