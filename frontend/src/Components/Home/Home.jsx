@@ -30,17 +30,16 @@ import sportvid from "../../assets/sportvid.mp4";
 import sportbanner from "../../assets/sportbanner.mp4";
 
 
-// Categories
 const categories = [
-  logo1,
-  logo2,
-  logo3,
-  logo4,
-  logo5,
-  logo6,
-  logo7,
-  logo8,
-  logo9,
+  { logo: logo1, name: 'adidas', path: '/brand/adidas' },
+  { logo: logo2, name: 'nike', path: '/brand/nike' },
+  { logo: logo3, name: 'puma', path: '/brand/puma' },
+  { logo: logo4, name: 'reebok', path: '/brand/reebok' },
+  { logo: logo5, name: 'under-armour', path: '/brand/under-armour' },
+  { logo: logo6, name: 'new-balance', path: '/brand/new-balance' },
+  { logo: logo7, name: 'asics', path: '/brand/asics' },
+  { logo: logo8, name: 'converse', path: '/brand/converse' },
+  { logo: logo9, name: 'vans', path: '/brand/vans' },
 ];
 
 // Products (example placeholders)
@@ -362,9 +361,9 @@ function Home() {
             >
               <div className="w-20 h-20 sm:w-30 sm:h-30 rounded-full overflow-hidden border border-gray-400 p-4 shadow-md">
                 <img
-                  src={cat.logo}
+                  src={logo}
                   className="w-full h-full object-cover object-center"
-                  alt={cat.name}
+                  alt={catname}
                 />
               </div>
             </Link>
