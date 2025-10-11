@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { useAuth } from "../../context/AuthContext";
 import { logout } from "../../store/slices/auth/authSlice";
 import { FiLogOut } from "react-icons/fi";
-import AuthModal from "../Auth/Authmodal";
+import AuthModal from "../Auth/AuthModal";
 
 const BottomNav = () => {
   const navigate = useNavigate();
