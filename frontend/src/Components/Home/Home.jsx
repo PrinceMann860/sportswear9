@@ -417,7 +417,7 @@ function Home() {
         </div>
 
         {/* Promo Carousel - Mobile */}
-        <div className="w-[100vw] max-w-7xl mx-auto pt-10">
+        <div className="w-[100vw] max-w-7xl mx-auto pt-10 px-4">
           <LandscapeCarousel items={promoBanners} />
         </div>
         <div className="max-w-7xl mx-auto px-4">
