@@ -14,7 +14,7 @@ import SearchPage from "./Components/Pages/SearchPage";
 import CartPage from "./Components/Cart/CartPage";
 import CategoriesPage from "./Components/Categories/CategoriesPage";
 import WishlistPage from "./Components/Wishlist/WishlistPage";
-import OrdersPage from "./Components/Orders/OrdersPage";
+import OrdersPage from "./Components/Orders/OrdersPage"
 import BrandPage from "./Components/Brands/BrandPage";
 import ProfilePage from "./Components/Profile/ProfilePage";
 import CheckoutPage from "./Components/Checkout/CheckoutPage";

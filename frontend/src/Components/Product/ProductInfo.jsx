@@ -146,7 +146,7 @@ const ProductInfo = () => {
       {/* Banners */}
       <div className="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-6">
         <div className="relative bg-black text-white rounded-2xl p-10 overflow-hidden">
-          <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1400&q=80')] bg-cover" />
+          <div className="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1400&q=80')] bg-cover" />
           <div className="relative z-10">
             <h3 className="text-2xl font-bold mb-3">Train Hard. Look Good.</h3>
             <p className="text-sm mb-4 text-gray-200">
@@ -159,7 +159,7 @@ const ProductInfo = () => {
         </div>
 
         <div className="relative bg-gray-900 text-white rounded-2xl p-10 overflow-hidden">
-          <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=1400&q=80')] bg-cover" />
+          <div className="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=1400&q=80')] bg-cover" />
           <div className="relative z-10">
             <h3 className="text-2xl font-bold mb-3 text-red-500">
               New Season Drop

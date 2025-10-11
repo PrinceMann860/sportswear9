@@ -27,6 +27,8 @@ import compression from "../../assets/compression.png";
 import gloves from "../../assets/gloves.png";
 import sportvid from "../../assets/sportvid.mp4";
 import sportbanner from "../../assets/sportbanner.mp4";
+import bigbanner from "../../assets/Bigbanner.png"
+
 
 // Categories
 const categories = [
@@ -323,6 +325,37 @@ const promoBanners = [
   }
 ]
 
+const mainBanners = [
+    {
+      id: 1,
+      image: banner1,
+      title: 'Fashion Sale',
+      Subtitle: 'banner'
+    },
+    {
+      id: 2,
+      image: bigbanner,
+      title: 'New Collection',
+    },
+    {
+      id: 3,
+      image: 'https://media.wellmed.workers.dev/?file=GBFHMM2QGFTEQMTWIF2XERLKJEHPY&mode=inline',
+      title: 'Sports Collection',
+    }
+    ,
+  {
+    id: 4,
+    image: 'https://media.wellmed.workers.dev/?file=MZTDIWBTIZQWQ2TPOR4TM6LUMRKH6&mode=inline',
+    title: 'Outdoor Gear',
+    
+  },
+  {
+    id: 5,
+    image: 'https://media.wellmed.workers.dev/?file=JFLESTCQJZTUUNLHLFNGCSSNGTEY4&mode=inline',
+    title: 'Winter Favorites',
+  }
+]
+
 function Home() {
   const [activeCategory, setActiveCategory] = useState('men');
   const currentProducts =
@@ -331,13 +364,9 @@ function Home() {
   return (
     <main className="w-full bg-white pb-20 md:pb-0">
       {/* Banner */}
-      <div className="w-full lg:h-[80vh] md:h-[50vh] h-[30vh] pt-[60px] lg:pt-[80px]">
-        <img
-          src={banner1}
-          alt="Sale Banner"
-          className="w-full h-full object-fill"
-        />
-      </div> */
+      <div className="w-full mx-auto mt-[60px] lg:mt-[80px]">
+        <LandscapeCarousel items={mainBanners}/>
+      </div>
       {/* Festive Deals */}
       <section className="mt-5 p-5 max-w-7xl mx-auto">
         <h2 className="text-center text-3xl font-bold">
@@ -417,7 +446,7 @@ function Home() {
         </div>
 
         {/* Promo Carousel - Mobile */}
-        <div className="w-[100vw] max-w-7xl mx-auto pt-10 px-4">
+        <div className="w-[100vw] max-w-7xl mx-auto pt-10 px-4 rounded-md md:rounded-xl">
           <LandscapeCarousel items={promoBanners} />
         </div>
         <div className="max-w-7xl mx-auto px-4">
@@ -506,14 +535,14 @@ function Home() {
         </div>
       </section>
       {/* big banner */}
-      <div className="max-w-7xl mx-auto hover:shadow-lg border border-gray-200 lg:mt-10 transition cursor-pointer p-5 lg:p-0">
+      <div className="max-w-7xl mx-auto hover:shadow-lg lg:mt-10 transition cursor-pointer lg:p-0 px-4">
         <video
           src="https://m.media-amazon.com/images/S/al-eu-726f4d26-7fdb/02e119b0-4f00-4880-b41e-abf86212eeb6.mp4"
           autoPlay
           loop
           muted
           playsInline
-          className="w-full h-full object-cover transition-transform duration-500"
+          className="w-full h-full object-cover transition-transform duration-500 border border-gray-200"
         />
       </div>
       {/* Customer Reviews */}

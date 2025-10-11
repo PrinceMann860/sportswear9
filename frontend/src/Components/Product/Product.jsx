@@ -7,7 +7,7 @@ function ProductCard({ product }) {
     <Link to={'/ProductInfo'}>
       <div className="group relative bg-white overflow-hidden shadow-sm border-gray-100 hover:shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-1">
         {/* Product Image */}
-        <div className="relative flex items-center p-4 justify-center">
+        <div className="relative flex items-center justify-center">
           <img
             src={product.img}
             alt={product.title}

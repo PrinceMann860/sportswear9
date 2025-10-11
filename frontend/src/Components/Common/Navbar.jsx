@@ -81,6 +81,7 @@ function Navbar() {
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
       setSearchQuery("");
+      setShowSearch(false);
     }
   };
 
@@ -164,7 +165,7 @@ function Navbar() {
                 { name: "Women", to: "/women" },
                 { name: "Kids", to: "/kids" },
                 { name: "Sports&Lifestyle", to: "/sports" },
-                { name: "Outlet", to: "/shop" },
+                { name: "Outlet", to: "/Categories" },
               ].map((link) => (
                 <div
                   key={link.name}

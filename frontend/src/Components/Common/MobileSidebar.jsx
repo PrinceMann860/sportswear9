@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, ChevronRight, User, Heart, ShoppingBag, Gift, Circle as HelpCircle, Settings } from 'lucide-react';
+import { X, ChevronRight, User, Heart, ShoppingBag, Gift, HelpCircle , Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';

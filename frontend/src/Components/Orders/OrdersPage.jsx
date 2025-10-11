@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Heart, ShoppingCart, X } from 'lucide-react';
 import { ProductCard } from '../Product/Product';
 
-const WishlistPage = () => {
+const OrdersPage = () => {
   const [wishlistItems, setWishlistItems] = useState([
     {
       id: 1,
@@ -47,7 +47,7 @@ const WishlistPage = () => {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center gap-3 mb-8">
           <Heart className="text-red-500" size={28} />
-          <h1 className="text-3xl font-bold text-gray-900">My Wishlist</h1>
+          <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>
           <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-medium">
             {wishlistItems.length} items
           </span>
@@ -105,4 +105,4 @@ const WishlistPage = () => {
   );
 };
 
-export default WishlistPage;
+export default OrdersPage;
