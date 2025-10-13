@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { logout } from "../../store/slices/auth/authSlice";
 import logo from "../../assets/blacklogo.png";
 import MobileSidebar from "./MobileSidebar";
-import AuthModal from "../Auth/Authmodal";
+import AuthModal from "../Auth/";
 import {
   FiSearch,
   FiUser,
