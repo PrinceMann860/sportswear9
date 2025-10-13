@@ -110,7 +110,7 @@ const Error404Page = () => {
                 <h1 className="text-7xl xs:text-8xl sm:text-9xl lg:text-10xl font-black tracking-tighter leading-none">
                   <span className="block text-gray-900 relative">
                     <span className="absolute -inset-2 md:-inset-4 bg-red-500 opacity-0 blur-lg animate-pulse-glitch"></span>
-                    404
+                     404
                   </span>
                 </h1>
 
