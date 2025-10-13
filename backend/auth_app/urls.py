@@ -7,6 +7,7 @@ from .views import (
     ForgotPasswordView,
     ResetPasswordView,
     GoogleLoginJWTView,
+    IsAdminView
 )
 
 urlpatterns = [
@@ -17,4 +18,6 @@ urlpatterns = [
     path("reset-password/", ResetPasswordView.as_view(), name="reset-password"),
     path("google/token/", GoogleLoginJWTView.as_view(), name="google-jwt"),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path("is-admin/", IsAdminView.as_view(), name="is-admin"),
+
 ]

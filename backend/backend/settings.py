@@ -73,6 +73,18 @@ INSTALLED_APPS = [
     'profile_app',
     # 'payment',
     # 'checkout',
+      # Your apps
+    'brands',
+    'categories',
+    'attributes',
+    'inventory',
+    'media',
+    'reviews',
+    'ProductSpecification',
+    'products',
+    'core',
+    'assets',
+
 ]
 
 
@@ -175,6 +187,10 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'  # for collectstatic
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# MEDIA_URL = '/assets/'
+# MEDIA_ROOT = BASE_DIR / 'assets'
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -194,7 +210,7 @@ REST_FRAMEWORK = {
 
 # ✅ Optional: Customize JWT behavior
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=3),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,

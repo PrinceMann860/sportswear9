@@ -1,0 +1,51 @@
+import api from '../utils/api';
+
+export const categoryService = {
+  async getCategories() {
+    try {
+      const response = await api.get('/api/categories/');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch categories' };
+    }
+  },
+
+  async getCategory(uuid) {
+    try {
+      const response = await api.get(`/api/categories/${uuid}/`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch category' };
+    }
+  },
+
+  // Create category
+  async createCategory(categoryData) {
+    try {
+      const response = await api.post('/api/categories/admin/create/', categoryData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to create category' };
+    }
+  },
+
+  // Update category
+  async updateCategory(uuid, categoryData) {
+    try {
+      const response = await api.put(`/api/categories/admin/${uuid}/update/`, categoryData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to update category' };
+    }
+  },
+
+  // Delete category
+  async deleteCategory(uuid) {
+    try {
+      const response = await api.delete(`/api/categories/admin/${uuid}/delete/`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to delete category' };
+    }
+  },
+};

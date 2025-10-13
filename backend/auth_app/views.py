@@ -221,3 +221,14 @@ class GoogleLoginJWTView(APIView):
             return Response({"error": "Invalid token"}, status=400)
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+
+class IsAdminView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        return Response({
+            "is_admin": user.is_staff or user.is_superuser,
+            "email": user.email,
+            "user_uuid": user.user_uuid,
+        })
