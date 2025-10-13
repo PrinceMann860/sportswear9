@@ -51,13 +51,13 @@ class AttributeListUserView(generics.ListAPIView):
     """User filter view — lists all attributes & values for filters"""
     queryset = Attribute.objects.prefetch_related("values").all()
     serializer_class = AttributeUserSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
 
 
 class ProductVariantListView(generics.ListAPIView):
     """User endpoint to list all variants for a given product"""
     serializer_class = ProductVariantListSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
 
     def get_queryset(self):
         product_uuid = self.kwargs.get("product_uuid")

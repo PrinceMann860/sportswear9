@@ -4,9 +4,10 @@ from .models import Attribute, AttributeValue, ProductAttribute, ProductVariant
 
 
 class AttributeValueSerializer(serializers.ModelSerializer):
+    attribute = serializers.PrimaryKeyRelatedField(queryset=Attribute.objects.all())
     class Meta:
         model = AttributeValue
-        fields = ['id', 'value', 'meta']
+        fields = ['id', 'attribute', 'value', 'meta']
 
 
 class AttributeSerializer(serializers.ModelSerializer):
