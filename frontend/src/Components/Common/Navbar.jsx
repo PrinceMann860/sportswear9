@@ -4,8 +4,8 @@ import { useDispatch } from "react-redux";
 import { useAuth } from "../../context/AuthContext";
 import { logout } from "../../store/slices/auth/authSlice";
 import logo from "../../assets/blacklogo.png";
+import AuthModal from "../Auth/Authodal";
 import MobileSidebar from "./MobileSidebar";
-import AuthModal from "../Auth/";
 import {
   FiSearch,
   FiUser,
