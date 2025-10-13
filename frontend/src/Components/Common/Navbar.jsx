@@ -3,7 +3,7 @@ import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useAuth } from "../../context/AuthContext";
 import { logout } from "../../store/slices/auth/authSlice";
-import logo from "../../assets/blacklogo.svg";
+import logo from "../../assets/blacklogo.png";
 import AuthModal from "../Auth/AuthModal";
 import MobileSidebar from "./MobileSidebar";
 import {
@@ -81,6 +81,7 @@ function Navbar() {
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
       setSearchQuery("");
+      setShowSearch(false);
     }
   };
 
@@ -164,7 +165,7 @@ function Navbar() {
                 { name: "Women", to: "/women" },
                 { name: "Kids", to: "/kids" },
                 { name: "Sports&Lifestyle", to: "/sports" },
-                { name: "Outlet", to: "/shop" },
+                { name: "Outlet", to: "/Categories" },
               ].map((link) => (
                 <div
                   key={link.name}

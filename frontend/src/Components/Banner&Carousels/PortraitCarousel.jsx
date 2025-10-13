@@ -65,7 +65,7 @@ export default function PortraitCarousel() {
               <img
                 src={slide.image}
                 alt={slide.title}
-                className="w-full h-[240px] object-cover"
+                className="w-full h-[200px] object-cover"
               />
 
               {/* Text Overlay */}

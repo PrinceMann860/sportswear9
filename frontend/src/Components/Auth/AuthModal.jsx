@@ -6,7 +6,7 @@ import OTPForm from "./OTPForm";
 import SetPasswordForm from "./SetPasswordForm";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 import ResetPasswordForm from "./ResetPasswordForm";
-import logo from "../../assets/blacklogo.svg"
+import logo from "../../assets/blacklogo.png"
 
 export default function AuthModal({ isOpen, onClose, mode = "login", setMode }) {
   const [currentPage, setCurrentPage] = useState(mode);

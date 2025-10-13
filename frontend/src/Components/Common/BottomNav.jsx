@@ -89,12 +89,12 @@ const BottomNav = () => {
           >
             <ShoppingBag
               size={22}
-              className={`${isActive("/cart") ? "text-red-500" : "text-gray-600"} transition-colors`}
-              strokeWidth={isActive("/cart") ? 2.5 : 2}
+              className={`${isActive("/orders") ? "text-red-500" : "text-gray-600"} transition-colors`}
+              strokeWidth={isActive("/orders") ? 2.5 : 2}
             />
             <span
               className={`text-[10px] mt-1 font-medium ${
-                isActive("/cart") ? "text-red-500" : "text-gray-600"
+                isActive("/orders") ? "text-red-500" : "text-gray-600"
               }`}
             >
               Orders

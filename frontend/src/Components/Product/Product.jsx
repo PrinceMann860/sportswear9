@@ -5,59 +5,45 @@ import banner from "../../assets/productbanner.png";
 function ProductCard({ product }) {
   return (
     <Link to={'/ProductInfo'}>
-      <div className="group relative bg-white overflow-hidden shadow-sm border-gray-100 hover:shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-1">
-        {/* Product Image */}
-        <div className="relative flex items-center p-4 justify-center">
+      <div className="group relative bg-white overflow-hidden shadow-sm border-gray-100 hover:shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-1 flex flex-col">
+
+        {/* Fixed Image Container */}
+        <div className="relative w-full h-64 flex items-center justify-center bg-gray-50">
           <img
             src={product.img}
             alt={product.title}
-            className="w-full h-auto object-contain transition-transform duration-500 "
+            className="max-h-full w-full object-fill transition-transform duration-500"
           />
 
           {/* Wishlist Icon */}
           <button className="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition-colors duration-300">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.6}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 8.25c0-2.485-2.015-4.5-4.5-4.5S12 5.765 12 8.25c0-2.485-2.015-4.5-4.5-4.5S3 5.765 3 8.25c0 7.125 9 11.25 9 11.25s9-4.125 9-11.25z"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.6} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.015-4.5-4.5-4.5S12 5.765 12 8.25c0-2.485-2.015-4.5-4.5-4.5S3 5.765 3 8.25c0 7.125 9 11.25 9 11.25s9-4.125 9-11.25z" />
             </svg>
           </button>
         </div>
 
-        {/* Product Details */}
-        <div className="p-4 text-start">
-          <h3 className="font-semibold text-gray-900 group-hover:text-black transition">
-            {product.title}
-          </h3>
+        {/* Text Section Fixed at Bottom */}
+        <div className="p-4 text-start flex flex-col flex-grow">
+          <h3 className="font-semibold text-gray-900 group-hover:text-black transition line-clamp-2">{product.title}</h3>
           <p className="text-sm text-gray-500 mt-1">{product.category}</p>
 
           {/* Price Section */}
-          <div className="mt-3">
+          <div className="mt-auto">
             <p className="text-lg font-bold text-gray-900">{product.price}</p>
             <p className="text-sm text-gray-500">
               <span className="line-through mr-1">{product.original}</span>
-              <span className="text-red-500 font-medium">
-                {product.discount}
-              </span>
+              <span className="text-red-500 font-medium">{product.discount}</span>
             </p>
           </div>
         </div>
 
-        {/* Subtle Bottom Border Accent */}
         <div className="absolute bottom-0 left-0 w-0 h-1 bg-red-500 transition-all duration-500 group-hover:w-full"></div>
       </div>
     </Link>
   );
 }
+
 
 function Product() {
   return (
@@ -97,7 +83,7 @@ function Product() {
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
-      <div className="max-w-7xl h-auto">
+      <div className="max-w-7xl h-auto flex">
         <img src={banner} alt="" className="" />
       </div>
     </div>
@@ -106,3 +92,4 @@ function Product() {
 
 export default Product;
 export { ProductCard };
+
