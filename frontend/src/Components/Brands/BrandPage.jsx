@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Star, Heart, ShoppingCart, ListFilter as Filter, Grid2x2 as Grid, List } from 'lucide-react';
 import { ProductCard } from '../Product/Product';
+import ComingSoon from '../Home/ComingSoon';
+import VideoClassSection from '../Home/VideoClassSection';
+import RecommendedProducts from '../Home/RecommendedProducts';
+
 
 const BrandPage = () => {
   const { brandName } = useParams();
@@ -133,19 +137,19 @@ const BrandPage = () => {
     <div className="min-h-screen bg-gray-50 pt-16 md:pt-20 pb-16 md:pb-0">
       {/* Brand Header */}
       <div className="relative">
-        <div 
+        <div
           className="h-32 sm:h-48 md:h-64 lg:h-80 bg-cover bg-center"
           style={{ backgroundImage: `url(${currentBrand.banner})` }}
         >
           <div className="absolute inset-0 bg-black bg-opacity-50"></div>
         </div>
-        
+
         <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
               <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-white rounded-lg p-2 md:p-3 shadow-lg">
-                <img 
-                  src={currentBrand.logo} 
+                <img
+                  src={currentBrand.logo}
                   alt={currentBrand.name}
                   className="w-full h-full object-contain"
                 />
@@ -183,6 +187,11 @@ const BrandPage = () => {
           </div>
         </div>
 
+        <ComingSoon />
+        {/* Video Class Section */}
+        <VideoClassSection />
+
+        <RecommendedProducts />
         {/* Filters and Sort */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <button
@@ -227,7 +236,7 @@ const BrandPage = () => {
           {/* Filters Sidebar */}
           <div className={`${showFilters ? 'block' : 'hidden'} sm:block w-full sm:w-64 bg-white rounded-lg shadow-sm p-4 h-fit mb-6 sm:mb-0`}>
             <h3 className="font-semibold text-base md:text-lg mb-4">Filters</h3>
-            
+
             <div className="space-y-4 md:space-y-6">
               {/* Category Filter */}
               <div>
@@ -240,7 +249,7 @@ const BrandPage = () => {
                         name="category"
                         value={cat}
                         checked={filters.category === cat}
-                        onChange={(e) => setFilters({...filters, category: e.target.value})}
+                        onChange={(e) => setFilters({ ...filters, category: e.target.value })}
                         className="mr-2"
                       />
                       <span>{cat}</span>
@@ -260,7 +269,7 @@ const BrandPage = () => {
                         name="priceRange"
                         value={range}
                         checked={filters.priceRange === range}
-                        onChange={(e) => setFilters({...filters, priceRange: e.target.value})}
+                        onChange={(e) => setFilters({ ...filters, priceRange: e.target.value })}
                         className="mr-2"
                       />
                       <span>{range}</span>
@@ -276,12 +285,11 @@ const BrandPage = () => {
                   {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map(size => (
                     <button
                       key={size}
-                      onClick={() => setFilters({...filters, size: filters.size === size ? '' : size})}
-                      className={`py-1.5 px-2 border rounded text-xs sm:text-sm ${
-                        filters.size === size
+                      onClick={() => setFilters({ ...filters, size: filters.size === size ? '' : size })}
+                      className={`py-1.5 px-2 border rounded text-xs sm:text-sm ${filters.size === size
                           ? 'border-red-500 bg-red-50 text-red-600'
                           : 'border-gray-300 hover:border-gray-400'
-                      }`}
+                        }`}
                     >
                       {size}
                     </button>
@@ -299,11 +307,10 @@ const BrandPage = () => {
               </p>
             </div>
 
-            <div className={`grid gap-3 sm:gap-4 ${
-              viewMode === 'grid' 
-                ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4' 
+            <div className={`grid gap-3 sm:gap-4 ${viewMode === 'grid'
+                ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
                 : 'grid-cols-1'
-            }`}>
+              }`}>
               {brandProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

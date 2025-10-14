@@ -20,7 +20,6 @@ import ProfilePage from "./Components/Profile/ProfilePage";
 import CheckoutPage from "./Components/Checkout/CheckoutPage";
 import Error404 from "./Components/Pages/Error404page";
 
-
 export default function App() {
   const router = createBrowserRouter([
     {
@@ -32,6 +31,7 @@ export default function App() {
           <Outlet />
           <Footer />
           <BottomNav />
+          
         </>,
       children: [
         {

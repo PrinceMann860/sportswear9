@@ -4,6 +4,9 @@ import { ProductCard } from "../Product/Product";
 import CategoryCarousel from "./CategoryCarousel";
 import LandscapeCarousel from "../Banner&Carousels/LandscapeCarousel";
 import HorizontalScrollCarousel from "../Banner&Carousels/HorizontalScrollCarousel";
+import ComingSoon from "./ComingSoon";
+import VideoClassSection from "./VideoClassSection";
+import RecommendedProducts from "./RecommendedProducts";
 
 import logo1 from "../../assets/1.svg";
 import logo2 from "../../assets/2.svg";
@@ -369,6 +372,11 @@ function Home() {
         </div>
       </section>
 
+      <ComingSoon />
+      {/* Video Class Section */}
+      <VideoClassSection />
+
+      <RecommendedProducts />
       {/* Categories */}
       <section className="mt-12 lg:max-w-7xl px-6 mx-auto">
         <h2 className="font-semibold text-3xl md:text-4xl text-center">
