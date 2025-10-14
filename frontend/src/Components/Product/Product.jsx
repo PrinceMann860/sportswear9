@@ -17,7 +17,7 @@ function ProductCard({ product }) {
       <div className="group relative bg-white overflow-hidden shadow-sm border-gray-100 hover:shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-1 flex flex-col rounded-lg">
 
         {/* Fixed Image Container */}
-        <div className="relative w-full h-64 flex items-center justify-center bg-gray-50">
+        <div className="relative w-full h-46 md:54 lg:h-64 flex items-center justify-center bg-gray-50">
           
           {/* Default Image */}
           <img
