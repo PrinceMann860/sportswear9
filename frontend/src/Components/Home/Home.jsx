@@ -49,37 +49,37 @@ const categories = [
 // --- Promotional Card Data (Vertical aspect ratio) ---
 const promoCards = [
     {
-        image: "https://placehold.co/400x550/374151/ffffff?text=SUMMER+LOOKS", // Dark background for contrast
+        image: "https://yardofdeals.com/cdn/shop/products/2018-New-Summer-style-Mens-cotton-Short-sleeve-t-shirt-Gyms-Fitness-shirts-male-casual-fashion.jpg_640x640_1024x1024_2x_6fcb8ce1-9502-4084-b154-08501d78e41a_1200x1200.jpg?v=1597908790", // Dark background for contrast
         deal: "MIN. 40% OFF",
         look: "Laidback Looks",
         logo: logo1
     },
     {
-        image: "https://placehold.co/400x550/10b981/ffffff?text=NEW+ARRIVALS", // Green background
+        image: "https://www.powerhousegymproshop.com/cdn/shop/files/powerhouse-gym-pro-shop-premium-oversized-hoodie-charcoal-34264387911851.jpg?v=1687997189&width=1445", // Green background
         deal: "FLAT 30% OFF",
         look: "Seasonal Essentials",
         logo: "https://placehold.co/100x40/ffffff/10b981?text=Brand+B+Logo"
     },
     {
-        image: "https://placehold.co/400x550/f97316/ffffff?text=LIMITED+TIME", // Orange background
-        deal: "BUY 1 GET 1 FREE",
-        look: "Premium Collections",
-        logo: "https://placehold.co/100x40/ffffff/f97316?text=Brand+C+Logo"
+      image: "https://bullarfitness.com/cdn/shop/files/Accessories.jpg?v=1740035011&width=1100", // Purple background
+      deal: "BUY 1 GET 1 FREE",
+      look: "Premium Collections",
+      logo: "https://placehold.co/100x40/ffffff/f97316?text=Brand+C+Logo"
     },
     { 
-        image: "https://placehold.co/400x550/5b21b6/ffffff?text=WEEKEND+FLASH", // Purple background
+        image: "https://www.verywellfit.com/thmb/Eyv2XS6jfnBy9nSnCLHe_9A71TU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/vwt-product-reebok-nano-x2-training-shoes-tstaples-133-e73e0a61fe50493daf72e839cd53dfdf.jpg", // Orange background
         deal: "UP TO 70% OFF",
         look: "Footwear & Accessories",
         logo: "https://placehold.co/100x40/ffffff/5b21b6?text=Brand+D+Logo"
     },
     {
-        image: "https://placehold.co/400x550/6d28d9/ffffff?text=LAST+CHANCE", // Deep Purple background
+        image: "https://www.fitlineindia.com/cdn/shop/files/WhatsApp_Image_2022-05-19_at_5.53.38_PM.jpg?v=1653037917&width=1500", // Deep Purple background
         deal: "EXTRA 20% OFF",
         look: "Clearance Event",
         logo: "https://placehold.co/100x40/ffffff/6d28d9?text=Brand+E+Logo"
     },
     {
-        image: "https://placehold.co/400x550/059669/ffffff?text=SPRING+STYLE", // Emerald Green background
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDU7OcmNBhqYI7DCu3wOmtEOCwyTOzhknEU490QpBwnI4ngrWe1kzpwyy06N33fyeQkRo&usqp=CAU", // Emerald Green background
         deal: "NEW COLORS",
         look: "Comfort Collection",
         logo: "https://placehold.co/100x40/ffffff/059669?text=Brand+F+Logo"

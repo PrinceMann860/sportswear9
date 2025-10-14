@@ -5,43 +5,41 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 // --- PromotionCard Component (Single card display logic) ---
 const PromotionCard = ({ image, deal, look, logo }) => {
-    // w-[33.33%] (3 cards on mobile) -> sm:w-[25%] (4 cards on tablet) -> lg:w-[22.22%] (4.5 cards on desktop)
     return (
-        <div className="w-[33.33%] sm:w-[25%] lg:w-[22.22%] flex-shrink-0 rounded-xl snap-start bg-white shadow-lg">
-            
-            {/* 1. Image Container with Dotted Border (Main visual part) */}
-            <div className="relative w-full aspect-[3/4.5] p-2 m-1 border-2 border-dotted border-gray-400 rounded-xl"> 
-                
-                {/* Inner image content wrapper */}
-                <div className="w-full h-full relative rounded-lg overflow-hidden">
-                    <img
-                        src={image}
-                        alt={deal}
-                        className="w-full h-full object-cover"
-                        onError={(e) => { e.target.onerror = null; e.target.src="https://placehold.co/400x550/6b7280/ffffff?text=Image+Failed+to+Load"; }}
-                    />
-
-                    {/* Text Overlay & Gradient */}
-                    <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 pt-16 sm:pt-20 bg-gradient-to-t from-black/80 via-black/40 to-transparent text-white">
-                        {/* Responsive font size for deal text */}
-                        <p className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-1 leading-none text-shadow-lg">
-                            {deal}
-                        </p>
-                        <p className="text-sm sm:text-base font-medium opacity-90 text-shadow-md">
-                            {look}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            {/* 2. Bottom Logo Rectangle */}
-            <div className=" bg-white border-t border-gray-200 flex justify-center items-center rounded-b-xl">
+        <div className="relative bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 w-[280px] sm:w-[300px] md:w-[320px] lg:w-[340px] flex-shrink-0 border border-gray-100">
+            {/* Image Container */}
+            <div className="relative aspect-[4/3] sm:aspect-[3/2] overflow-hidden">
                 <img 
-                    src={logo}
-                    alt="Brand Logo"
-                    className="w-1/2 h-auto object-contain max-h-8"
-                    onError={(e) => { e.target.onerror = null; e.target.src="https://placehold.co/100x100/ffffff/374151?text=LOGO"; }}
+                    src={image} 
+                    alt={deal}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                 />
+                
+                {/* Logo Badge */}
+                {logo && (
+                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-lg p-2 shadow-sm">
+                        <img 
+                            src={logo} 
+                            alt="Brand logo" 
+                            className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+                        />
+                    </div>
+                )}
+            </div>
+            
+            {/* Content */}
+            <div className="p-3 sm:p-4">
+                <h3 className="font-semibold text-gray-900 text-sm sm:text-base line-clamp-2 mb-2">
+                    {deal}
+                </h3>
+                <p className="text-gray-600 text-xs sm:text-sm line-clamp-2">
+                    {look}
+                </p>
+                
+                {/* CTA Button */}
+                <button className="w-full mt-3 sm:mt-4 bg-gray-900 hover:bg-black text-white py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-colors duration-200">
+                    Shop Now
+                </button>
             </div>
         </div>
     );
@@ -64,44 +62,57 @@ const DealsOfTheDay = ({ title, items }) => {
     const scrollRight = () => scrollBy(0.8);
     
     return (
-        <div className="mt-8 relative"> 
-            <h2 className="text-3xl font-bold text-gray-800 mb-6 px-4 sm:px-0 text-center">
+        <div className="mt-8 relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6 text-center sm:text-left">
                 {title}
             </h2>
             
-            {/* Left Scroll Arrow (Visible on tablet/desktop only) */}
-            <button
-                onClick={scrollLeft}
-                className="absolute -left-1 sm:left-1 md:-left-4 top-1/2 -translate-y-1/2 bg-white/70 backdrop-blur p-2 rounded-full shadow-xl z-20 hidden sm:block hover:bg-white transition-all transform hover:scale-110"
-                aria-label="Scroll left"
-            >
-                <ChevronLeft size={24} className="text-gray-800" />
-            </button>
-            
-            {/* Scrollable Container - attached ref here */}
-            <div 
-                ref={scrollRef} 
-                className="flex overflow-x-auto snap-x snap-mandatory pb-4 gap-4 px-4 sm:px-0 scrollbar-hide"
-            >
-                {items.map((item, index) => (
-                    <PromotionCard 
-                        key={index} 
-                        image={item.image} 
-                        deal={item.deal} 
-                        look={item.look} 
-                        logo={item.logo}
-                    />
-                ))}
+            {/* Container with proper positioning */}
+            <div className="relative">
+                {/* Left Scroll Arrow (Visible on tablet/desktop only) */}
+                <button
+                    onClick={scrollLeft}
+                    className="absolute -left-2 sm:-left-4 md:-left-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 sm:p-3 rounded-full shadow-lg z-20 hidden sm:flex items-center justify-center hover:bg-white transition-all duration-200 transform hover:scale-105 border border-gray-200"
+                    aria-label="Scroll left"
+                >
+                    <ChevronLeft size={20} className="text-gray-700 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                </button>
+                
+                {/* Scrollable Container */}
+                <div 
+                    ref={scrollRef} 
+                    className="flex overflow-x-auto snap-x snap-mandatory pb-4 gap-3 sm:gap-4 lg:gap-6 scrollbar-hide px-1"
+                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                    {items.map((item, index) => (
+                        <div key={index} className="flex-shrink-0 snap-start">
+                            <PromotionCard 
+                                image={item.image} 
+                                deal={item.deal} 
+                                look={item.look} 
+                                logo={item.logo}
+                            />
+                        </div>
+                    ))}
+                </div>
+
+                {/* Right Scroll Arrow (Visible on tablet/desktop only) */}
+                <button
+                    onClick={scrollRight}
+                    className="absolute -right-2 sm:-right-4 md:-right-6 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 sm:p-3 rounded-full shadow-lg z-20 hidden sm:flex items-center justify-center hover:bg-white transition-all duration-200 transform hover:scale-105 border border-gray-200"
+                    aria-label="Scroll right"
+                >
+                    <ChevronRight size={20} className="text-gray-700 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                </button>
             </div>
 
-            {/* Right Scroll Arrow (Visible on tablet/desktop only) */}
-            <button
-                onClick={scrollRight}
-                className="absolute -right-1 sm:right-1 md:-right-4 top-1/2 -translate-y-1/2 bg-white/70 backdrop-blur p-2 rounded-full shadow-xl z-20 hidden sm:block hover:bg-white transition-all transform hover:scale-110"
-                aria-label="Scroll right"
-            >
-                <ChevronRight size={24} className="text-gray-800" />
-            </button>
+            {/* Mobile scroll indicators */}
+            <div className="sm:hidden flex justify-center mt-4 space-x-2">
+                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+            </div>
         </div>
     );
 };

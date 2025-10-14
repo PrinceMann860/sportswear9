@@ -113,7 +113,7 @@ const RecommendedProducts = () => {
           <button
             onClick={() => scroll('left')}
             disabled={!canScrollLeft}
-            className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-all ${
+            className={`hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg items-center justify-center transition-all ${
               canScrollLeft ? 'opacity-100 hover:bg-gray-100' : 'opacity-50 cursor-not-allowed'
             }`}
             aria-label="previous-button"
@@ -173,7 +173,7 @@ const RecommendedProducts = () => {
           <button
             onClick={() => scroll('right')}
             disabled={!canScrollRight}
-            className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-all ${
+            className={`hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg items-center justify-center transition-all ${
               canScrollRight ? 'opacity-100 hover:bg-gray-100' : 'opacity-50 cursor-not-allowed'
             }`}
             aria-label="next-button"

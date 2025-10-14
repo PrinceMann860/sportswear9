@@ -1,14 +1,18 @@
 // ProductInfo.jsx
 import React, { useState } from "react";
-import { Star, Heart, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, Heart, Truck, Shield, RefreshCw, ChevronDown } from "lucide-react";
 import { ProductCard } from "./Product";
 import RecommendedProducts from "../Home/RecommendedProducts";
+import { Check, Info, Ruler } from "lucide-react";
 
 const ProductInfo = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [showAllReviews, setShowAllReviews] = useState(false);
+  const [selectedSize, setSelectedSize] = useState("M");
+  const [selectedColor, setSelectedColor] = useState("Black");
+  const [quantity, setQuantity] = useState(1);
 
-  // Mock product data
+  // Mock product data - Enhanced with additional fields
   const product = {
     id: 3,
     title: "Compression T-shirt",
@@ -18,12 +22,36 @@ const ProductInfo = () => {
     discount: "-65%",
     images: [
       "https://assets.myntassets.com/dpr_1.5,q_30,w_800,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-      "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?auto=format&fit=crop&w=800&q=80",
+      "https://assets.myntassets.com/dpr_1.5,q_30,w_800,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+      "https://assets.myntassets.com/dpr_1.5,q_30,w_800,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+      "https://assets.myntassets.com/dpr_1.5,q_30,w_800,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
     ],
-    description:
-      "Engineered with moisture-wicking fabric, our Compression T-shirt provides superior breathability, flexibility, and comfort during intense workouts.",
+    description: "Engineered with moisture-wicking fabric, our Compression T-shirt provides superior breathability, flexibility, and comfort during intense workouts.",
+    features: [
+      "Moisture-wicking technology",
+      "4-way stretch fabric",
+      "Anti-odor treatment",
+      "UPF 50+ sun protection",
+      "Flatlock seams for comfort"
+    ],
+    sizes: ["XS", "S", "M", "L", "XL", "XXL"],
+    colors: [
+      { name: "Black", value: "#000000" },
+      { name: "Navy Blue", value: "#1e3a8a" },
+      { name: "Charcoal", value: "#374151" },
+      { name: "Burgundy", value: "#831843" }
+    ],
+    specifications: {
+      "Material": "92% Polyester, 8% Spandex",
+      "Fit": "Compression Fit",
+      "Care": "Machine Wash Cold",
+      "Weight": "Lightweight (150 GSM)",
+      "Origin": "Made in India"
+    },
+    inStock: true,
+    deliveryDate: "2-3 business days",
+    rating: 4.5,
+    reviewCount: 128
   };
 
   const relatedProducts = [
@@ -128,154 +156,160 @@ const ProductInfo = () => {
   const totalReviews = reviews.length;
   const ratingSum = reviews.reduce((sum, r) => sum + (r.rating || 0), 0);
   const averageRating = totalReviews ? (ratingSum / totalReviews) : 0;
-  const roundedAverage = Math.round(averageRating * 10) / 10; // one decimal
+  const roundedAverage = Math.round(averageRating * 10) / 10;
 
-  const ratingsCount = [0,0,0,0,0]; // index 0 -> 5 stars, index 4 -> 1 star mapping
-  // We'll map index 0 -> 5 stars for easier display
+  const ratingsCount = [0,0,0,0,0];
   reviews.forEach(r => {
     const rt = Math.max(1, Math.min(5, Math.floor(r.rating || 0)));
     ratingsCount[5 - rt] += 1;
   });
 
   const ratingPercentages = ratingsCount.map(c => Math.round((c / (totalReviews || 1)) * 100));
-
-  // Collect all review images
   const reviewImages = reviews.flatMap(r => (r.images || []));
 
-  // Navigation functions
-  const nextImage = () => {
-    setSelectedImage((prev) => (prev + 1) % product.images.length);
-  };
-
-  const prevImage = () => {
-    setSelectedImage((prev) => (prev - 1 + product.images.length) % product.images.length);
-  };
-
   return (
-    <div className="pt-24 bg-gradient-to-b from-gray-200 to-white text-gray-900">
+    <div className="pt-20 bg-gradient-to-b from-gray-50 to-white text-gray-900 overflow-x-hidden">
       {/* Product Section */}
-      <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 py-10">
-        {/* Left: Image Gallery - Gymshark Style */}
-        <div className="relative">
-          {/* Main Image Container */}
-          <div className="relative aspect-[3/4] bg-white rounded-lg overflow-hidden group">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-8 lg:gap-16 py-8 lg:py-12">
+        
+        {/* Left: Image Gallery */}
+        <div className="space-y-4">
+          <div className="relative rounded-2xl overflow-hidden bg-white shadow-lg border border-gray-200">
             <img
               src={product.images[selectedImage]}
               alt="product"
-              className="w-full h-full object-cover transition-opacity duration-300"
+              className="w-full h-auto object-cover aspect-[3/4]"
             />
-            
-            {/* Navigation Arrows */}
-            <button
-              onClick={prevImage}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg"
-            >
-              <ChevronLeft size={20} className="text-gray-800" />
-            </button>
-            
-            <button
-              onClick={nextImage}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg"
-            >
-              <ChevronRight size={20} className="text-gray-800" />
-            </button>
-
-            {/* Image Counter */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
-              {selectedImage + 1} / {product.images.length}
-            </div>
           </div>
-
-          {/* Thumbnail Gallery - Horizontal Scroll */}
-          <div className="flex gap-3 mt-6 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-thin">
             {product.images.map((img, i) => (
               <button
                 key={i}
                 onClick={() => setSelectedImage(i)}
-                className={`flex-shrink-0 w-20 h-24 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
                   selectedImage === i
-                    ? "border-black scale-105 shadow-md"
-                    : "border-gray-200 hover:border-gray-400"
+                    ? "border-red-500 shadow-md scale-105 ring-2 ring-red-200"
+                    : "border-gray-300 hover:border-gray-400 hover:scale-102"
                 }`}
               >
                 <img
                   src={img}
-                  alt={`Thumbnail ${i + 1}`}
+                  alt=""
                   className="w-full h-full object-cover"
                 />
               </button>
             ))}
           </div>
-
-          {/* Product Actions */}
-          <div className="flex gap-3 mt-6">
-            <button className="flex-1 bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors duration-200">
-              Add to Cart
-            </button>
-            <button className="px-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-              <Heart className="w-5 h-5" />
-            </button>
-          </div>
         </div>
 
-        {/* Right: Product Info */}
-        <div className="flex flex-col justify-center space-y-6">
-          <div>
-            <span className="inline-block bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-medium mb-3">
-              {product.category}
-            </span>
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-2">
+        {/* Right: Modern Product Information */}
+        <div className="flex flex-col space-y-8">
+          {/* Product Header */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="inline-block bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-md">
+                {product.category}
+              </span>
+              <div className="flex items-center gap-2 bg-white rounded-full px-3 py-1 shadow-sm border border-gray-200">
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                <span className="text-sm font-semibold text-gray-700">{product.rating}</span>
+                <span className="text-xs text-gray-500">({product.reviewCount})</span>
+              </div>
+            </div>
+            
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
               {product.title}
             </h1>
           </div>
-
-          {/* Price Section */}
-          <div className="flex items-center gap-4">
-            <span className="text-3xl font-bold text-black">
-              {product.price}
-            </span>
-            <span className="text-lg text-gray-500 line-through">
-              {product.original}
-            </span>
-            <span className="bg-red-500 text-white px-2 py-1 rounded text-sm font-semibold">
-              {product.discount}
-            </span>
-          </div>
-
-          {/* Rating */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  size={18}
-                  className={i < 4 ? "text-yellow-400" : "text-gray-300"}
-                  fill={i < 4 ? "currentColor" : "none"}
-                />
-              ))}
+          
+          {/* Pricing - Modern Card Style */}
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
+            <div className="flex items-center gap-4 flex-wrap">
+              <span className="text-3xl sm:text-4xl font-bold text-gray-900">
+                {product.price}
+              </span>
+              <span className="text-xl text-gray-500 line-through">
+                {product.original}
+              </span>
+              <span className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md">
+                {product.discount} OFF
+              </span>
             </div>
-            <span className="text-gray-600">4.2 • 128 Reviews</span>
+            <p className="text-red-600 text-sm font-medium mt-2 flex items-center gap-1">
+              <Check className="w-4 h-4" />
+              You save ₹4,100.00
+            </p>
           </div>
 
           {/* Description */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Product Description</h3>
-            <p className="text-gray-700 leading-relaxed">{product.description}</p>
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Info className="w-5 h-5 text-red-500" />
+              Product Description
+            </h3>
+            <p className="text-gray-700 leading-relaxed text-base">
+              {product.description}
+            </p>
           </div>
 
-          {/* Size Guide */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Size</h3>
-              <button className="text-sm text-gray-600 underline hover:text-black">
+          {/* Key Features - Modern Grid */}
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Key Features</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {product.features.map((feature, index) => (
+                <div key={index} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-200">
+                  <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
+                    <Check className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-800">{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Color Selection - Modern Cards */}
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Choose Color</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {product.colors.map((color) => (
+                <button
+                  key={color.name}
+                  onClick={() => setSelectedColor(color.name)}
+                  className={`flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 ${
+                    selectedColor === color.name 
+                      ? "border-red-500 bg-red-50 shadow-md scale-105 ring-2 ring-red-200" 
+                      : "border-gray-300 hover:border-gray-400 hover:shadow-sm"
+                  }`}
+                >
+                  <div
+                    className="w-12 h-12 rounded-full border-2 border-gray-300 shadow-sm"
+                    style={{ backgroundColor: color.value }}
+                  ></div>
+                  <span className="text-sm font-medium text-gray-700">{color.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Size Selection - Modern Grid */}
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Select Size</h3>
+              <button className="flex items-center gap-2 text-red-600 hover:text-red-700 font-medium text-sm">
+                <Ruler className="w-4 h-4" />
                 Size Guide
               </button>
             </div>
-            <div className="grid grid-cols-4 gap-3">
-              {['S', 'M', 'L', 'XL'].map((size) => (
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+              {product.sizes.map((size) => (
                 <button
                   key={size}
-                  className="border-2 border-gray-200 rounded-lg py-3 font-medium hover:border-black transition-colors duration-200"
+                  onClick={() => setSelectedSize(size)}
+                  className={`py-4 rounded-xl border-2 font-semibold transition-all duration-300 ${
+                    selectedSize === size
+                      ? "bg-gray-900 text-white border-gray-900 shadow-md scale-105"
+                      : "border-gray-300 text-gray-700 hover:border-gray-400 hover:shadow-sm hover:scale-102 bg-white"
+                  }`}
                 >
                   {size}
                 </button>
@@ -283,64 +317,131 @@ const ProductInfo = () => {
             </div>
           </div>
 
-          {/* Color Options */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold">Color</h3>
-            <div className="flex gap-3">
-              {['bg-black', 'bg-gray-400', 'bg-blue-500'].map((color, i) => (
-                <button
-                  key={i}
-                  className={`w-10 h-10 rounded-full border-2 border-gray-300 ${color} hover:scale-110 transition-transform duration-200`}
-                />
-              ))}
+          {/* Quantity & Actions - Modern Layout */}
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Quantity Selection */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Quantity</h3>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden shadow-sm">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="px-4 py-3 text-gray-600 hover:text-gray-800 transition-colors hover:bg-gray-50"
+                    >
+                      -
+                    </button>
+                    <span className="px-6 py-3 border-l border-r border-gray-300 min-w-12 text-center font-semibold bg-white">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="px-4 py-3 text-gray-600 hover:text-gray-800 transition-colors hover:bg-gray-50"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <div className={`px-3 py-2 rounded-full text-sm font-medium ${
+                    product.inStock 
+                      ? "bg-green-100 text-green-800" 
+                      : "bg-red-100 text-red-800"
+                  }`}>
+                    {product.inStock ? "✓ In Stock" : "Out of Stock"}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3">
+                <button className="flex-1 bg-gray-900 text-white py-4 rounded-xl font-bold hover:bg-black transition-all duration-300 transform hover:scale-105 shadow-md">
+                  Add to Cart
+                </button>
+                <button className="p-4 border-2 border-gray-300 rounded-xl hover:border-red-300 hover:bg-red-50 transition-all duration-300 group">
+                  <Heart className="w-6 h-6 text-red-500 group-hover:scale-110 transition-transform" />
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Add to Cart Button */}
-          <button className="w-full bg-black text-white py-4 rounded-lg font-semibold text-lg hover:bg-gray-800 transition-colors duration-200 shadow-lg">
-            Add to Cart
-          </button>
-
-          {/* Delivery Info */}
-          <div className="space-y-2 text-sm text-gray-600">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>Free delivery for orders above ₹999</span>
+          {/* Services - Modern Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center">
+                  <Truck className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">Free Delivery</p>
+                  <p className="text-sm text-gray-600">By {product.deliveryDate}</p>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>30-day returns & exchanges</span>
+            
+            <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">1 Year Warranty</p>
+                  <p className="text-sm text-gray-600">Quality Assured</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center">
+                  <RefreshCw className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">Easy Returns</p>
+                  <p className="text-sm text-gray-600">30-Day Policy</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Specifications - Modern Table */}
+          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Specifications</h3>
+            <div className="space-y-3">
+              {Object.entries(product.specifications).map(([key, value]) => (
+                <div key={key} className="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0">
+                  <span className="text-gray-600 font-medium">{key}</span>
+                  <span className="text-gray-900 font-semibold bg-gray-50 px-3 py-1 rounded-lg">{value}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Rest of the component remains the same... */}
       {/* Banners */}
-      <div className="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-6">
-        <div className="relative bg-black text-white rounded-2xl p-10 overflow-hidden">
-          <div className="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1400&q=80')] bg-cover" />
-          <div className="relative z-10">
-            <h3 className="text-2xl font-bold mb-3">Train Hard. Look Good.</h3>
-            <p className="text-sm mb-4 text-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 grid md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="relative bg-gray-900 text-white rounded-2xl p-6 sm:p-8 lg:p-10 overflow-hidden min-h-[200px]">
+          <div className="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1400&q=80')] bg-cover bg-center" />
+          <div className="relative z-10 h-full flex flex-col justify-center">
+            <h3 className="text-xl sm:text-2xl font-bold mb-3">Train Hard. Look Good.</h3>
+            <p className="text-sm mb-4 text-gray-200 max-w-md">
               Push your limits with SportsWear9's high-performance collection.
             </p>
-            <button className="bg-white text-black px-5 py-2 rounded-full font-semibold hover:bg-gray-200 transition">
+            <button className="bg-white text-gray-900 px-5 py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors w-fit text-sm">
               Shop Now
             </button>
           </div>
         </div>
 
-        <div className="relative bg-gray-900 text-white rounded-2xl p-10 overflow-hidden">
-          <div className="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=1400&q=80')] bg-cover" />
-          <div className="relative z-10">
-            <h3 className="text-2xl font-bold mb-3 text-red-500">
+        <div className="relative bg-gray-800 text-white rounded-2xl p-6 sm:p-8 lg:p-10 overflow-hidden min-h-[200px]">
+          <div className="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=1400&q=80')] bg-cover bg-center" />
+          <div className="relative z-10 h-full flex flex-col justify-center">
+            <h3 className="text-xl sm:text-2xl font-bold mb-3 text-red-500">
               New Season Drop
             </h3>
-            <p className="text-sm mb-4 text-gray-200">
+            <p className="text-sm mb-4 text-gray-200 max-w-md">
               Discover the latest designs crafted for speed and comfort.
             </p>
-            <button className="bg-white text-black px-5 py-2 rounded-full font-semibold hover:bg-gray-200 transition">
+            <button className="bg-white text-gray-900 px-5 py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors w-fit text-sm">
               Explore
             </button>
           </div>
@@ -351,20 +452,20 @@ const ProductInfo = () => {
       <RecommendedProducts />
 
       {/* Reviews Section */}
-      <div className="max-w-7xl mx-auto px-4 py-12 border-t border-gray-300">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 border-t border-gray-200">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Left: Ratings summary */}
-          <div className="col-span-1">
-            <div className="bg-white rounded-lg p-6 shadow-sm">
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
               <div className="flex items-center gap-4">
                 <div>
-                  <div className="text-4xl font-bold text-black">{roundedAverage}</div>
-                  <div className="flex items-center mt-1">
-                    <div className="flex -space-x-1">
+                  <div className="text-3xl sm:text-4xl font-bold text-gray-900">{roundedAverage}</div>
+                  <div className="flex items-center mt-2">
+                    <div className="flex gap-0.5">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
-                          size={16}
+                          size={18}
                           className={i < Math.round(averageRating) ? "text-yellow-500" : "text-gray-300"}
                           fill={i < Math.round(averageRating) ? "currentColor" : "none"}
                         />
@@ -375,113 +476,147 @@ const ProductInfo = () => {
                 </div>
               </div>
 
-              <div className="mt-6 space-y-2">
+              {/* Rating breakdown */}
+              <div className="mt-6 space-y-3">
                 {[5,4,3,2,1].map((star, idx) => {
                   const pct = ratingPercentages[idx] ?? 0;
                   return (
                     <div key={star} className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
-                        <div className="flex items-center">
+                        <div className="flex items-center gap-1">
                           {Array.from({ length: star }).map((__, i) => (
                             <Star key={i} size={14} className="text-yellow-500" fill="currentColor" />
                           ))}
                         </div>
-                        <span className="text-sm text-gray-600 ml-2">{pct}%</span>
+                        <span className="text-gray-600 text-sm w-8">{pct}%</span>
                       </div>
                     </div>
                   );
                 })}
               </div>
 
+              {/* Write a review button */}
               <div className="mt-6">
-                <button className="w-full border border-gray-300 py-2 rounded-md text-sm font-medium hover:bg-gray-50">
+                <button className="w-full border border-gray-300 py-3 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
                   Write a product review
                 </button>
               </div>
             </div>
           </div>
 
+          {/* Middle + Right: Enhanced Comments Section */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h4 className="font-semibold text-lg">Customers say</h4>
-              <p className="text-sm text-gray-600 mt-2">
+            {/* Customers say */}
+            <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
+              <h4 className="font-semibold text-lg text-gray-900 mb-3">Customers say</h4>
+              <p className="text-sm text-gray-600 leading-relaxed">
                 Customers find the workout gloves have a nice fit. However, the quality receives mixed feedback, with some customers finding them good while others say they are not of good quality.
               </p>
-              <div className="mt-3 flex gap-3 text-sm text-blue-600">
-                <button className="underline">Fit</button>
-                <button className="underline">Quality</button>
+              <div className="mt-4 flex gap-4 text-sm">
+                <button className="text-red-600 hover:text-red-700 font-medium px-3 py-1 bg-red-50 rounded-full transition-colors">
+                  Fit
+                </button>
+                <button className="text-red-600 hover:text-red-700 font-medium px-3 py-1 bg-red-50 rounded-full transition-colors">
+                  Quality
+                </button>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-6 shadow-sm">
+            {/* Reviews with images */}
+            <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
               <div className="flex items-center justify-between">
-                <h4 className="font-semibold">Reviews with images</h4>
-                <a href="#" className="text-sm text-blue-600 underline">See all photos</a>
+                <h4 className="font-semibold text-gray-900">Reviews with images</h4>
+                <button className="text-sm text-red-600 hover:text-red-700 font-medium">
+                  See all photos
+                </button>
               </div>
 
               {reviewImages.length > 0 ? (
-                <div className="mt-4 overflow-x-auto flex gap-3 py-2">
+                <div className="mt-4 overflow-x-auto flex gap-3 py-2 scrollbar-thin">
                   {reviewImages.map((img, i) => (
-                    <img key={i} src={img} alt={`review-img-${i}`} className="w-28 h-28 object-cover rounded-md border border-gray-200" />
+                    <img 
+                      key={i} 
+                      src={img} 
+                      alt={`review-img-${i}`} 
+                      className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-lg border border-gray-200 flex-shrink-0" 
+                    />
                   ))}
                 </div>
               ) : (
-                <div className="mt-4 text-sm text-gray-500">No review images yet</div>
+                <div className="mt-4 text-sm text-gray-500 text-center py-4">
+                  No review images yet
+                </div>
               )}
             </div>
 
-            <div className="bg-white rounded-lg p-6 shadow-sm space-y-6">
-              <h4 className="font-semibold text-lg">Top reviews from India</h4>
+            {/* Enhanced Reviews list */}
+            <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
+              <h4 className="font-semibold text-lg text-gray-900 mb-6">Top reviews from India</h4>
 
-              {(showAllReviews ? reviews : reviews.slice(0, 3)).map((r, idx) => (
-                <div key={idx} className="border-b last:border-b-0 pb-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
-                        {r.name ? r.name.charAt(0).toUpperCase() : "U"}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center -space-x-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                size={14}
-                                className={i < r.rating ? "text-yellow-500" : "text-gray-300"}
-                                fill={i < r.rating ? "currentColor" : "none"}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-sm text-gray-500">{r.name}</span>
+              <div className="space-y-6">
+                {(showAllReviews ? reviews : reviews.slice(0, 3)).map((r, idx) => (
+                  <div key={idx} className="pb-6 border-b border-gray-200 last:border-b-0 last:pb-0">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 font-semibold text-sm border border-gray-300">
+                          {r.name ? r.name.charAt(0).toUpperCase() : "U"}
                         </div>
-                        <div className="text-xs text-gray-400 mt-1">{r.date}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <div className="flex items-center gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  size={14}
+                                  className={i < r.rating ? "text-yellow-500" : "text-gray-300"}
+                                  fill={i < r.rating ? "currentColor" : "none"}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-sm font-medium text-gray-900 truncate">{r.name}</span>
+                            <span className="text-xs text-gray-500">{r.date}</span>
+                          </div>
+                          
+                          {/* Enhanced Comment Text */}
+                          <p className="text-gray-700 mt-2 leading-relaxed text-sm sm:text-base">
+                            {r.text}
+                          </p>
+
+                          {/* Review Images */}
+                          {r.images && r.images.length > 0 && (
+                            <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+                              {r.images.map((img, j) => (
+                                <img 
+                                  key={j} 
+                                  src={img} 
+                                  alt={`rev-${idx}-img-${j}`} 
+                                  className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg border border-gray-200 flex-shrink-0" 
+                                />
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
 
-                    {r.rating >= 4 && (
-                      <div className="text-sm text-green-600 font-medium">Verified Purchase</div>
-                    )}
+                      {/* Verified tag */}
+                      {r.rating >= 4 && (
+                        <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium whitespace-nowrap ml-2">
+                          Verified
+                        </div>
+                      )}
+                    </div>
                   </div>
+                ))}
+              </div>
 
-                  <p className="text-gray-700 mt-3">{r.text}</p>
-
-                  {r.images && r.images.length > 0 && (
-                    <div className="mt-3 flex gap-3">
-                      {r.images.map((img, j) => (
-                        <img key={j} src={img} alt={`rev-${idx}-img-${j}`} className="w-24 h-24 object-cover rounded-md border border-gray-200" />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-
+              {/* See more / see less */}
               {reviews.length > 3 && (
-                <div className="text-center mt-2">
+                <div className="text-center mt-6 pt-4 border-t border-gray-200">
                   <button
                     onClick={() => setShowAllReviews(!showAllReviews)}
-                    className="text-sm text-blue-600 underline"
+                    className="text-sm text-red-600 hover:text-red-700 font-medium px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                   >
-                    {showAllReviews ? "See less reviews" : "See more reviews"}
+                    {showAllReviews ? "Show Less Reviews" : `Show More Reviews (${reviews.length - 3})`}
                   </button>
                 </div>
               )}

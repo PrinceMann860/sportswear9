@@ -193,3 +193,20 @@ function Product() {
 
 export default Product;
 export { ProductCard };
+
+const product = {
+    id: 3,
+    title: "Compression T-shirt",
+    category: "Performance",
+    price: "₹2,499.00",
+    original: "₹6,599.00",
+    discount: "-65%",
+    images: [
+      "https://assets.myntassets.com/dpr_1.5,q_30,w_800,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+      "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?auto=format&fit=crop&w=800&q=80",
+    ],
+    description:
+      "Engineered with moisture-wicking fabric, our Compression T-shirt provides superior breathability, flexibility, and comfort during intense workouts.",
+  };
