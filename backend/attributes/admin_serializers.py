@@ -36,7 +36,8 @@ class ProductVariantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductVariant
-        fields = ['id', 'product', 'sku', 'price', 'is_default', 'attributes']
+        fields = ['id', 'product', 'sku', 'price', 'is_default', 'attributes', 'images']
+
 
     def create(self, validated_data):
         attributes = validated_data.pop('attributes', [])
@@ -52,3 +53,5 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         if attributes is not None:
             instance.attributes.set(attributes)
         return instance
+
+
