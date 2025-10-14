@@ -178,9 +178,21 @@ function CategoriesPage() {
     products,
   ]);
 
-  // UI helpers
-  const accent = "text-red-500";
-  const controlBg = "bg-black text-white";
+  // Close mobile filters
+  const closeMobileFilters = () => {
+    setShowMobileFilters(false);
+  };
+
+  // Reset all filters
+  const resetAllFilters = () => {
+    setActiveCategory("all");
+    setSelectedTags([]);
+    setPriceMax(5000);
+    setMinRating(0);
+    setQuery("");
+    setSortBy("latest");
+    setShowMobileFilters(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 mt-10">
@@ -220,22 +232,6 @@ function CategoriesPage() {
                 />
               </svg>
             </div>
-
-            <button
-              onClick={() => setShowMobileFilters(true)}
-              className="md:hidden inline-flex items-center gap-2 px-3 py-2 rounded-full border border-gray-200 bg-white"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M3 5h18M7 12h10M10 19h4"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Filters
-            </button>
 
             <div className="hidden md:flex items-center gap-3">
               <select
@@ -339,14 +335,7 @@ function CategoriesPage() {
 
             <div className="mt-5 flex gap-2">
               <button
-                onClick={() => {
-                  setActiveCategory("all");
-                  setSelectedTags([]);
-                  setPriceMax(5000);
-                  setMinRating(0);
-                  setQuery("");
-                  setSortBy("latest");
-                }}
+                onClick={resetAllFilters}
                 className="flex-1 py-2 rounded-lg border border-gray-200"
               >
                 Reset
@@ -471,14 +460,7 @@ function CategoriesPage() {
               </p>
               <div className="mt-4">
                 <button
-                  onClick={() => {
-                    setActiveCategory("all");
-                    setSelectedTags([]);
-                    setPriceMax(5000);
-                    setMinRating(0);
-                    setQuery("");
-                    setSortBy("latest");
-                  }}
+                  onClick={resetAllFilters}
                   className="px-4 py-2 border rounded"
                 >
                   Reset
@@ -490,174 +472,159 @@ function CategoriesPage() {
       </div>
 
       {/* MOBILE: slide-up filter sheet */}
-      <div
-        className={`fixed inset-0 z-50 pointer-events-none ${
-          showMobileFilters ? "pointer-events-auto" : ""
-        }`}
-      >
-        {/* backdrop */}
-        <div
-          onClick={() => setShowMobileFilters(false)}
-          className={`absolute inset-0 bg-black/40 transition-opacity ${
-            showMobileFilters ? "opacity-100" : "opacity-0"
-          }`}
-        />
+      {showMobileFilters && (
+        <div className="fixed inset-0 z-50">
+          {/* backdrop */}
+          <div
+            onClick={closeMobileFilters}
+            className="absolute inset-0 bg-black/40"
+          />
 
-        {/* sheet */}
-        <div
-          className={`absolute left-0 right-0 bottom-0 bg-white rounded-t-2xl shadow-xl transform transition-transform ${
-            showMobileFilters ? "translate-y-0" : "translate-y-full"
-          }`}
-        >
-          <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-            <h4 className="text-lg font-semibold">Filters</h4>
-            <button
-              onClick={() => setShowMobileFilters(false)}
-              className="text-gray-600 px-2 py-1 rounded"
-            >
-              ✕
-            </button>
-          </div>
-
-          <div className="p-4 space-y-4 max-h-[60vh] overflow-auto">
-            <div>
-              <h5 className="text-sm font-medium">Category</h5>
-              <div className="mt-2 flex gap-2 flex-wrap">
-                <button
-                  onClick={() => setActiveCategory("all")}
-                  className={`px-3 py-1 rounded-full border ${
-                    activeCategory === "all"
-                      ? "bg-red-50 border-red-200 text-red-700"
-                      : "bg-white border-gray-200"
-                  }`}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => setActiveCategory("men")}
-                  className={`px-3 py-1 rounded-full border ${
-                    activeCategory === "men"
-                      ? "bg-red-50 border-red-200 text-red-700"
-                      : "bg-white border-gray-200"
-                  }`}
-                >
-                  Men
-                </button>
-                <button
-                  onClick={() => setActiveCategory("women")}
-                  className={`px-3 py-1 rounded-full border ${
-                    activeCategory === "women"
-                      ? "bg-red-50 border-red-200 text-red-700"
-                      : "bg-white border-gray-200"
-                  }`}
-                >
-                  Women
-                </button>
-                <button
-                  onClick={() => setActiveCategory("kids")}
-                  className={`px-3 py-1 rounded-full border ${
-                    activeCategory === "kids"
-                      ? "bg-red-50 border-red-200 text-red-700"
-                      : "bg-white border-gray-200"
-                  }`}
-                >
-                  Kids
-                </button>
-                <button
-                  onClick={() => setActiveCategory("sports")}
-                  className={`px-3 py-1 rounded-full border ${
-                    activeCategory === "sports"
-                      ? "bg-red-50 border-red-200 text-red-700"
-                      : "bg-white border-gray-200"
-                  }`}
-                >
-                  Sports
-                </button>
-              </div>
+          {/* sheet */}
+          <div className="absolute left-0 right-0 bottom-0 bg-white rounded-t-2xl shadow-xl transform transition-transform">
+            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+              <h4 className="text-lg font-semibold">Filters</h4>
+              <button
+                onClick={closeMobileFilters}
+                className="text-gray-600 px-2 py-1 rounded"
+              >
+                ✕
+              </button>
             </div>
 
-            <div>
-              <h5 className="text-sm font-medium">Tags</h5>
-              <div className="mt-2 flex gap-2 flex-wrap">
-                {allTags.map((t) => (
+            <div className="p-4 space-y-4 max-h-[60vh] overflow-auto">
+              <div>
+                <h5 className="text-sm font-medium">Category</h5>
+                <div className="mt-2 flex gap-2 flex-wrap">
                   <button
-                    key={t}
-                    onClick={() => toggleTag(t)}
+                    onClick={() => setActiveCategory("all")}
                     className={`px-3 py-1 rounded-full border ${
-                      selectedTags.includes(t)
+                      activeCategory === "all"
                         ? "bg-red-50 border-red-200 text-red-700"
-                        : "bg-white border-gray-200 text-gray-700"
+                        : "bg-white border-gray-200"
                     }`}
                   >
-                    {t}
+                    All
                   </button>
-                ))}
+                  <button
+                    onClick={() => setActiveCategory("men")}
+                    className={`px-3 py-1 rounded-full border ${
+                      activeCategory === "men"
+                        ? "bg-red-50 border-red-200 text-red-700"
+                        : "bg-white border-gray-200"
+                    }`}
+                  >
+                    Men
+                  </button>
+                  <button
+                    onClick={() => setActiveCategory("women")}
+                    className={`px-3 py-1 rounded-full border ${
+                      activeCategory === "women"
+                        ? "bg-red-50 border-red-200 text-red-700"
+                        : "bg-white border-gray-200"
+                    }`}
+                  >
+                    Women
+                  </button>
+                  <button
+                    onClick={() => setActiveCategory("kids")}
+                    className={`px-3 py-1 rounded-full border ${
+                      activeCategory === "kids"
+                        ? "bg-red-50 border-red-200 text-red-700"
+                        : "bg-white border-gray-200"
+                    }`}
+                  >
+                    Kids
+                  </button>
+                  <button
+                    onClick={() => setActiveCategory("sports")}
+                    className={`px-3 py-1 rounded-full border ${
+                      activeCategory === "sports"
+                        ? "bg-red-50 border-red-200 text-red-700"
+                        : "bg-white border-gray-200"
+                    }`}
+                  >
+                    Sports
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <div>
-              <h5 className="text-sm font-medium">Max Price</h5>
-              <div className="mt-2">
-                <input
-                  type="range"
-                  min={500}
-                  max={5000}
-                  step={100}
-                  value={priceMax}
-                  onChange={(e) => setPriceMax(Number(e.target.value))}
-                  className="w-full"
-                />
-                <div className="mt-2 text-sm font-semibold">
-                  Up to ₹{priceMax}
+              <div>
+                <h5 className="text-sm font-medium">Tags</h5>
+                <div className="mt-2 flex gap-2 flex-wrap">
+                  {allTags.map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => toggleTag(t)}
+                      className={`px-3 py-1 rounded-full border ${
+                        selectedTags.includes(t)
+                          ? "bg-red-50 border-red-200 text-red-700"
+                          : "bg-white border-gray-200 text-gray-700"
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h5 className="text-sm font-medium">Max Price</h5>
+                <div className="mt-2">
+                  <input
+                    type="range"
+                    min={500}
+                    max={5000}
+                    step={100}
+                    value={priceMax}
+                    onChange={(e) => setPriceMax(Number(e.target.value))}
+                    className="w-full"
+                  />
+                  <div className="mt-2 text-sm font-semibold">
+                    Up to ₹{priceMax}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h5 className="text-sm font-medium">Minimum rating</h5>
+                <div className="mt-2 flex gap-2">
+                  {[0, 3, 4, 4.5].map((r) => (
+                    <button
+                      key={r}
+                      onClick={() => setMinRating(r)}
+                      className={`px-3 py-1 rounded-lg border ${
+                        minRating === r
+                          ? "bg-red-600 text-white border-red-700"
+                          : "bg-white border-gray-200 text-gray-700"
+                      }`}
+                    >
+                      {r === 0 ? "Any" : `${r}+`}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
 
-            <div>
-              <h5 className="text-sm font-medium">Minimum rating</h5>
-              <div className="mt-2 flex gap-2">
-                {[0, 3, 4, 4.5].map((r) => (
-                  <button
-                    key={r}
-                    onClick={() => setMinRating(r)}
-                    className={`px-3 py-1 rounded-lg border ${
-                      minRating === r
-                        ? "bg-red-600 text-white border-red-700"
-                        : "bg-white border-gray-200 text-gray-700"
-                    }`}
-                  >
-                    {r === 0 ? "Any" : `${r}+`}
-                  </button>
-                ))}
-              </div>
+            <div className="p-4 border-t border-gray-100 flex gap-3">
+              <button
+                onClick={resetAllFilters}
+                className="flex-1 py-3 rounded-lg border"
+              >
+                Reset
+              </button>
+              <button
+                onClick={closeMobileFilters}
+                className="flex-1 py-3 rounded-lg bg-black text-white"
+              >
+                Apply
+              </button>
             </div>
           </div>
-
-          <div className="p-4 border-t border-gray-100 flex gap-3">
-            <button
-              onClick={() => {
-                setActiveCategory("all");
-                setSelectedTags([]);
-                setPriceMax(5000);
-                setMinRating(0);
-                setQuery("");
-                setSortBy("latest");
-                setShowMobileFilters(false);
-              }}
-              className="flex-1 py-3 rounded-lg border"
-            >
-              Reset
-            </button>
-            <button
-              onClick={() => setShowMobileFilters(false)}
-              className="flex-1 py-3 rounded-lg bg-black text-white"
-            >
-              Apply
-            </button>
-          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
+
 export default CategoriesPage;

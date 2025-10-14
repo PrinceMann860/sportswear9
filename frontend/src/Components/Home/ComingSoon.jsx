@@ -51,8 +51,6 @@ const ComingSoon = () => {
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
       setCanScrollLeft(scrollLeft > 0);
       setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
-      
-      // Calculate current page
       const itemWidth = scrollRef.current.querySelector('.coming-soon-item')?.offsetWidth || 300;
       const page = Math.round(scrollLeft / itemWidth);
       setCurrentPage(page);
@@ -81,8 +79,7 @@ const ComingSoon = () => {
               Coming Soon
             </h2>
           </AnimatedSection>
-          
-          {/* Desktop Navigation Arrows */}
+
           <div className="hidden md:flex gap-2">
             <button
               onClick={() => scroll('left')}
@@ -111,7 +108,6 @@ const ComingSoon = () => {
           </div>
         </div>
 
-        {/* Carousel */}
         <div
           ref={scrollRef}
           onScroll={checkScrollPosition}
@@ -121,13 +117,13 @@ const ComingSoon = () => {
           {comingSoonItems.map((item, index) => (
             <div
               key={item.id}
-              className="coming-soon-item flex-shrink-0 w-[70%] sm:w-[45%] md:w-[40%] lg:w-[30%]"
+              className="coming-soon-item flex-shrink-0 w-[80%] sm:w-[50%]"
               role="group"
               aria-label={`${index + 1} of ${comingSoonItems.length} in Coming Soon`}
             >
-              {/* Mobile View */}
+              {/* ✅ MOBILE: Fixed aspect to prevent height jump */}
               <div className="block md:hidden rounded-lg overflow-hidden shadow-lg relative group cursor-pointer hover:shadow-xl transition-shadow">
-                <div className="aspect-[9/16] relative">
+                <div className="aspect-[16/9] relative">
                   <img
                     src={item.portraitImage}
                     alt={item.instructor}
@@ -142,7 +138,7 @@ const ComingSoon = () => {
                 </div>
               </div>
 
-              {/* Desktop View */}
+              {/* ✅ DESKTOP: Stable aspect ratio */}
               <div className="hidden md:block rounded-lg overflow-hidden shadow-lg relative group cursor-pointer hover:shadow-xl transition-shadow">
                 <div className="aspect-[16/9] relative">
                   <img
@@ -162,7 +158,6 @@ const ComingSoon = () => {
           ))}
         </div>
 
-        {/* Pagination Dots */}
         <div className="flex justify-center gap-2 mt-6">
           {[...Array(totalPages)].map((_, index) => (
             <button

@@ -33,6 +33,7 @@ import sportvid from "../../assets/sportvid.mp4";
 import sportbanner from "../../assets/sportbanner.mp4";
 import bigbanner from "../../assets/Bigbanner.png";
 import ProductVideoCarousel from "../Banner&Carousels/ProductVideoCarousel";
+import ShopTheLookCarousel from "../Banner&Carousels/ShopTheLookCarousel";
 
 // Categories
 const categories = [
@@ -92,6 +93,7 @@ const products = [
   {
     id: 1,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+    img2: "https://www.gymxapparel.in/cdn/shop/files/m1.jpg?v=1753353563",
     price: "₹2,499.00",
     original: "₹6,599.00",
     discount: "-65%",
@@ -99,8 +101,9 @@ const products = [
     category: "Performance",
   },
   {
-    id: 2,
+    id: 1,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+    img2: "https://www.gymxapparel.in/cdn/shop/files/m1.jpg?v=1753353563",
     price: "₹2,499.00",
     original: "₹6,599.00",
     discount: "-65%",
@@ -108,17 +111,9 @@ const products = [
     category: "Performance",
   },
   {
-    id: 3,
+    id: 1,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-    price: "₹2,499.00",
-    original: "₹6,599.00",
-    discount: "-65%",
-    title: "Compression T-shirt",
-    category: "Performance",
-  },
-  {
-    id: 4,
-    img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+    img2: "https://www.gymxapparel.in/cdn/shop/files/m1.jpg?v=1753353563",
     price: "₹2,499.00",
     original: "₹6,599.00",
     discount: "-65%",
@@ -126,20 +121,34 @@ const products = [
     category: "Performance",
   },
   {
-    id: 5,
+    id: 1,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+    img2: "https://www.gymxapparel.in/cdn/shop/files/m1.jpg?v=1753353563",
     price: "₹2,499.00",
     original: "₹6,599.00",
     discount: "-65%",
     title: "Duramo 10 Shoes",
     category: "Performance",
   },
+  {
+    id: 1,
+    img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+    img2: "https://www.gymxapparel.in/cdn/shop/files/m1.jpg?v=1753353563",
+    price: "₹2,499.00",
+    original: "₹6,599.00",
+    discount: "-65%",
+    title: "Duramo 10 Shoes",
+    category: "Performance",
+  },
+  
+
 ];
 
 const menProducts = [
   {
     id: 1,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+    img2: "https://www.gymxapparel.in/cdn/shop/files/m1.jpg?v=1753353563",
     title: "Duramo 10 Shoes",
     subtitle: "Performance",
     price: 2499,
@@ -149,6 +158,7 @@ const menProducts = [
   {
     id: 2,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+    img2: "https://www.gymxapparel.in/cdn/shop/files/m1.jpg?v=1753353563",
     title: "Galaxy 6 Shoes",
     category: "Performance",
     price: 2400,
@@ -158,6 +168,7 @@ const menProducts = [
   {
     id: 3,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+    img2: "https://www.gymxapparel.in/cdn/shop/files/m1.jpg?v=1753353563",
     title: "Samba OG Shoes",
     category: "Originals",
     price: 4400,
@@ -167,6 +178,7 @@ const menProducts = [
   {
     id: 4,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+    img2: "https://www.gymxapparel.in/cdn/shop/files/m1.jpg?v=1753353563",
     title: "Ultraboost 20 Shoes",
     category: "Performance",
     price: 7600,
@@ -176,6 +188,7 @@ const menProducts = [
   {
     id: 5,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+    img2: "https://www.gymxapparel.in/cdn/shop/files/m1.jpg?v=1753353563",
     title: "Duramo 10 Shoes",
     category: "Performance",
     price: 2499,
@@ -185,6 +198,7 @@ const menProducts = [
   {
     id: 6,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+    img2: "https://www.gymxapparel.in/cdn/shop/files/m1.jpg?v=1753353563",
     title: "Galaxy 6 Shoes",
     category: "Performance",
     price: 2400,
@@ -194,6 +208,7 @@ const menProducts = [
   {
     id: 7,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+    img2: "https://www.gymxapparel.in/cdn/shop/files/m1.jpg?v=1753353563",
     title: "Samba OG Shoes",
     category: "Originals",
     price: 4400,
@@ -203,6 +218,7 @@ const menProducts = [
   {
     id: 8,
     img: "https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+    img2: "https://www.gymxapparel.in/cdn/shop/files/m1.jpg?v=1753353563",
     title: "Ultraboost 20 Shoes",
     category: "Performance",
     price: 7600,
@@ -215,6 +231,7 @@ const womenProducts = [
   {
     id: 1,
     img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
+    img2: "https://www.cyclop.in/cdn/shop/files/3_811df92c-4799-43d6-afe6-994c6885dce1_1080x.jpg?v=1689009277",
     title: "Running Top",
     category: "Performance",
     price: 1499,
@@ -224,6 +241,7 @@ const womenProducts = [
   {
     id: 2,
     img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
+    img2: "https://www.cyclop.in/cdn/shop/files/3_811df92c-4799-43d6-afe6-994c6885dce1_1080x.jpg?v=1689009277",
     title: "Yoga Tee",
     category: "Training",
     price: 1999,
@@ -233,6 +251,7 @@ const womenProducts = [
   {
     id: 3,
     img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
+    img2: "https://www.cyclop.in/cdn/shop/files/3_811df92c-4799-43d6-afe6-994c6885dce1_1080x.jpg?v=1689009277",
     title: "Winter Jacket",
     category: "Originals",
     price: 3499,
@@ -242,6 +261,7 @@ const womenProducts = [
   {
     id: 4,
     img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
+    img2: "https://www.cyclop.in/cdn/shop/files/3_811df92c-4799-43d6-afe6-994c6885dce1_1080x.jpg?v=1689009277",
     title: "Compression Top",
     category: "Performance",
     price: 2299,
@@ -251,6 +271,7 @@ const womenProducts = [
   {
     id: 5,
     img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
+    img2: "https://www.cyclop.in/cdn/shop/files/3_811df92c-4799-43d6-afe6-994c6885dce1_1080x.jpg?v=1689009277",
     title: "Running Top",
     category: "Performance",
     price: 1499,
@@ -260,6 +281,7 @@ const womenProducts = [
   {
     id: 6,
     img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
+    img2: "https://www.cyclop.in/cdn/shop/files/3_811df92c-4799-43d6-afe6-994c6885dce1_1080x.jpg?v=1689009277",
     title: "Yoga Tee",
     category: "Training",
     price: 1999,
@@ -269,6 +291,7 @@ const womenProducts = [
   {
     id: 7,
     img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
+    img2: "https://www.cyclop.in/cdn/shop/files/3_811df92c-4799-43d6-afe6-994c6885dce1_1080x.jpg?v=1689009277",
     title: "Winter Jacket",
     category: "Originals",
     price: 3499,
@@ -278,6 +301,7 @@ const womenProducts = [
   {
     id: 8,
     img: "https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277",
+    img2: "https://www.cyclop.in/cdn/shop/files/3_811df92c-4799-43d6-afe6-994c6885dce1_1080x.jpg?v=1689009277",
     title: "Compression Top",
     category: "Performance",
     price: 2299,
@@ -400,7 +424,7 @@ function Home() {
   return (
     <main className="w-full bg-white pb-20 md:pb-0">
       {/* Banner */}
-      <div className="w-full mx-auto mt-[60px] lg:mt-[80px]">
+      <div className="w-full mx-auto mt-[60px] lg:mt-[80px] p-5 lg:p-10">
         <LandscapeCarousel items={mainBanners} />
       </div>
       {/* Festive Deals */}
@@ -409,13 +433,12 @@ function Home() {
           Curated Deals for Every Mood
         </h2>
         <div className="mt-10">
-          <HorizontalScrollCarousel items={festiveDeals} speed={0.4} />
+          <HorizontalScrollCarousel items={festiveDeals} speed={0.3} />
         </div>
       </section>
 
       <ComingSoon />
       {/* Video Class Section */}
-      <VideoClassSection />
 
       <RecommendedProducts />
 
@@ -423,7 +446,7 @@ function Home() {
         <DealsOfTheDay
           title="Shop Now: Deals of the Day"
           items={promoCards}
-        />
+          />
       </div>
       {/* Categories */}
       <section className="mt-12 lg:max-w-7xl px-6 mx-auto">
@@ -437,10 +460,10 @@ function Home() {
         <div className="my-8 grid grid-cols-5 md:grid-cols-6 xl:grid-cols-9 gap-6">
           {categories.map((cat, i) => (
             <Link
-              to={cat.path}
+            to={cat.path}
               key={i}
               className="flex flex-col items-center text-center hover:scale-105 transition"
-            >
+              >
               <div className="w-16 h-16 sm:w-30 sm:h-30 rounded-full overflow-hidden border border-gray-400 p-1 md:p-4 shadow-md">
                 <img
                   src={cat.logo}
@@ -465,8 +488,8 @@ function Home() {
         <div className="grid grid-cols-2 gap-2 p-3">
           {[yoga, running, compression, gloves].map((img, i) => (
             <img
-              key={i}
-              src={img}
+            key={i}
+            src={img}
               alt="sport"
               className="mb-1 hover:scale-102 transition hover:shadow-lg"
             />
@@ -555,7 +578,7 @@ function Home() {
             <div className="flex gap-4 mb-8">
               {["men", "women"].map((cat) => (
                 <button
-                  key={cat}
+                key={cat}
                   onClick={() => setActiveCategory(cat)}
                   className={`px-6 py-2 rounded-full font-semibold ${activeCategory === cat
                       ? "bg-black text-white"
@@ -584,13 +607,13 @@ function Home() {
       {/* big banner */}
       <div className="max-w-7xl mx-auto hover:shadow-lg lg:mt-10 transition cursor-pointer lg:p-0 px-4">
         <video
-          src="https://m.media-amazon.com/images/S/al-eu-726f4d26-7fdb/02e119b0-4f00-4880-b41e-abf86212eeb6.mp4"
+          src="https://m.media-amazon.com/images/I/D1WvQSHwzHL.mp4"
           autoPlay
           loop
           muted
           playsInline
           className="w-full h-full object-cover transition-transform duration-500 border border-gray-200"
-        />
+          />
       </div>
       {/* Customer Reviews */}
       <section className="max-w-7xl mx-auto px-6 py-12">
@@ -620,7 +643,7 @@ function Home() {
             },
           ].map((review, i) => (
             <div
-              key={i}
+            key={i}
               className="border rounded-lg p-6 shadow-sm hover:shadow-lg hover:translate-y-1 hover:scale-102 transition bg-white"
             >
               <div className="">
@@ -640,7 +663,7 @@ function Home() {
         </div>
       </section>
       <section className="max-w-7xl w-full my-10 mx-auto">
-        <ProductVideoCarousel />
+        <ShopTheLookCarousel />
       </section>
       {/* Promo & Availability Section */}
       <section className="max-w-7xl mx-auto lg:px-6 pt-12">

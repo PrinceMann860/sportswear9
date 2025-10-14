@@ -5,6 +5,7 @@ import { ProductCard } from '../Product/Product';
 import ComingSoon from '../Home/ComingSoon';
 import VideoClassSection from '../Home/VideoClassSection';
 import RecommendedProducts from '../Home/RecommendedProducts';
+import ShopTheLookCarousel from '../Banner&Carousels/ShopTheLookCarousel';
 
 
 const BrandPage = () => {
@@ -189,7 +190,7 @@ const BrandPage = () => {
 
         <ComingSoon />
         {/* Video Class Section */}
-        <VideoClassSection />
+        <ShopTheLookCarousel/>
 
         <RecommendedProducts />
         {/* Filters and Sort */}
