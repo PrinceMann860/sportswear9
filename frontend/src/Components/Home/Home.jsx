@@ -30,9 +30,7 @@ import running from "../../assets/running.png";
 import compression from "../../assets/compression.png";
 import gloves from "../../assets/gloves.png";
 import sportvid from "../../assets/sportvid.mp4";
-import sportbanner from "../../assets/sportbanner.mp4";
 import bigbanner from "../../assets/Bigbanner.png";
-import ProductVideoCarousel from "../Banner&Carousels/ProductVideoCarousel";
 import ShopTheLookCarousel from "../Banner&Carousels/ShopTheLookCarousel";
 
 // Categories
