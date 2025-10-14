@@ -7,6 +7,7 @@ import HorizontalScrollCarousel from "../Banner&Carousels/HorizontalScrollCarous
 import ComingSoon from "./ComingSoon";
 import VideoClassSection from "./VideoClassSection";
 import RecommendedProducts from "./RecommendedProducts";
+import { PromotionCard, DealsOfTheDay }  from "../Banner&Carousels/DealsOfTheDay";
 
 import logo1 from "../../assets/1.svg";
 import logo2 from "../../assets/2.svg";
@@ -44,6 +45,46 @@ const categories = [
   { logo: logo7, name: "asics", path: "/brand/asics" },
   { logo: logo8, name: "converse", path: "/brand/converse" },
   { logo: logo9, name: "vans", path: "/brand/vans" },
+];
+
+// --- Promotional Card Data (Vertical aspect ratio) ---
+const promoCards = [
+    {
+        image: "https://placehold.co/400x550/374151/ffffff?text=SUMMER+LOOKS", // Dark background for contrast
+        deal: "MIN. 40% OFF",
+        look: "Laidback Looks",
+        logo: logo1
+    },
+    {
+        image: "https://placehold.co/400x550/10b981/ffffff?text=NEW+ARRIVALS", // Green background
+        deal: "FLAT 30% OFF",
+        look: "Seasonal Essentials",
+        logo: "https://placehold.co/100x40/ffffff/10b981?text=Brand+B+Logo"
+    },
+    {
+        image: "https://placehold.co/400x550/f97316/ffffff?text=LIMITED+TIME", // Orange background
+        deal: "BUY 1 GET 1 FREE",
+        look: "Premium Collections",
+        logo: "https://placehold.co/100x40/ffffff/f97316?text=Brand+C+Logo"
+    },
+    { 
+        image: "https://placehold.co/400x550/5b21b6/ffffff?text=WEEKEND+FLASH", // Purple background
+        deal: "UP TO 70% OFF",
+        look: "Footwear & Accessories",
+        logo: "https://placehold.co/100x40/ffffff/5b21b6?text=Brand+D+Logo"
+    },
+    {
+        image: "https://placehold.co/400x550/6d28d9/ffffff?text=LAST+CHANCE", // Deep Purple background
+        deal: "EXTRA 20% OFF",
+        look: "Clearance Event",
+        logo: "https://placehold.co/100x40/ffffff/6d28d9?text=Brand+E+Logo"
+    },
+    {
+        image: "https://placehold.co/400x550/059669/ffffff?text=SPRING+STYLE", // Emerald Green background
+        deal: "NEW COLORS",
+        look: "Comfort Collection",
+        logo: "https://placehold.co/100x40/ffffff/059669?text=Brand+F+Logo"
+    },
 ];
 
 // Products (example placeholders)
@@ -377,6 +418,13 @@ function Home() {
       <VideoClassSection />
 
       <RecommendedProducts />
+
+      <div className="max-w-6xl mx-auto">
+        <DealsOfTheDay
+          title="Shop Now: Deals of the Day"
+          items={promoCards}
+        />
+      </div>
       {/* Categories */}
       <section className="mt-12 lg:max-w-7xl px-6 mx-auto">
         <h2 className="font-semibold text-3xl md:text-4xl text-center">
@@ -509,11 +557,10 @@ function Home() {
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`px-6 py-2 rounded-full font-semibold ${
-                    activeCategory === cat
+                  className={`px-6 py-2 rounded-full font-semibold ${activeCategory === cat
                       ? "bg-black text-white"
                       : "bg-gray-200 text-black"
-                  }`}
+                    }`}
                 >
                   {cat.toUpperCase()}
                 </button>
