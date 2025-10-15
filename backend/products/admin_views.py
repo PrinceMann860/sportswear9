@@ -27,24 +27,39 @@ class ProductCreateAPIView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save()
 
+class ProductUpdateAPIView(generics.UpdateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductCreateSerializer
+    permission_classes = [IsAdminUser]
+    lookup_field = 'product_uuid'
+
 
 
 class AddVariantAPIView(APIView):
     permission_classes = [IsAdminUser]
 
-    def post(self, request, pk):
-        product = get_object_or_404(Product, pk=pk)
-        color_name = request.data.get("color_name")
-        color_hex = request.data.get("color_hex")
+    def post(self, request, product_uuid):
+        product = get_object_or_404(Product, product_uuid=product_uuid)
+        # serializer = ProductVariantSerializer(data=request.data)
+        # serializer.is_valid(raise_exception=True)
+        # serializer.save(product=product)
+        # return Response(serializer.data, status=201)
+        attributes = request.data.get("attributes", [])
+        price = request.data.get("price", product.net)
         is_default = request.data.get("is_default", False)
 
         variant = ProductVariant.objects.create(
             product=product,
-            color_name=color_name,
-            color_hex=color_hex,
+            price=price,
             is_default=is_default,
         )
-        return Response({"variant_id": variant.id, "message": "Variant added"}, status=201)
+        variant.attributes.set(attributes)
+
+        return Response({
+            "variant_id": variant.id,
+            "sku": variant.sku,
+            "message": "Variant created successfully"
+        }, status=201)
 
 
 class AddSpecificationAPIView(APIView):
@@ -66,11 +81,15 @@ class AddSpecificationAPIView(APIView):
 class UploadVariantMediaAPIView(APIView):
     permission_classes = [IsAdminUser]
 
-    def post(self, request, variant_id):
-        variant = get_object_or_404(ProductVariant, pk=variant_id)
+    def post(self, request, product_uuid, variant_id):
+        product = get_object_or_404(Product, product_uuid=product_uuid)
+        variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
         images = request.FILES.getlist("images")
 
         for img in images:
             ProductImage.objects.create(variant=variant, image=img)
 
-        return Response({"message": "Images uploaded successfully"}, status=201)
+        return Response({
+            "variant_id": variant.id,
+            "message": f"{len(images)} images uploaded successfully"
+        }, status=201)

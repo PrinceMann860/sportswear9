@@ -25,8 +25,9 @@ class ProductSpecification(models.Model):
     Can either use an existing global Specification
     OR have a custom key/value for that product only.
     """
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_specifications')
-    specification = models.ForeignKey(Specification, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_links')
+    # product = models.ForeignKey(    Product,    on_delete=models.CASCADE,    related_name="specifications")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='specifications')
+    # specification = models.ForeignKey(Specification, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_links')
 
     # Optional override fields
     key = models.CharField(max_length=255, blank=True)

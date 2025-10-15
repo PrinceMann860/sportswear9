@@ -1,7 +1,7 @@
 # attributes/admin_serializers.py
 from rest_framework import serializers
 from .models import Attribute, AttributeValue, ProductAttribute, ProductVariant
-
+import requests
 
 class AttributeValueSerializer(serializers.ModelSerializer):
     attribute = serializers.PrimaryKeyRelatedField(queryset=Attribute.objects.all())
@@ -33,6 +33,8 @@ class ProductVariantSerializer(serializers.ModelSerializer):
     attributes = serializers.PrimaryKeyRelatedField(
         many=True, queryset=AttributeValue.objects.all()
     )
+    images = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
 
     class Meta:
         model = ProductVariant
@@ -40,9 +42,17 @@ class ProductVariantSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        attributes = validated_data.pop('attributes', [])
-        variant = ProductVariant.objects.create(**validated_data)
+        attributes = validated_data.pop("attributes", [])
+        product = validated_data.get("product")
+        price = validated_data.get("price", getattr(product, "net", None))
+        is_default = validated_data.get("is_default", False)
+        variant = ProductVariant.objects.create(
+            product=product,
+            price=price,
+            is_default=is_default
+        )
         variant.attributes.set(attributes)
+
         return variant
 
     def update(self, instance, validated_data):

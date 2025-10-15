@@ -31,10 +31,10 @@ class Product(models.Model):
         return self.name
 
 
-def save(self, *args, **kwargs):
-    if self.disc and self.disc > 0:
-        discount_amount = (self.price * self.disc) / 100
-        self.net = self.price - discount_amount
-    else:
-        self.net = self.price
-    super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        if self.disc and self.disc > 0:
+            discount_amount = (self.price * self.disc) / 100
+            self.net = self.price - discount_amount
+        else:
+            self.net = self.price
+        super().save(*args, **kwargs)

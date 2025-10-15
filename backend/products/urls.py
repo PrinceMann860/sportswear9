@@ -8,8 +8,19 @@ urlpatterns = [
     path('<str:product_uuid>/', views.ProductDetailAPIView.as_view(), name='product-detail'),
 
     # Admin APIs
+    # Product CRUD
     path('admin/create/', admin_views.ProductCreateAPIView.as_view(), name='product-create'),
-    path('admin/<int:pk>/add-variant/', admin_views.AddVariantAPIView.as_view(), name='add-variant'),
-    path('admin/<int:pk>/add-specs/', admin_views.AddSpecificationAPIView.as_view(), name='add-specs'),
-    path('admin/variant/<int:variant_id>/upload-media/', admin_views.UploadVariantMediaAPIView.as_view(), name='upload-media'),
+    
+    # Product Update
+    path('admin/<str:product_uuid>/update/', admin_views.ProductUpdateAPIView.as_view(), name='product-update'),
+
+    # Product Variants (nested under product)
+    path('admin/<str:product_uuid>/variants/', admin_views.AddVariantAPIView.as_view(), name='product-add-variant'),
+
+    # Specifications
+    path('admin/<str:product_uuid>/specs/', admin_views.AddSpecificationAPIView.as_view(), name='product-add-specs'),
+
+    # Variant Media Uploads
+    path('admin/<str:product_uuid>/variant/<str:variant_id>/upload-media/', admin_views.UploadVariantMediaAPIView.as_view(), name='variant-upload-media'),
+
 ]
