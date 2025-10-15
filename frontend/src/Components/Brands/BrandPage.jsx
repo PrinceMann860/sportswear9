@@ -7,6 +7,16 @@ import VideoClassSection from '../Home/VideoClassSection';
 import RecommendedProducts from '../Home/RecommendedProducts';
 import ShopTheLookCarousel from '../Banner&Carousels/ShopTheLookCarousel';
 
+import logo1 from "../../assets/1.svg";
+import logo2 from "../../assets/2.svg";
+import logo3 from "../../assets/3.svg";
+import logo4 from "../../assets/4.svg";
+import logo5 from "../../assets/5.svg";
+import logo6 from "../../assets/6.svg";
+import logo7 from "../../assets/7.svg";
+import logo8 from "../../assets/8.svg";
+import logo9 from "../../assets/9.svg";
+
 
 const BrandPage = () => {
   const { brandName } = useParams();
@@ -22,59 +32,100 @@ const BrandPage = () => {
 
   // Brand data mapping
   const brandData = {
-    'adidas': {
-      name: 'Adidas',
-      logo: '/src/assets/1.svg',
-      description: 'Impossible is Nothing. Adidas is a global leader in sportswear, known for innovation and performance.',
-      banner: 'https://images.unsplash.com/photo-1556906781-9a412961c28c?auto=format&fit=crop&w=1200&q=80',
-      founded: '1949',
-      headquarters: 'Germany',
-      rating: 4.5,
-      totalProducts: 1250
-    },
-    'nike': {
-      name: 'Nike',
-      logo: '/src/assets/2.svg',
-      description: 'Just Do It. Nike brings inspiration and innovation to every athlete in the world.',
-      banner: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80',
-      founded: '1964',
-      headquarters: 'USA',
-      rating: 4.6,
-      totalProducts: 1500
-    },
-    'puma': {
-      name: 'Puma',
-      logo: '/src/assets/3.svg',
-      description: 'Forever Faster. Puma is one of the world\'s leading sports brands.',
-      banner: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1200&q=80',
-      founded: '1948',
-      headquarters: 'Germany',
-      rating: 4.3,
-      totalProducts: 980
-    },
-    'reebok': {
-      name: 'Reebok',
-      logo: '/src/assets/4.svg',
-      description: 'Be More Human. Reebok creates products and experiences that enable movement.',
-      banner: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&w=1200&q=80',
-      founded: '1958',
-      headquarters: 'USA',
-      rating: 4.2,
-      totalProducts: 750
-    },
-    'under-armour': {
-      name: 'Under Armour',
-      logo: '/src/assets/5.svg',
-      description: 'I Will. Under Armour makes you better through passion, design and relentless pursuit of innovation.',
-      banner: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1200&q=80',
-      founded: '1996',
-      headquarters: 'USA',
-      rating: 4.4,
-      totalProducts: 650
-    }
-  };
+  'Work For It': {
+    name: 'Work For It',
+    logo: logo1,
+    description: 'Built for relentless achievers. Work For It inspires dedication and discipline through every rep.',
+    banner: 'https://images.unsplash.com/photo-1571019613576-2b22c76fd955?auto=format&fit=crop&w=1200&q=80',
+    founded: '2018',
+    headquarters: 'USA',
+    rating: 4.4,
+    totalProducts: 540
+  },
+  'U': {
+    name: 'U',
+    logo: logo2,
+    description: 'Minimal yet bold. U represents individuality and personal fitness expression.',
+    banner: 'https://images.unsplash.com/photo-1594737625785-c5c3e7f87a58?auto=format&fit=crop&w=1200&q=80',
+    founded: '2020',
+    headquarters: 'UK',
+    rating: 4.2,
+    totalProducts: 320
+  },
+  'WMX': {
+    name: 'WMX',
+    logo: logo3,
+    description: 'High-performance activewear engineered for durability and power.',
+    banner: 'https://images.unsplash.com/photo-1571731956672-f2b94d7dd0cb?auto=format&fit=crop&w=1200&q=80',
+    founded: '2016',
+    headquarters: 'Germany',
+    rating: 4.5,
+    totalProducts: 410
+  },
+  'SportInger': {
+    name: 'SportInger',
+    logo: logo4,
+    description: 'Versatile sports essentials designed for training, recovery and lifestyle.',
+    banner: 'https://images.unsplash.com/photo-1616279969859-6a0f8f2940f2?auto=format&fit=crop&w=1200&q=80',
+    founded: '2014',
+    headquarters: 'Canada',
+    rating: 4.3,
+    totalProducts: 600
+  },
+  'Ninq': {
+    name: 'Ninq',
+    logo: logo5,
+    description: 'Sleek athleisure with a futuristic touch. Ninq blends comfort and performance.',
+    banner: 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=1200&q=80',
+    founded: '2019',
+    headquarters: 'Japan',
+    rating: 4.1,
+    totalProducts: 280
+  },
+  'Never Lose': {
+    name: 'Never Lose',
+    logo: logo6,
+    description: 'A mindset, not just a brand. Built for fighters, grinders and comeback kings.',
+    banner: 'https://images.unsplash.com/photo-1609899532197-d8c9e6529a7c?auto=format&fit=crop&w=1200&q=80',
+    founded: '2017',
+    headquarters: 'USA',
+    rating: 4.6,
+    totalProducts: 450
+  },
+  'GYMFIC': {
+    name: 'GYMFIC',
+    logo: logo7,
+    description: 'Raw strength meets aesthetics. Gymfic crafts bold designs for lifters.',
+    banner: 'https://images.unsplash.com/photo-1546484959-f9a53a360a5c?auto=format&fit=crop&w=1200&q=80',
+    founded: '2015',
+    headquarters: 'Australia',
+    rating: 4.4,
+    totalProducts: 390
+  },
+  'KYK': {
+    name: 'KYK',
+    logo: logo8,
+    description: 'Street-style gymwear with a touch of rebellion.',
+    banner: 'https://images.unsplash.com/photo-1549045337-967927d923c8?auto=format&fit=crop&w=1200&q=80',
+    founded: '2021',
+    headquarters: 'South Korea',
+    rating: 4.0,
+    totalProducts: 230
+  },
+  'Train Hard': {
+    name: 'Train Hard',
+    logo: logo9,
+    description: 'No excuses. Only progress. Train Hard delivers top-tier fitness gear.',
+    banner: 'https://images.unsplash.com/photo-1556817411-31ae72fa3ea0?auto=format&fit=crop&w=1200&q=80',
+    founded: '2013',
+    headquarters: 'USA',
+    rating: 4.7,
+    totalProducts: 520
+  }
+};
 
-  const currentBrand = brandData[brandName] || brandData['adidas'];
+
+  const currentBrand = brandData[brandName] || brandData['Work For It'];
 
   // Mock products for the brand
   const brandProducts = [
@@ -189,8 +240,6 @@ const BrandPage = () => {
         </div>
 
         <ComingSoon />
-        {/* Video Class Section */}
-        <ShopTheLookCarousel/>
 
         <RecommendedProducts />
         {/* Filters and Sort */}

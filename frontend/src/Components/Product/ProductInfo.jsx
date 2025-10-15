@@ -624,6 +624,18 @@ const ProductInfo = () => {
           </div>
         </div>
       </div>
+      <div className="max-w-7xl mx-auto lg:px-6 pt-12">
+        <div className="bg-[#fdf9f3] px-4 lg:px-0 border border-dashed border-red-400 text-center py-4 rounded-md mb-10">
+          <p className="lg:text-lg text-sm">
+            Super discount for your{" "}
+            <span className="font-semibold text-red-500">first purchase.</span>{" "}
+            <span className="inline-block mx-2 px-3 py-1 border-2 border-dashed border-red-400 text-red-500 font-bold rounded">
+              FREE15FIRST
+            </span>
+            Use discount code in checkout!
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

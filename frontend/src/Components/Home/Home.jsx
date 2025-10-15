@@ -35,15 +35,15 @@ import ShopTheLookCarousel from "../Banner&Carousels/ShopTheLookCarousel";
 
 // Categories
 const categories = [
-  { logo: logo1, name: "adidas", path: "/brand/adidas" },
-  { logo: logo2, name: "nike", path: "/brand/nike" },
-  { logo: logo3, name: "puma", path: "/brand/puma" },
-  { logo: logo4, name: "reebok", path: "/brand/reebok" },
-  { logo: logo5, name: "under-armour", path: "/brand/under-armour" },
-  { logo: logo6, name: "new-balance", path: "/brand/new-balance" },
-  { logo: logo7, name: "asics", path: "/brand/asics" },
-  { logo: logo8, name: "converse", path: "/brand/converse" },
-  { logo: logo9, name: "vans", path: "/brand/vans" },
+  { logo: logo1, name: "Work For It", path: "/brand/Work For It" },
+  { logo: logo2, name: "U", path: "/brand/U" },
+  { logo: logo3, name: "WMX", path: "/brand/WMX" },
+  { logo: logo4, name: "SportInger", path: "/brand/SportInger" },
+  { logo: logo5, name: "Ninq", path: "/brand/Ninq" },
+  { logo: logo6, name: "Never Lose", path: "/brand/Never Lose" },
+  { logo: logo7, name: "GYMFIC", path: "/brand/GYMFIC" },
+  { logo: logo8, name: "KYK", path: "/brand/KYK" },
+  { logo: logo9, name: "Train Hard", path: "/brand/Train Hard" },
 ];
 
 // --- Promotional Card Data (Vertical aspect ratio) ---
@@ -422,7 +422,7 @@ function Home() {
   return (
     <main className="w-full bg-white pb-20 md:pb-0">
       {/* Banner */}
-      <div className="w-full mx-auto mt-[60px] lg:mt-[80px] p-5 lg:p-10">
+      <div className="w-full mx-auto mt-[60px] lg:mt-[80px]">
         <LandscapeCarousel items={mainBanners} />
       </div>
       {/* Festive Deals */}
@@ -434,19 +434,6 @@ function Home() {
           <HorizontalScrollCarousel items={festiveDeals} speed={0.3} />
         </div>
       </section>
-
-      <ComingSoon />
-      {/* Video Class Section */}
-
-      <RecommendedProducts />
-
-      <div className="max-w-6xl mx-auto">
-        <DealsOfTheDay
-          title="Shop Now: Deals of the Day"
-          items={promoCards}
-          />
-      </div>
-      {/* Categories */}
       <section className="mt-12 lg:max-w-7xl px-6 mx-auto">
         <h2 className="font-semibold text-3xl md:text-4xl text-center">
           Trusted by Iconic Brands
@@ -473,6 +460,18 @@ function Home() {
           ))}
         </div>
       </section>
+
+      {/* Video Class Section */}
+
+      <RecommendedProducts />
+
+      <div className="max-w-7xl mx-auto">
+        <DealsOfTheDay
+          title="Shop Now: Deals of the Day"
+          items={promoCards}
+          />
+      </div>
+      {/* Categories */}
 
       {/* Sports */}
       <section className="lg:px-6 mx-auto text-center lg:max-w-7xl">
@@ -507,7 +506,7 @@ function Home() {
             </span>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -531,7 +530,7 @@ function Home() {
               Shop now
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 py-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 py-6">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -547,7 +546,7 @@ function Home() {
               Shop now
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 py-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 py-6">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -589,7 +588,7 @@ function Home() {
             </div>
 
             {/* Category Products */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {currentProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -663,6 +662,7 @@ function Home() {
       <section className="max-w-7xl w-full my-10 mx-auto">
         <ShopTheLookCarousel />
       </section>
+            <ComingSoon />
       {/* Promo & Availability Section */}
       <section className="max-w-7xl mx-auto lg:px-6 pt-12">
         {/* Discount Banner */}
