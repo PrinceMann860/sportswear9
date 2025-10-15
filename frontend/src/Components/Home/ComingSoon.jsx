@@ -1,6 +1,10 @@
 import { useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import AnimatedSection from './AnimatedSection';
+import p1 from '../../assets/p1.png';
+import p2 from '../../assets/p2.png';
+import p3 from '../../assets/p3.png';
+import p4 from '../../assets/p4.png';
 
 const ComingSoon = () => {
   const scrollRef = useRef(null);
@@ -8,40 +12,42 @@ const ComingSoon = () => {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
+
+
   const comingSoonItems = [
     {
       id: 1,
       date: "Nov 20",
-      instructor: "with Ramit Sethi",
-      image: "https://www.masterclass.com/course-images/attachments/5o12l653b1pydxgoif21rrx5asrl?width=1920&quality=75&format=webp",
+      instructor: "WMX",
+      image: p2,
       portraitImage: "https://www.masterclass.com/course-images/attachments/5o12l653b1pydxgoif21rrx5asrl?width=750&quality=75&format=webp"
     },
     {
       id: 2,
       date: "Nov 25",
-      instructor: "with Former NSA and US Cyber Command leaders",
-      image: "https://www.masterclass.com/course-images/attachments/eykwhv5x816om6iwog9o85cthtp4?width=1920&quality=75&format=webp",
+      instructor: "Work for it",
+      image: p4,
       portraitImage: "https://www.masterclass.com/course-images/attachments/eykwhv5x816om6iwog9o85cthtp4?width=750&quality=75&format=webp"
     },
     {
       id: 3,
       date: "Oct",
-      instructor: "with Futurist Amy Webb & Other Experts",
-      image: "https://www.masterclass.com/course-images/attachments/jesu450ohznlgam3f2p7upm01efn?width=1920&quality=75&format=webp",
+      instructor: "never loose",
+      image: p3,
       portraitImage: "https://www.masterclass.com/course-images/attachments/jesu450ohznlgam3f2p7upm01efn?width=750&quality=75&format=webp"
     },
     {
       id: 4,
       date: "Oct",
-      instructor: "with renowned behavioral expert Vanessa Van Edwards",
-      image: "https://www.masterclass.com/course-images/attachments/ikspv8pqp0i0dac1r169zfbyobjc?width=1920&quality=75&format=webp",
+      instructor: "wmx",
+      image: p2,
       portraitImage: "https://www.masterclass.com/course-images/attachments/ikspv8pqp0i0dac1r169zfbyobjc?width=750&quality=75&format=webp"
     },
     {
       id: 5,
       date: "Nov",
-      instructor: "with Dr. Peter Attia",
-      image: "https://www.masterclass.com/course-images/attachments/5o12l653b1pydxgoif21rrx5asrl?width=1920&quality=75&format=webp",
+      instructor: "ninq",
+      image: p1,
       portraitImage: "https://www.masterclass.com/course-images/attachments/5o12l653b1pydxgoif21rrx5asrl?width=750&quality=75&format=webp"
     }
   ];

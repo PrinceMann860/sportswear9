@@ -86,14 +86,14 @@ const LandscapeCarousel = ({ items = [] }) => {
     <div className="relative w-full group">
       <div className="relative w-full overflow-hidden shadow-2xl">
         <div
-          className="relative w-full bg-gray-900 h-[25vh] md:h-[50vh] lg:h-[80vh]">
+          className="relative w-full bg-gray-900 h-[25vh] md:h-[50vh] lg:h-[50vh]">
           {items.map((item, index) => (
             <div key={item.id || index} className={getSlideClasses(index)}>
               <div className="relative w-full h-full">
                 <img
                   src={item.image}
                   alt={item.alt || item.title || `Banner ${index + 1}`}
-                  className="w-full h-full object-fill"
+                  className="w-full h-full object-cover"
                   draggable="false"
                   loading="lazy"
                 />

@@ -7,7 +7,7 @@ import HorizontalScrollCarousel from "../Banner&Carousels/HorizontalScrollCarous
 import ComingSoon from "./ComingSoon";
 import VideoClassSection from "./VideoClassSection";
 import RecommendedProducts from "./RecommendedProducts";
-import { PromotionCard, DealsOfTheDay }  from "../Banner&Carousels/DealsOfTheDay";
+import { PromotionCard, DealsOfTheDay } from "../Banner&Carousels/DealsOfTheDay";
 
 import logo1 from "../../assets/1.svg";
 import logo2 from "../../assets/2.svg";
@@ -33,6 +33,8 @@ import sportvid from "../../assets/sportvid.mp4";
 import bigbanner from "../../assets/Bigbanner.png";
 import ShopTheLookCarousel from "../Banner&Carousels/ShopTheLookCarousel";
 
+import diwali from "../../assets/diwalisale.png";
+import ad3 from "../../assets/ad3.gif"
 // Categories
 const categories = [
   { logo: logo1, name: "Work For It", path: "/brand/Work For It" },
@@ -48,42 +50,42 @@ const categories = [
 
 // --- Promotional Card Data (Vertical aspect ratio) ---
 const promoCards = [
-    {
-        image: "https://yardofdeals.com/cdn/shop/products/2018-New-Summer-style-Mens-cotton-Short-sleeve-t-shirt-Gyms-Fitness-shirts-male-casual-fashion.jpg_640x640_1024x1024_2x_6fcb8ce1-9502-4084-b154-08501d78e41a_1200x1200.jpg?v=1597908790", // Dark background for contrast
-        deal: "MIN. 40% OFF",
-        look: "Laidback Looks",
-        logo: logo1
-    },
-    {
-        image: "https://www.powerhousegymproshop.com/cdn/shop/files/powerhouse-gym-pro-shop-premium-oversized-hoodie-charcoal-34264387911851.jpg?v=1687997189&width=1445", // Green background
-        deal: "FLAT 30% OFF",
-        look: "Seasonal Essentials",
-        logo: "https://placehold.co/100x40/ffffff/10b981?text=Brand+B+Logo"
-    },
-    {
-      image: "https://bullarfitness.com/cdn/shop/files/Accessories.jpg?v=1740035011&width=1100", // Purple background
-      deal: "BUY 1 GET 1 FREE",
-      look: "Premium Collections",
-      logo: "https://placehold.co/100x40/ffffff/f97316?text=Brand+C+Logo"
-    },
-    { 
-        image: "https://www.verywellfit.com/thmb/Eyv2XS6jfnBy9nSnCLHe_9A71TU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/vwt-product-reebok-nano-x2-training-shoes-tstaples-133-e73e0a61fe50493daf72e839cd53dfdf.jpg", // Orange background
-        deal: "UP TO 70% OFF",
-        look: "Footwear & Accessories",
-        logo: "https://placehold.co/100x40/ffffff/5b21b6?text=Brand+D+Logo"
-    },
-    {
-        image: "https://www.fitlineindia.com/cdn/shop/files/WhatsApp_Image_2022-05-19_at_5.53.38_PM.jpg?v=1653037917&width=1500", // Deep Purple background
-        deal: "EXTRA 20% OFF",
-        look: "Clearance Event",
-        logo: "https://placehold.co/100x40/ffffff/6d28d9?text=Brand+E+Logo"
-    },
-    {
-        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDU7OcmNBhqYI7DCu3wOmtEOCwyTOzhknEU490QpBwnI4ngrWe1kzpwyy06N33fyeQkRo&usqp=CAU", // Emerald Green background
-        deal: "NEW COLORS",
-        look: "Comfort Collection",
-        logo: "https://placehold.co/100x40/ffffff/059669?text=Brand+F+Logo"
-    },
+  {
+    image: "https://yardofdeals.com/cdn/shop/products/2018-New-Summer-style-Mens-cotton-Short-sleeve-t-shirt-Gyms-Fitness-shirts-male-casual-fashion.jpg_640x640_1024x1024_2x_6fcb8ce1-9502-4084-b154-08501d78e41a_1200x1200.jpg?v=1597908790", // Dark background for contrast
+    deal: "MIN. 40% OFF",
+    look: "Laidback Looks",
+    logo: logo1
+  },
+  {
+    image: "https://www.powerhousegymproshop.com/cdn/shop/files/powerhouse-gym-pro-shop-premium-oversized-hoodie-charcoal-34264387911851.jpg?v=1687997189&width=1445", // Green background
+    deal: "FLAT 30% OFF",
+    look: "Seasonal Essentials",
+    logo: "https://placehold.co/100x40/ffffff/10b981?text=Brand+B+Logo"
+  },
+  {
+    image: "https://bullarfitness.com/cdn/shop/files/Accessories.jpg?v=1740035011&width=1100", // Purple background
+    deal: "BUY 1 GET 1 FREE",
+    look: "Premium Collections",
+    logo: "https://placehold.co/100x40/ffffff/f97316?text=Brand+C+Logo"
+  },
+  {
+    image: "https://www.verywellfit.com/thmb/Eyv2XS6jfnBy9nSnCLHe_9A71TU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/vwt-product-reebok-nano-x2-training-shoes-tstaples-133-e73e0a61fe50493daf72e839cd53dfdf.jpg", // Orange background
+    deal: "UP TO 70% OFF",
+    look: "Footwear & Accessories",
+    logo: "https://placehold.co/100x40/ffffff/5b21b6?text=Brand+D+Logo"
+  },
+  {
+    image: "https://www.fitlineindia.com/cdn/shop/files/WhatsApp_Image_2022-05-19_at_5.53.38_PM.jpg?v=1653037917&width=1500", // Deep Purple background
+    deal: "EXTRA 20% OFF",
+    look: "Clearance Event",
+    logo: "https://placehold.co/100x40/ffffff/6d28d9?text=Brand+E+Logo"
+  },
+  {
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDU7OcmNBhqYI7DCu3wOmtEOCwyTOzhknEU490QpBwnI4ngrWe1kzpwyy06N33fyeQkRo&usqp=CAU", // Emerald Green background
+    deal: "NEW COLORS",
+    look: "Comfort Collection",
+    logo: "https://placehold.co/100x40/ffffff/059669?text=Brand+F+Logo"
+  },
 ];
 
 // Products (example placeholders)
@@ -138,7 +140,7 @@ const products = [
     title: "Duramo 10 Shoes",
     category: "Performance",
   },
-  
+
 
 ];
 
@@ -397,21 +399,21 @@ const promoBanners = [
 const mainBanners = [
   {
     id: 1,
-    image: banner1,
+    image: diwali,
     title: "Fashion Sale",
     Subtitle: "banner",
   },
-  {
-    id: 2,
-    image: bigbanner,
-    title: "New Collection",
-  },
-  {
-    id: 3,
-    image:
-      "https://media.wellmed.workers.dev/?file=JFLESTCQJZTUUNLHLFNGCSSNGTEY4&mode=inline",
-    title: "Winter Favorites",
-  },
+  // {
+  //   id: 2,
+  //   image: bigbanner,
+  //   title: "New Collection",
+  // },
+  // {
+  //   id: 3,
+  //   image:
+  //     "https://media.wellmed.workers.dev/?file=JFLESTCQJZTUUNLHLFNGCSSNGTEY4&mode=inline",
+  //   title: "Winter Favorites",
+  // },
 ];
 
 function Home() {
@@ -420,9 +422,9 @@ function Home() {
     activeCategory === "men" ? menProducts : womenProducts;
 
   return (
-    <main className="w-full bg-white pb-20 md:pb-0">
+    <main className="w-full bg-white pb-20 md:pb-0 ">
       {/* Banner */}
-      <div className="w-full mx-auto mt-[60px] lg:mt-[80px]">
+      <div className="w-full mx-auto mt-[60px] lg:mt-[80px] p-5 lg:p-10 rounded-2xl">
         <LandscapeCarousel items={mainBanners} />
       </div>
       {/* Festive Deals */}
@@ -445,10 +447,10 @@ function Home() {
         <div className="my-8 grid grid-cols-5 md:grid-cols-6 xl:grid-cols-9 gap-6">
           {categories.map((cat, i) => (
             <Link
-            to={cat.path}
+              to={cat.path}
               key={i}
               className="flex flex-col items-center text-center hover:scale-105 transition"
-              >
+            >
               <div className="w-16 h-16 sm:w-30 sm:h-30 rounded-full overflow-hidden border border-gray-400 p-1 md:p-4 shadow-md">
                 <img
                   src={cat.logo}
@@ -469,7 +471,7 @@ function Home() {
         <DealsOfTheDay
           title="Shop Now: Deals of the Day"
           items={promoCards}
-          />
+        />
       </div>
       {/* Categories */}
 
@@ -485,8 +487,8 @@ function Home() {
         <div className="grid grid-cols-2 gap-2 p-3">
           {[yoga, running, compression, gloves].map((img, i) => (
             <img
-            key={i}
-            src={img}
+              key={i}
+              src={img}
               alt="sport"
               className="mb-1 hover:scale-102 transition hover:shadow-lg"
             />
@@ -514,9 +516,13 @@ function Home() {
         </div>
 
         {/* Promo Carousel - Mobile */}
-        <div className="w-[100vw] max-w-7xl mx-auto pt-10 px-4 rounded-md md:rounded-xl">
+        {/* <div className="w-[100vw] max-w-7xl mx-auto pt-10 px-4 rounded-md md:rounded-xl">
           <LandscapeCarousel items={promoBanners} />
+        </div> */}
+        <div className="w-[100vw] max-w-7xl mx-auto pt-10 px-4 rounded-md md:rounded-xl">
+          <img src={ad3} alt="Promotional Banner" className="w-full rounded-md md:rounded-xl" />
         </div>
+
         <div className="max-w-7xl mx-auto px-4">
           {/* Trending */}
           <div className="flex justify-between mt-10 items-center">
@@ -575,11 +581,11 @@ function Home() {
             <div className="flex gap-4 mb-8">
               {["men", "women"].map((cat) => (
                 <button
-                key={cat}
+                  key={cat}
                   onClick={() => setActiveCategory(cat)}
                   className={`px-6 py-2 rounded-full font-semibold ${activeCategory === cat
-                      ? "bg-black text-white"
-                      : "bg-gray-200 text-black"
+                    ? "bg-black text-white"
+                    : "bg-gray-200 text-black"
                     }`}
                 >
                   {cat.toUpperCase()}
@@ -610,7 +616,7 @@ function Home() {
           muted
           playsInline
           className="w-full h-full object-cover transition-transform duration-500 border border-gray-200"
-          />
+        />
       </div>
       {/* Customer Reviews */}
       <section className="max-w-7xl mx-auto px-6 py-12">
@@ -640,7 +646,7 @@ function Home() {
             },
           ].map((review, i) => (
             <div
-            key={i}
+              key={i}
               className="border rounded-lg p-6 shadow-sm hover:shadow-lg hover:translate-y-1 hover:scale-102 transition bg-white"
             >
               <div className="">
@@ -662,7 +668,7 @@ function Home() {
       <section className="max-w-7xl w-full my-10 mx-auto">
         <ShopTheLookCarousel />
       </section>
-            <ComingSoon />
+      <ComingSoon />
       {/* Promo & Availability Section */}
       <section className="max-w-7xl mx-auto lg:px-6 pt-12">
         {/* Discount Banner */}
