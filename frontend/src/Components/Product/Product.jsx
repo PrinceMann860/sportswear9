@@ -18,9 +18,10 @@ function ProductCard({ product }) {
 
   return (
     <Link to={"/ProductInfo"}>
-      <div className="group relative max-w-[300px] bg-white overflow-hidden border border-gray-200 hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col rounded-lg">
-        {/* Image */}
-        <div className="relative w-full h-46 md:h-54 lg:h-70 flex items-center justify-center bg-gray-50">
+      <div className="relative max-w-[300px] bg-white overflow-hidden border border-gray-200 hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col rounded-lg">
+        
+        {/* Image - group moved here */}
+        <div className="group relative w-full h-46 md:h-54 lg:h-70 flex items-center justify-center bg-gray-50">
           <img
             src={product.img}
             alt={product.title}
@@ -41,9 +42,7 @@ function ProductCard({ product }) {
             ⭐ {rating} <span className="text-gray-500">| {count}</span>
           </div>
           <button className="mx-4 mt-3 w-6 h-6 sm:w-7 sm:h-7 bg-white rounded-full flex items-center justify-center border border-gray-300 hover:border-primary hover:bg-primary/5 transition-all duration-300">
-            <Heart
-              className={`w-3 h-3 sm:w-4 sm:h-4 transition-all duration-300`}
-            />
+            <Heart className="w-3 h-3 sm:w-4 sm:h-4 transition-all duration-300" />
           </button>
         </div>
 
@@ -69,13 +68,14 @@ function ProductCard({ product }) {
         </div>
 
         {/* Add to Cart Button */}
-        <button className="w-[95%] mx-auto py-2 my-2  text-sm font-bold uppercase border border-gray-300 bg-white hover:bg-gray-100 transition">
+        <button className="w-[95%] mx-auto py-2 my-2 text-sm font-bold uppercase border border-gray-300 bg-white hover:bg-gray-100 transition">
           Add to Cart
         </button>
       </div>
     </Link>
   );
 }
+
 
 // Helper function to transform API data to match your ProductCard expectations
 const transformProductData = (apiProduct) => {

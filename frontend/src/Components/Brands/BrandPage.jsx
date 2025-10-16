@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Star, Heart, ShoppingCart, ListFilter as Filter, Grid2x2 as Grid, List } from 'lucide-react';
 import { ProductCard } from '../Product/Product';
-import ComingSoon from '../Home/ComingSoon';
 import VideoClassSection from '../Home/VideoClassSection';
 import RecommendedProducts from '../Home/RecommendedProducts';
 import ShopTheLookCarousel from '../Banner&Carousels/ShopTheLookCarousel';
@@ -239,7 +238,6 @@ const BrandPage = () => {
           </div>
         </div>
 
-        <ComingSoon />
 
         <RecommendedProducts />
         {/* Filters and Sort */}

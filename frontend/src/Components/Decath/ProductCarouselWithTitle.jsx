@@ -63,7 +63,7 @@ const ProductCarouselWithTitle = ({
         </div>
 
         {/* Product Carousel */}
-        <div className="relative flex-1 group">
+        <div className="relative flex-1">
 
           {/* Scroll Buttons */}
           <button
