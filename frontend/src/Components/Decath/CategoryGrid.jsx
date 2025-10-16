@@ -5,13 +5,13 @@ const CategoryGrid = ({
   title = "", 
   subtitle = "",
   categories = [],
-  columns = "grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8",
+  columns = "grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 px-2 md:px-4 lg:px-12",
   showTitle = true,
   className = ""
 }) => {
   return (
     <div className={`w-full bg-background py-4 sm:py-6 md:py-8 ${className}`}>
-      <div className="container mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
+      <div className="mx-auto px-2">
         {showTitle && (title || subtitle) && (
           <div className="mb-4 sm:mb-6 md:mb-8">
             {subtitle && (
@@ -27,7 +27,7 @@ const CategoryGrid = ({
           </div>
         )}
         
-        <div className={`grid ${columns} gap-2 sm:gap-3 md:gap-4 lg:gap-5`}>
+        <div className={`grid ${columns} gap-2 sm:gap-3 md:gap-4 lg:gap-10`}>
           {categories.map((category, index) => (
             <Link
               key={index}

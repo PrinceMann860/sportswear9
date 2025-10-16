@@ -188,7 +188,7 @@ const ProductInfo = () => {
                 onClick={() => setSelectedImage(i)}
                 className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
                   selectedImage === i
-                    ? "border-red-500 shadow-md scale-105 ring-2 ring-red-200"
+                    ? "border-blue-500 shadow-md scale-105 ring-2 ring-blue-200"
                     : "border-gray-300 hover:border-gray-400 hover:scale-102"
                 }`}
               >
@@ -231,11 +231,11 @@ const ProductInfo = () => {
               <span className="text-xl text-gray-500 line-through">
                 {product.original}
               </span>
-              <span className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md">
+              <span className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md">
                 {product.discount} OFF
               </span>
             </div>
-            <p className="text-red-600 text-sm font-medium mt-2 flex items-center gap-1">
+            <p className="text-blue-600 text-sm font-medium mt-2 flex items-center gap-1">
               <Check className="w-4 h-4" />
               You save ₹4,100.00
             </p>
@@ -244,7 +244,7 @@ const ProductInfo = () => {
           {/* Description */}
           <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <Info className="w-5 h-5 text-red-500" />
+              <Info className="w-5 h-5 text-blue-500" />
               Product Description
             </h3>
             <p className="text-gray-700 leading-relaxed text-base">
@@ -258,7 +258,7 @@ const ProductInfo = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {product.features.map((feature, index) => (
                 <div key={index} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-200">
-                  <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
                     <Check className="w-4 h-4 text-white" />
                   </div>
                   <span className="text-sm font-medium text-gray-800">{feature}</span>
@@ -277,7 +277,7 @@ const ProductInfo = () => {
                   onClick={() => setSelectedColor(color.name)}
                   className={`flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 ${
                     selectedColor === color.name 
-                      ? "border-red-500 bg-red-50 shadow-md scale-105 ring-2 ring-red-200" 
+                      ? "border-blue-500 bg-blue-50 shadow-md scale-105 ring-2 ring-blue-200" 
                       : "border-gray-300 hover:border-gray-400 hover:shadow-sm"
                   }`}
                 >
@@ -295,7 +295,7 @@ const ProductInfo = () => {
           <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Select Size</h3>
-              <button className="flex items-center gap-2 text-red-600 hover:text-red-700 font-medium text-sm">
+              <button className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm">
                 <Ruler className="w-4 h-4" />
                 Size Guide
               </button>
@@ -344,7 +344,7 @@ const ProductInfo = () => {
                   <div className={`px-3 py-2 rounded-full text-sm font-medium ${
                     product.inStock 
                       ? "bg-green-100 text-green-800" 
-                      : "bg-red-100 text-red-800"
+                      : "bg-blue-100 text-blue-800"
                   }`}>
                     {product.inStock ? "✓ In Stock" : "Out of Stock"}
                   </div>
@@ -356,8 +356,8 @@ const ProductInfo = () => {
                 <button className="flex-1 bg-gray-900 text-white py-4 rounded-xl font-bold hover:bg-black transition-all duration-300 transform hover:scale-105 shadow-md">
                   Add to Cart
                 </button>
-                <button className="p-4 border-2 border-gray-300 rounded-xl hover:border-red-300 hover:bg-red-50 transition-all duration-300 group">
-                  <Heart className="w-6 h-6 text-red-500 group-hover:scale-110 transition-transform" />
+                <button className="p-4 border-2 border-gray-300 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all duration-300 group">
+                  <Heart className="w-6 h-6 text-blue-500 group-hover:scale-110 transition-transform" />
                 </button>
               </div>
             </div>
@@ -513,10 +513,10 @@ const ProductInfo = () => {
                 Customers find the workout gloves have a nice fit. However, the quality receives mixed feedback, with some customers finding them good while others say they are not of good quality.
               </p>
               <div className="mt-4 flex gap-4 text-sm">
-                <button className="text-red-600 hover:text-red-700 font-medium px-3 py-1 bg-red-50 rounded-full transition-colors">
+                <button className="text-blue-600 hover:text-blue-700 font-medium px-3 py-1 bg-blue-50 rounded-full transition-colors">
                   Fit
                 </button>
-                <button className="text-red-600 hover:text-red-700 font-medium px-3 py-1 bg-red-50 rounded-full transition-colors">
+                <button className="text-blue-600 hover:text-blue-700 font-medium px-3 py-1 bg-blue-50 rounded-full transition-colors">
                   Quality
                 </button>
               </div>
@@ -526,7 +526,7 @@ const ProductInfo = () => {
             <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
               <div className="flex items-center justify-between">
                 <h4 className="font-semibold text-gray-900">Reviews with images</h4>
-                <button className="text-sm text-red-600 hover:text-red-700 font-medium">
+                <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
                   See all photos
                 </button>
               </div>
@@ -614,7 +614,7 @@ const ProductInfo = () => {
                 <div className="text-center mt-6 pt-4 border-t border-gray-200">
                   <button
                     onClick={() => setShowAllReviews(!showAllReviews)}
-                    className="text-sm text-red-600 hover:text-red-700 font-medium px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     {showAllReviews ? "Show Less Reviews" : `Show More Reviews (${reviews.length - 3})`}
                   </button>

@@ -133,7 +133,7 @@ function Navbar() {
       {/* NAVBAR */}
       <nav
         ref={navRef}
-        className="w-full bg-[#F4EFE7] border-b border-gray-200 fixed top-0 z-50"
+        className="w-full bg-white border-b border-gray-200 fixed top-0 z-50 shadow-lg"
         onMouseLeave={handleMouseLeaveNav}
       >
         <div className="px-4 md:px-6 lg:px-10 mx-auto flex items-center justify-between py-3 lg:py-4 h-[60px] lg:h-[80px]">
@@ -175,16 +175,16 @@ function Navbar() {
                   <NavLink
                     to={link.to}
                     className={({ isActive }) =>
-                      `text-sm xl:text-base transition-all duration-200 hover:text-red-500 relative pb-1 ${
+                      `text-sm xl:text-base transition-all duration-200 hover:text-blue-600 relative pb-1 ${
                         isActive
-                          ? "text-red-500 font-semibold"
+                          ? "text-blue-600 font-semibold"
                           : "text-gray-900"
                       }`
                     }
                   >
                     {link.name}
                     <span
-                      className={`absolute bottom-0 left-0 w-0 h-0.5 bg-red-500 transition-all duration-300 group-hover:w-full`}
+                      className={`absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full`}
                     ></span>
                   </NavLink>
 
@@ -200,74 +200,74 @@ function Navbar() {
                     >
                       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-8 grid grid-cols-5 gap-6 lg:gap-10">
                         <div>
-                          <h3 className="font-bold text-red-500 mb-4 text-xs tracking-wider">
+                          <h3 className="font-bold text-blue-600 mb-4 text-xs tracking-wider">
                             NEW & TRENDING
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               New Drops
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Gym Essentials
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Performance Range
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Athleisure
                             </li>
                           </ul>
                         </div>
 
                         <div>
-                          <h3 className="font-bold text-red-500 mb-4 text-xs tracking-wider">
+                          <h3 className="font-bold text-blue-600 mb-4 text-xs tracking-wider">
                             TOPS
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               T-Shirts
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Stringers
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Oversized Tees
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Hoodies
                             </li>
                           </ul>
                         </div>
 
                         <div>
-                          <h3 className="font-bold text-red-500 mb-4 text-xs tracking-wider">
+                          <h3 className="font-bold text-blue-600 mb-4 text-xs tracking-wider">
                             BOTTOMS
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Shorts
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Joggers
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Cargo Pants
                             </li>
                           </ul>
                         </div>
 
                         <div>
-                          <h3 className="font-bold text-red-500 mb-4 text-xs tracking-wider">
+                          <h3 className="font-bold text-blue-600 mb-4 text-xs tracking-wider">
                             ACCESSORIES
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Training Bags
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Caps
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Socks
                             </li>
                           </ul>
@@ -311,74 +311,74 @@ function Navbar() {
                     >
                       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-8 grid grid-cols-5 gap-6 lg:gap-10">
                         <div>
-                          <h3 className="font-bold text-red-500 mb-4 text-xs tracking-wider">
+                          <h3 className="font-bold text-blue-600 mb-4 text-xs tracking-wider">
                             WHAT'S HOT
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               New Arrivals
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Bestsellers
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Gym to Street
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Performance Luxe
                             </li>
                           </ul>
                         </div>
 
                         <div>
-                          <h3 className="font-bold text-red-500 mb-4 text-xs tracking-wider">
+                          <h3 className="font-bold text-blue-600 mb-4 text-xs tracking-wider">
                             TOPS
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Crop Tops
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Sports Bras
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Oversized Tees
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Sweatshirts
                             </li>
                           </ul>
                         </div>
 
                         <div>
-                          <h3 className="font-bold text-red-500 mb-4 text-xs tracking-wider">
+                          <h3 className="font-bold text-blue-600 mb-4 text-xs tracking-wider">
                             BOTTOMS
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Leggings
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Shorts
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Track Pants
                             </li>
                           </ul>
                         </div>
 
                         <div>
-                          <h3 className="font-bold text-red-500 mb-4 text-xs tracking-wider">
+                          <h3 className="font-bold text-blue-600 mb-4 text-xs tracking-wider">
                             ACCESSORIES
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Tote Bags
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Headbands
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Water Bottles
                             </li>
                           </ul>
@@ -422,65 +422,65 @@ function Navbar() {
                     >
                       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-8 grid grid-cols-5 gap-6 lg:gap-10">
                         <div>
-                          <h3 className="font-bold text-red-500 mb-4 text-xs tracking-wider">
+                          <h3 className="font-bold text-blue-600 mb-4 text-xs tracking-wider">
                             TRENDING
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               New In
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Mini Athletes
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Playwear
                             </li>
                           </ul>
                         </div>
 
                         <div>
-                          <h3 className="font-bold text-red-500 mb-4 text-xs tracking-wider">
+                          <h3 className="font-bold text-blue-600 mb-4 text-xs tracking-wider">
                             TOPS
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               T-Shirts
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Sweatshirts
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Hoodies
                             </li>
                           </ul>
                         </div>
 
                         <div>
-                          <h3 className="font-bold text-red-500 mb-4 text-xs tracking-wider">
+                          <h3 className="font-bold text-blue-600 mb-4 text-xs tracking-wider">
                             BOTTOMS
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Joggers
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Shorts
                             </li>
                           </ul>
                         </div>
 
                         <div>
-                          <h3 className="font-bold text-red-500 mb-4 text-xs tracking-wider">
+                          <h3 className="font-bold text-blue-600 mb-4 text-xs tracking-wider">
                             ACCESSORIES
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Bags
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Caps
                             </li>
-                            <li className="hover:text-red-500 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
                               Socks
                             </li>
                           </ul>
@@ -524,12 +524,12 @@ function Navbar() {
                 placeholder={`Search for ${placeholders[currentPlaceholder]}`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-[280px] xl:w-[350px] pl-4 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300 placeholder:text-gray-400 bg-white/80 backdrop-blur-sm hover:bg-white placeholder-animate"
+                className="w-[280px] xl:w-[350px] pl-4 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-300 placeholder:text-gray-400 bg-white/80 backdrop-blur-sm hover:bg-white placeholder-animate"
               />
 
               <button
                 type="submit"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors p-1 rounded-full hover:bg-blue-50"
                 aria-label="Search for "
               >
                 <FiSearch size={18} />
@@ -540,7 +540,7 @@ function Navbar() {
               <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-2 hover:text-red-500 transition-all duration-200 p-2 rounded-full hover:bg-red-50"
+                  className="flex items-center gap-2 hover:text-blue-600 transition-all duration-200 p-2 rounded-full hover:bg-blue-50"
                 >
                   <FiUser className="text-lg" />
                   <span className="text-sm font-medium max-w-[100px] truncate">
@@ -555,7 +555,7 @@ function Navbar() {
                         dispatch(logout());
                         setShowUserMenu(false);
                       }}
-                      className="w-full px-4 py-2.5 text-left hover:bg-red-50 flex items-center gap-3 text-gray-700 hover:text-red-500 transition-colors rounded-lg mx-1"
+                      className="w-full px-4 py-2.5 text-left hover:bg-blue-50 flex items-center gap-3 text-gray-700 hover:text-blue-600 transition-colors rounded-lg mx-1"
                     >
                       <FiLogOut size={18} />
                       <span className="font-medium">Logout</span>
@@ -569,26 +569,26 @@ function Navbar() {
                   setAuthMode("login");
                   setAuthOpen(true);
                 }}
-                className="p-2 rounded-full hover:bg-red-50 transition-colors"
+                className="p-2 rounded-full hover:bg-blue-50 transition-colors"
                 aria-label="Login"
               >
-                <FiUser className="text-lg cursor-pointer hover:text-red-500 transition-colors" />
+                <FiUser className="text-lg cursor-pointer hover:text-blue-600 transition-colors" />
               </button>
             )}
 
             <Link
               to="/wishlist"
-              className="p-2 rounded-full hover:bg-red-50 transition-colors"
+              className="p-2 rounded-full hover:bg-blue-50 transition-colors"
               aria-label="Wishlist"
             >
-              <FiHeart className="text-lg cursor-pointer hover:text-red-500 transition-colors" />
+              <FiHeart className="text-lg cursor-pointer hover:text-blue-600 transition-colors" />
             </Link>
             <Link
               to="/cart"
-              className="p-2 rounded-full hover:bg-red-50 transition-colors"
+              className="p-2 rounded-full hover:bg-blue-50 transition-colors"
               aria-label="Shopping Cart"
             >
-              <FiShoppingCart className="text-lg cursor-pointer hover:text-red-500 transition-colors" />
+              <FiShoppingCart className="text-lg cursor-pointer hover:text-blue-600 transition-colors" />
             </Link>
           </div>
 
@@ -624,7 +624,7 @@ function Navbar() {
                   placeholder={placeholders[currentPlaceholder]}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                   autoFocus
                 />
               </form>
@@ -650,7 +650,7 @@ function Navbar() {
                 .map((s, i) => (
                   <div
                     key={i}
-                    className="p-3 rounded-lg cursor-pointer hover:bg-red-50 transition-colors flex items-center gap-3 border-b border-gray-100 last:border-0"
+                    className="p-3 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-gray-100 last:border-0"
                     onClick={() => {
                       setSearchQuery(s);
                       navigate(`/search?q=${encodeURIComponent(s)}`);

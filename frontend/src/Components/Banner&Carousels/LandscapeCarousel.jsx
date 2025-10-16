@@ -74,7 +74,7 @@ const LandscapeCarousel = ({ items = [] }) => {
 
   if (!items || items.length === 0) {
     return (
-      <div className="w-full h-[200px] md:h-[350px] lg:h-[500px] flex items-center justify-center bg-gray-100 sm:rounded-md lg:rounded-xl">
+      <div className="w-full h-[200px] md:h-[350px] lg:h-[500px] flex items-center justify-center bg-gray-100">
         <p className="text-gray-500 text-sm md:text-base">
           No banners to display
         </p>
@@ -84,16 +84,16 @@ const LandscapeCarousel = ({ items = [] }) => {
 
   return (
     <div className="relative w-full group">
-      <div className="relative w-full overflow-hidden shadow-2xl">
+      <div className="relative w-full overflow-hidden">
         <div
-          className="relative w-full bg-gray-900 h-[25vh] md:h-[50vh] lg:h-[50vh]">
+          className="relative w-full bg-gray-900 h-[25vh] md:h-[50vh] lg:h-[50vh] xl:h-[60vh]">
           {items.map((item, index) => (
             <div key={item.id || index} className={getSlideClasses(index)}>
               <div className="relative w-full h-full">
                 <img
                   src={item.image}
                   alt={item.alt || item.title || `Banner ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-fill"
                   draggable="false"
                   loading="lazy"
                 />

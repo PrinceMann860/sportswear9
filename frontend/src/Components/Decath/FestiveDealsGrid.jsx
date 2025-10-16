@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const FestiveDealsGrid = ({ title = "Festive Steal Deals!", items = [] }) => {
   return (
     <div className="py-4 mb-8 bg-background">
-      <div className="container px-2 mx-auto md:px-4">
+      <div className="px-2 mx-auto sm:px-4 md:px-6 lg:px-12 xl:px-16">
         <div className="flex flex-wrap">
           <div className="w-full mb-4 px-4">
             <h2 className="font-bold uppercase text-base sm:text-lg md:text-xl">

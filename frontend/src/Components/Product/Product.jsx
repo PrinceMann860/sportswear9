@@ -2,68 +2,80 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { 
-  fetchProducts, 
-  selectAllProducts, 
-  selectProductsLoading, 
-  selectProductsError 
+import {
+  fetchProducts,
+  selectAllProducts,
+  selectProductsLoading,
+  selectProductsError,
 } from "./productslice";
 import banner from "../../assets/productbanner.png";
+import { Heart } from "lucide-react";
 
 // Your original ProductCard component (unchanged)
 function ProductCard({ product }) {
-  return (
-    <Link to={'/ProductInfo'}>
-      <div className="group relative bg-white overflow-hidden shadow-sm border-gray-100 hover:shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-1 flex flex-col rounded-lg">
+  const rating = product.rating?.rate || 4.5;
+  const count = product.rating?.count || 100;
 
-        {/* Fixed Image Container */}
-        <div className="relative w-full h-46 md:54 lg:h-64 flex items-center justify-center bg-gray-50">
-          
-          {/* Default Image */}
+  return (
+    <Link to={"/ProductInfo"}>
+      <div className="group relative max-w-[300px] bg-white overflow-hidden border border-gray-200 hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col rounded-lg">
+        {/* Image */}
+        <div className="relative w-full h-46 md:h-54 lg:h-70 flex items-center justify-center bg-gray-50">
           <img
             src={product.img}
             alt={product.title}
-            className="absolute inset-0 w-full h-full object-fill transition-opacity duration-500 group-hover:opacity-0"
+            className="absolute w-full h-full object-fill transition-opacity duration-500 group-hover:opacity-0"
           />
-
-          {/* Hover Image */}
           {product.img2 && (
             <img
               src={product.img2}
               alt={`${product.title} Hover`}
-              className="absolute inset-0 w-full h-full object-fill opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              className="absolute w-full h-full object-fill opacity-0 transition-opacity duration-500 group-hover:opacity-100"
             />
           )}
+        </div>
 
-          {/* Wishlist Icon */}
-          <button className="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition-colors duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.6} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.015-4.5-4.5-4.5S12 5.765 12 8.25c0-2.485-2.015-4.5-4.5-4.5S3 5.765 3 8.25c0 7.125 9 11.25 9 11.25s9-4.125 9-11.25z" />
-            </svg>
+        {/* Rating */}
+        <div className="flex justify-between">
+          <div className="px-4 pt-3 text-sm font-medium text-gray-700">
+            ⭐ {rating} <span className="text-gray-500">| {count}</span>
+          </div>
+          <button className="mx-4 mt-3 w-6 h-6 sm:w-7 sm:h-7 bg-white rounded-full flex items-center justify-center border border-gray-300 hover:border-primary hover:bg-primary/5 transition-all duration-300">
+            <Heart
+              className={`w-3 h-3 sm:w-4 sm:h-4 transition-all duration-300`}
+            />
           </button>
         </div>
 
-        {/* Text Section Fixed at Bottom */}
-        <div className="p-4 text-start flex flex-col flex-grow">
-          <h3 className="font-semibold text-gray-900 group-hover:text-black transition line-clamp-2">{product.title}</h3>
-          <p className="text-sm text-gray-500 mt-1">{product.category}</p>
+        {/* Content */}
+        <div className="px-4 text-start flex flex-col flex-grow min-h-[120px]">
+          <p className="text-xs font-semibold text-gray-600 uppercase">
+            {product.brand}
+          </p>
+          <h3 className="font-semibold text-gray-900 line-clamp-2 mt-1">
+            {product.title}
+          </h3>
 
-          {/* Price Section */}
-          <div className="mt-auto">
+          {/* Price */}
+          <div className="mt-1">
             <p className="text-lg font-bold text-gray-900">{product.price}</p>
             <p className="text-sm text-gray-500">
               <span className="line-through mr-1">{product.original}</span>
-              <span className="text-red-500 font-medium">{product.discount}</span>
+              <span className="text-red-500 font-medium">
+                {product.discount}
+              </span>
             </p>
           </div>
         </div>
 
-        <div className="absolute bottom-0 left-0 w-0 h-1 bg-red-500 transition-all duration-500 group-hover:w-full"></div>
+        {/* Add to Cart Button */}
+        <button className="w-[95%] mx-auto py-2 my-2  text-sm font-bold uppercase border border-gray-300 bg-white hover:bg-gray-100 transition">
+          Add to Cart
+        </button>
       </div>
     </Link>
   );
 }
-
 
 // Helper function to transform API data to match your ProductCard expectations
 const transformProductData = (apiProduct) => {
@@ -71,11 +83,18 @@ const transformProductData = (apiProduct) => {
     id: apiProduct.product_uuid,
     title: apiProduct.name,
     price: `$${apiProduct.price}`,
-    original: apiProduct.disc > 0 ? `$${(parseFloat(apiProduct.price) + parseFloat(apiProduct.disc)).toFixed(2)}` : '',
-    discount: apiProduct.disc > 0 ? `Save $${apiProduct.disc}` : '',
-    category: apiProduct.category?.name || 'Uncategorized',
+    original:
+      apiProduct.disc > 0
+        ? `$${(
+            parseFloat(apiProduct.price) + parseFloat(apiProduct.disc)
+          ).toFixed(2)}`
+        : "",
+    discount: apiProduct.disc > 0 ? `Save $${apiProduct.disc}` : "",
+    category: apiProduct.category?.name || "Uncategorized",
     // You'll need to provide an image - using a placeholder for now
-    img: apiProduct.thumbnail || 'https://via.placeholder.com/300x300?text=No+Image'
+    img:
+      apiProduct.thumbnail ||
+      "https://via.placeholder.com/300x300?text=No+Image",
   };
 };
 
@@ -85,8 +104,8 @@ function Product() {
   const loading = useSelector(selectProductsLoading);
   const error = useSelector(selectProductsError);
 
-  console.log('API Products:', apiProducts);
-  console.log('Number of products:', apiProducts.length);
+  console.log("API Products:", apiProducts);
+  console.log("Number of products:", apiProducts.length);
 
   // Transform API data to match your ProductCard component
   const products = apiProducts.map(transformProductData);
@@ -99,7 +118,7 @@ function Product() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center mt-10">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading products...</p>
         </div>
       </div>
@@ -110,10 +129,10 @@ function Product() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-500 text-lg">Error: {error}</p>
+          <p className="text-blue-500 text-lg">Error: {error}</p>
           <button
             onClick={() => dispatch(fetchProducts())}
-            className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg"
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg"
           >
             Retry
           </button>
@@ -159,7 +178,7 @@ function Product() {
           <p className="text-gray-500 text-lg">No products found</p>
           <button
             onClick={() => dispatch(fetchProducts())}
-            className="mt-4 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+            className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
           >
             Reload Products
           </button>
@@ -177,13 +196,13 @@ function Product() {
           Shop now
         </Link>
       </div>
-      
+
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-6">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
-      
+
       <div className="max-w-7xl h-auto flex">
         <img src={banner} alt="" className="" />
       </div>
@@ -195,18 +214,18 @@ export default Product;
 export { ProductCard };
 
 const product = {
-    id: 3,
-    title: "Compression T-shirt",
-    category: "Performance",
-    price: "₹2,499.00",
-    original: "₹6,599.00",
-    discount: "-65%",
-    images: [
-      "https://assets.myntassets.com/dpr_1.5,q_30,w_800,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-      "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?auto=format&fit=crop&w=800&q=80",
-    ],
-    description:
-      "Engineered with moisture-wicking fabric, our Compression T-shirt provides superior breathability, flexibility, and comfort during intense workouts.",
-  };
+  id: 3,
+  title: "Compression T-shirt",
+  category: "Performance",
+  price: "₹2,499.00",
+  original: "₹6,599.00",
+  discount: "-65%",
+  images: [
+    "https://assets.myntassets.com/dpr_1.5,q_30,w_800,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
+    "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?auto=format&fit=crop&w=800&q=80",
+  ],
+  description:
+    "Engineeblue with moisture-wicking fabric, our Compression T-shirt provides superior breathability, flexibility, and comfort during intense workouts.",
+};

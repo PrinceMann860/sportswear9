@@ -104,8 +104,8 @@ const MobileSidebar = ({ isOpen, onClose }) => {
           </div>
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                <User className="w-5 h-5 text-red-500" />
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <User className="w-5 h-5 text-blue-500" />
               </div>
               <div>
                 {user ? (
@@ -118,7 +118,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                 ) : (
                   <button
                     onClick={() => handleNavigation('/login')}
-                    className="font-semibold text-sm text-red-500"
+                    className="font-semibold text-sm text-blue-500"
                   >
                     Login / Sign Up
                   </button>
@@ -171,7 +171,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                               `/category/${category.id}/${sub.toLowerCase()}`
                             )
                           }
-                          className="w-full text-left px-8 py-2 text-sm text-gray-700 hover:text-red-500 hover:bg-white transition-colors"
+                          className="w-full text-left px-8 py-2 text-sm text-gray-700 hover:text-blue-500 hover:bg-white transition-colors"
                         >
                           {sub}
                         </button>
@@ -201,7 +201,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                   logout();
                   onClose();
                 }}
-                className="w-full py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors active:scale-95"
+                className="w-full py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors active:scale-95"
               >
                 Logout
               </button>

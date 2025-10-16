@@ -32,12 +32,12 @@ const BottomNav = () => {
           >
             <Home
               size={22}
-              className={`${isActive("/") ? "text-red-500" : "text-gray-600"} transition-colors`}
+              className={`${isActive("/") ? "text-blue-600" : "text-gray-600"} transition-colors`}
               strokeWidth={isActive("/") ? 2.5 : 2}
             />
             <span
               className={`text-[10px] mt-1 font-medium ${
-                isActive("/") ? "text-red-500" : "text-gray-600"
+                isActive("/") ? "text-blue-600" : "text-gray-600"
               }`}
             >
               Home
@@ -51,12 +51,12 @@ const BottomNav = () => {
           >
             <Search
               size={22}
-              className={`${isActive("/categories") ? "text-red-500" : "text-gray-600"} transition-colors`}
+              className={`${isActive("/categories") ? "text-blue-600" : "text-gray-600"} transition-colors`}
               strokeWidth={isActive("/categories") ? 2.5 : 2}
             />
             <span
               className={`text-[10px] mt-1 font-medium ${
-                isActive("/categories") ? "text-red-500" : "text-gray-600"
+                isActive("/categories") ? "text-blue-600" : "text-gray-600"
               }`}
             >
               Explore
@@ -70,12 +70,12 @@ const BottomNav = () => {
           >
             <Heart
               size={22}
-              className={`${isActive("/wishlist") ? "text-red-500" : "text-gray-600"} transition-colors`}
+              className={`${isActive("/wishlist") ? "text-blue-600" : "text-gray-600"} transition-colors`}
               strokeWidth={isActive("/wishlist") ? 2.5 : 2}
             />
             <span
               className={`text-[10px] mt-1 font-medium ${
-                isActive("/wishlist") ? "text-red-500" : "text-gray-600"
+                isActive("/wishlist") ? "text-blue-600" : "text-gray-600"
               }`}
             >
               Wishlist
@@ -89,12 +89,12 @@ const BottomNav = () => {
           >
             <ShoppingBag
               size={22}
-              className={`${isActive("/orders") ? "text-red-500" : "text-gray-600"} transition-colors`}
+              className={`${isActive("/orders") ? "text-blue-600" : "text-gray-600"} transition-colors`}
               strokeWidth={isActive("/orders") ? 2.5 : 2}
             />
             <span
               className={`text-[10px] mt-1 font-medium ${
-                isActive("/orders") ? "text-red-500" : "text-gray-600"
+                isActive("/orders") ? "text-blue-600" : "text-gray-600"
               }`}
             >
               Orders
@@ -110,11 +110,11 @@ const BottomNav = () => {
               >
                 <User
                   size={22}
-                  className={`${isActive("/profile") ? "text-red-500" : "text-gray-600"} transition-colors`}
+                  className={`${isActive("/profile") ? "text-blue-600" : "text-gray-600"} transition-colors`}
                   strokeWidth={isActive("/profile") ? 2.5 : 2}
                 />
                 <span className={`text-[10px] mt-1 font-medium ${
-                  isActive("/profile") ? "text-red-500" : "text-gray-600"
+                  isActive("/profile") ? "text-blue-600" : "text-gray-600"
                 }`}>
                   {profile?.full_name?.split(" ")[0] || "Profile"}
                 </span>
@@ -130,7 +130,7 @@ const BottomNav = () => {
             >
               <User
                 size={22}
-                className="text-gray-600 hover:text-red-500 transition-colors"
+                className="text-gray-600 hover:text-blue-600 transition-colors"
               />
               <span className="text-[10px] mt-1 font-medium text-gray-600">
                 Profile
