@@ -86,7 +86,7 @@ const LandscapeCarousel = ({ items = [] }) => {
     <div className="relative w-full group">
       <div className="relative w-full overflow-hidden">
         <div
-          className="relative w-full bg-gray-900 h-[20vh] md:h-[50vh] lg:h-[50vh] ">
+          className="relative w-full h-[20vh] md:h-[50vh] lg:h-[50vh] ">
           {items.map((item, index) => (
             <div key={item.id || index} className={getSlideClasses(index)}>
               <div className="relative w-full h-full">

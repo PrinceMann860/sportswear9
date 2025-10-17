@@ -142,19 +142,7 @@ function Product() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* Debug Info - Remove this in production */}
-      <div className="mb-4 p-4 bg-yellow-100 rounded-lg">
-        <p className="text-sm text-yellow-800">
-          Debug: Loaded {apiProducts.length} product(s) from API
-        </p>
-        {apiProducts.length > 0 && (
-          <p className="text-sm text-yellow-800 mt-2">
-            First product: {apiProducts[0].name} - ${apiProducts[0].price}
-          </p>
-        )}
-      </div>
-
+    <div className="max-w-7xl mx-auto px-4 py-20">
       {/* Header */}
       <div className="flex items-center gap-2 mb-6">
         <span className="bg-black text-white px-3 py-1 text-xs rounded">
