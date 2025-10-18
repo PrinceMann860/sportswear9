@@ -1,10 +1,16 @@
-# attributes/admin_serializers.py
 from rest_framework import serializers
-from .models import Attribute, AttributeValue, ProductAttribute, ProductVariant
-import requests
+from .models import (
+    Attribute, AttributeValue, ProductAttribute, ProductVariant, ProductVariantAttributeMedia
+)
+from assets.models import ProductImage
 
+
+# ─────────────────────────────
+# Attribute serializers
+# ─────────────────────────────
 class AttributeValueSerializer(serializers.ModelSerializer):
     attribute = serializers.PrimaryKeyRelatedField(queryset=Attribute.objects.all())
+
     class Meta:
         model = AttributeValue
         fields = ['id', 'attribute', 'value', 'meta']
@@ -18,50 +24,119 @@ class AttributeSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'values']
 
 
+# ─────────────────────────────
+# Product Attribute
+# ─────────────────────────────
 class ProductAttributeSerializer(serializers.ModelSerializer):
     attribute = AttributeSerializer(read_only=True)
     attribute_id = serializers.PrimaryKeyRelatedField(
         queryset=Attribute.objects.all(), source="attribute", write_only=True
     )
+    product_uuid = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductAttribute
-        fields = ['id', 'product', 'attribute', 'attribute_id']
+        fields = ['id', 'product_uuid', 'attribute', 'attribute_id']
+
+    def get_product_uuid(self, obj):
+        return obj.product.product_uuid
+
+
+# ─────────────────────────────
+# Nested Attribute + Variant serializers
+# ─────────────────────────────
+class AttributeValueNestedSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source="attribute.name", read_only=True)
+    images = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AttributeValue
+        fields = ["id", "name", "value", "meta", "images"]
+
+    def get_images(self, obj):
+        request = self.context.get("request")
+        variant = self.context.get("variant") or self.parent.context.get("variant")
+        if not variant:
+            return []
+        media = ProductVariantAttributeMedia.objects.filter(
+            variant=variant, attribute_value=obj
+        ).first()
+        if not media:
+            return []
+        return [
+            request.build_absolute_uri(img.image.url)
+            for img in media.images.all() if img.image
+        ]
 
 
 class ProductVariantSerializer(serializers.ModelSerializer):
-    attributes = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=AttributeValue.objects.all()
+    attributes = AttributeValueNestedSerializer(many=True, read_only=True)
+    attribute_ids = serializers.PrimaryKeyRelatedField(
+        many=True, source="attributes", queryset=AttributeValue.objects.all(), write_only=True
     )
-    images = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-
+    product_uuid = serializers.SerializerMethodField()
+    # images = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductVariant
-        fields = ['id', 'product', 'sku', 'price', 'is_default', 'attributes', 'images']
+        fields = [
+            "id", "product_uuid", "sku", "price", "net", "is_default",
+            "attributes", "attribute_ids" #, "images"
+        ]
 
+    def get_product_uuid(self, obj):
+        return obj.product.product_uuid
+
+    def get_images(self, obj):
+        request = self.context.get("request")
+        if not hasattr(obj, "images"):
+            return []
+        return [
+            request.build_absolute_uri(img.image.url)
+            for img in obj.images.all() if img.image
+        ]
+
+    def to_representation(self, instance):
+        context = self.context.copy()
+        context["variant"] = instance
+        rep = super().to_representation(instance)
+        rep["attributes"] = AttributeValueNestedSerializer(
+            instance.attributes.all(), many=True, context=context
+        ).data
+        return rep
+
+class ProductVariantAttributeMediaUploadSerializer(serializers.ModelSerializer):
+    """Serializer for direct image upload for (variant, attribute_value) pair."""
+    images = serializers.ListField(
+        child=serializers.ImageField(), write_only=True
+    )
+
+    class Meta:
+        model = ProductVariantAttributeMedia
+        fields = ["id", "variant", "attribute_value", "images"]
 
     def create(self, validated_data):
-        attributes = validated_data.pop("attributes", [])
-        product = validated_data.get("product")
-        price = validated_data.get("price", getattr(product, "net", None))
-        is_default = validated_data.get("is_default", False)
-        variant = ProductVariant.objects.create(
-            product=product,
-            price=price,
-            is_default=is_default
-        )
-        variant.attributes.set(attributes)
+        images = validated_data.pop("images", [])
+        instance, _ = ProductVariantAttributeMedia.objects.get_or_create(**validated_data)
 
-        return variant
+        # create ProductImage objects for each uploaded file
+        from assets.models import ProductImage
+        uploaded = []
+        for img in images:
+            pic = ProductImage.objects.create(image=img)
+            uploaded.append(pic)
 
-    def update(self, instance, validated_data):
-        attributes = validated_data.pop('attributes', None)
-        for attr, val in validated_data.items():
-            setattr(instance, attr, val)
+        instance.images.set(uploaded)
         instance.save()
-        if attributes is not None:
-            instance.attributes.set(attributes)
         return instance
 
-
+    def to_representation(self, instance):
+        request = self.context.get("request")
+        return {
+            "variant": instance.variant.id,
+            "attribute_value": instance.attribute_value.id,
+            "images": [
+                request.build_absolute_uri(img.image.url)
+                for img in instance.images.all()
+            ]
+        }

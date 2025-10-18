@@ -12,7 +12,7 @@ from .admin_serializers import ProductCreateSerializer
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 # from .serializers import ProductAdminSerializer  # ✅ use this, not ProductDetailSerializer
-from attributes.admin_serializers import ProductVariantSerializer
+from attributes.models import AttributeValue, ProductVariantAttributeMedia
 
 
 class ProductCreateAPIView(generics.CreateAPIView):
@@ -91,5 +91,30 @@ class UploadVariantMediaAPIView(APIView):
 
         return Response({
             "variant_id": variant.id,
+            "message": f"{len(images)} images uploaded successfully"
+        }, status=201)
+
+
+class UploadAttributeMediaAPIView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, product_uuid, variant_id, attribute_value_id):
+        product = get_object_or_404(Product, product_uuid=product_uuid)
+        variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
+        attr_value = get_object_or_404(AttributeValue, id=attribute_value_id)
+
+        images = request.FILES.getlist("images")
+        media_link, _ = ProductVariantAttributeMedia.objects.get_or_create(
+            variant=variant,
+            attribute_value=attr_value
+        )
+
+        for img in images:
+            product_image = ProductImage.objects.create(image=img)
+            media_link.images.add(product_image)
+
+        return Response({
+            "variant_id": variant.id,
+            "attribute_value": attr_value.value,
             "message": f"{len(images)} images uploaded successfully"
         }, status=201)

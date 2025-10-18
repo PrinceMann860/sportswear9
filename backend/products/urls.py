@@ -1,6 +1,7 @@
 # products/urls.py
 from django.urls import path
 from . import views, admin_views
+from attributes.views import ProductVariantAttributeUploadView
 
 urlpatterns = [
     # Public APIs
@@ -23,4 +24,9 @@ urlpatterns = [
     # Variant Media Uploads
     path('admin/<str:product_uuid>/variant/<str:variant_id>/upload-media/', admin_views.UploadVariantMediaAPIView.as_view(), name='variant-upload-media'),
 
+    path(
+        "admin/products/<str:product_uuid>/variants/<str:variant_id>/attributes/<str:attribute_value_id>/upload/",
+        ProductVariantAttributeUploadView.as_view(),
+        name="admin-variant-attribute-upload",
+    ),
 ]
