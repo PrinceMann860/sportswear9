@@ -67,26 +67,41 @@ class ProductListSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     original = serializers.SerializerMethodField()
     discount = serializers.SerializerMethodField()
+    brand = BrandSerializer()
+    category = CategorySerializer()
+    # thumbnail = serializers.SerializerMethodField()
+    # average_rating = serializers.SerializerMethodField()
+    
 
     class Meta:
         model = Product
         fields = [
-            "id", "title", "img", "img2", "price", "original", "discount", "category"
+            "id", "title", "img", "img2", "price", "original", "discount", "category",
+            "product_uuid", "name", "price", "disc", "net", "brand", "category", 
+              "is_featured"
         ]
 
+
     def get_img(self, obj):
+        # Try default variant first
         variant = obj.variants.filter(is_default=True).first() or obj.variants.first()
         if not variant:
             return None
-        img = variant.images.filter(is_main=True).first() or variant.images.first()
-        return img.medium_url if img else None
+
+        image = variant.images.filter(is_main=True).first() or variant.images.first()
+        if image:
+            return image.medium_url
+        return None
 
     def get_img2(self, obj):
         variant = obj.variants.filter(is_default=True).first() or obj.variants.first()
         if not variant:
             return None
-        imgs = variant.images.all()[:2]
-        return imgs[1].medium_url if len(imgs) > 1 else None
+
+        images = variant.images.all()[1:3]  # get 2nd image if exists
+        if images:
+            return images[0].medium_url
+        return None
 
     def get_price(self, obj):
         return f"₹{obj.net:,.2f}"

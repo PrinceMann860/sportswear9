@@ -6,16 +6,23 @@ from .serializers import ProductListSerializer, ProductDetailSerializer
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 
+
 @method_decorator(cache_page(60 * 5), name="dispatch")  # cache 5 min
 class ProductListAPIView(generics.ListAPIView):
     """
     Public & user endpoint: returns paginated product list with filters and search
     """
-    queryset = Product.objects.filter(is_active=True).select_related('brand', 'category')
+    queryset = (
+        Product.objects.filter(is_active=True)
+        .select_related("brand", "category")
+        .prefetch_related("variants__images", "category")
+    )
+
     serializer_class = ProductListSerializer
     permission_classes = [AllowAny]
     authentication_classes = []  # Disable authentication here so JWT is NOT required
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend,
+                       filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['category', 'brand', 'is_featured']
     search_fields = ['name', 'description', 'brand__name', 'category__name']
     ordering_fields = ['price', 'created_at']

@@ -78,21 +78,54 @@ class AddSpecificationAPIView(APIView):
         return Response({"message": "Specifications added"}, status=201)
 
 
+# products/admin_views.py
 class UploadVariantMediaAPIView(APIView):
     permission_classes = [IsAdminUser]
 
     def post(self, request, product_uuid, variant_id):
         product = get_object_or_404(Product, product_uuid=product_uuid)
         variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
-        images = request.FILES.getlist("images")
 
-        for img in images:
-            ProductImage.objects.create(variant=variant, image=img)
+        images = request.FILES.getlist("images")
+        alt_texts = request.data.getlist("alt_texts", [])
+        is_main_flags = request.data.getlist("is_main_flags", [])
+
+        uploaded = []
+        for i, img in enumerate(images):
+            alt_text = alt_texts[i] if i < len(alt_texts) else ""
+            is_main = False
+            if i < len(is_main_flags):
+                flag = str(is_main_flags[i]).lower()
+                is_main = flag in ["true", "1", "yes"]
+
+            # create the ProductImage
+            image_obj = ProductImage.objects.create(
+                variant=variant,
+                image=img,
+                alt_text=alt_text,
+                is_main=is_main
+            )
+            uploaded.append({
+                "uuid": image_obj.image_uuid,
+                "alt_text": image_obj.alt_text,
+                "is_main": image_obj.is_main,
+                "image_url": image_obj.medium_url
+            })
+
+        # ✅ ensure only one default image per variant
+        main_images = [img for img in variant.images.all() if img.is_main]
+        if len(main_images) > 1:
+            # keep the latest as main, others set to false
+            for extra in main_images[:-1]:
+                extra.is_main = False
+                extra.save()
 
         return Response({
             "variant_id": variant.id,
-            "message": f"{len(images)} images uploaded successfully"
+            "uploaded": uploaded,
+            "message": f"{len(uploaded)} images uploaded successfully"
         }, status=201)
+
 
 
 class UploadAttributeMediaAPIView(APIView):
