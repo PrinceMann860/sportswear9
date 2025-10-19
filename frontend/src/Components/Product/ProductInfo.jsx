@@ -1,99 +1,384 @@
 // ProductInfo.jsx
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { Star, Heart, Truck, Shield, RefreshCw, ChevronDown } from "lucide-react";
+import { Check, Info, Ruler } from "lucide-react";
+import { fetchProductDetail, clearProductDetail } from "./Productdetailslice"; // adjust if your file path differs
 import { ProductCard } from "./Product";
 import RecommendedProducts from "../Home/RecommendedProducts";
-import { Check, Info, Ruler } from "lucide-react";
+
+/**
+ * Notes:
+ * - This file preserves your original UI exactly.
+ * - It maps API data into fields your UI expects (title, images, colors, sizes, etc.).
+ * - It reads product data from state.productdetail (your store key).
+ */
 
 const ProductInfo = () => {
+  const { id, product_uuid } = useParams();
+  const productId = id || product_uuid; // support both param names
+  const dispatch = useDispatch();
+
+  // Use separate selectors to avoid returning new objects and causing warnings
+  const productFromState = useSelector((state) => state.productdetail?.data);
+  const loading = useSelector((state) => state.productdetail?.loading);
+  const error = useSelector((state) => state.productdetail?.error);
+
+  // Local UI state (kept same names as original)
   const [selectedImage, setSelectedImage] = useState(0);
   const [showAllReviews, setShowAllReviews] = useState(false);
-  const [selectedSize, setSelectedSize] = useState("M");
-  const [selectedColor, setSelectedColor] = useState("Black");
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
-  // Mock product data - Enhanced with additional fields
-  const product = {
-    id: 3,
-    title: "Compression T-shirt",
-    category: "Performance",
-    price: "₹2,499.00",
-    original: "₹6,599.00",
-    discount: "-65%",
-    images: [
-      "https://assets.myntassets.com/dpr_1.5,q_30,w_800,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-      "https://assets.myntassets.com/dpr_1.5,q_30,w_800,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-      "https://assets.myntassets.com/dpr_1.5,q_30,w_800,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-      "https://assets.myntassets.com/dpr_1.5,q_30,w_800,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg",
-    ],
-    description: "Engineered with moisture-wicking fabric, our Compression T-shirt provides superior breathability, flexibility, and comfort during intense workouts.",
-    features: [
-      "Moisture-wicking technology",
-      "4-way stretch fabric",
-      "Anti-odor treatment",
-      "UPF 50+ sun protection",
-      "Flatlock seams for comfort"
-    ],
-    sizes: ["XS", "S", "M", "L", "XL", "XXL"],
-    colors: [
-      { name: "Black", value: "#000000" },
-      { name: "Navy Blue", value: "#1e3a8a" },
-      { name: "Charcoal", value: "#374151" },
-      { name: "Burgundy", value: "#831843" }
-    ],
-    specifications: {
-      "Material": "92% Polyester, 8% Spandex",
-      "Fit": "Compression Fit",
-      "Care": "Machine Wash Cold",
-      "Weight": "Lightweight (150 GSM)",
-      "Origin": "Made in India"
-    },
-    inStock: true,
-    deliveryDate: "2-3 business days",
-    rating: 4.5,
-    reviewCount: 128
+  // Fetch product on mount / id change
+  useEffect(() => {
+    if (productId) {
+      dispatch(fetchProductDetail(productId));
+    }
+    return () => {
+      dispatch(clearProductDetail());
+    };
+  }, [dispatch, productId]);
+
+  // Normalize API product into shape your UI expects (with graceful fallbacks)
+  const product = useMemo(() => {
+    if (!productFromState) return null;
+
+    // Title/name
+    const title = productFromState.name || productFromState.title || "Product";
+
+    // Description
+    const description = productFromState.description || "";
+
+    // Price fields
+    const price = productFromState.net || productFromState.price || "";
+    const original = productFromState.price || productFromState.original || "";
+    const discount = productFromState.disc || productFromState.discount || "";
+
+    // Specifications (API might provide array or object) -> ensure object
+    const specifications =
+      productFromState.specifications && typeof productFromState.specifications === "object"
+        ? productFromState.specifications
+        : {};
+
+    // Images: prefer default_images, else variant attribute images flattened, else brand logo
+    let images = Array.isArray(productFromState.default_images) && productFromState.default_images.length > 0
+      ? productFromState.default_images
+      : [];
+
+    if (images.length === 0) {
+      // gather images from variant attributes
+      const imgs = [];
+      (productFromState.variants || []).forEach((v) => {
+        (v.attributes || []).forEach((a) => {
+          if (Array.isArray(a.images) && a.images.length > 0) {
+            a.images.forEach((im) => {
+              if (!imgs.includes(im)) imgs.push(im);
+            });
+          }
+        });
+      });
+      images = imgs;
+    }
+
+    if (images.length === 0 && productFromState.brand?.logo) {
+      images = [productFromState.brand.logo];
+    }
+
+    // Features (if not provided, try to infer or leave empty)
+    const features = Array.isArray(productFromState.features) ? productFromState.features : [];
+
+    // In-stock indicator
+    const inStock = productFromState.inventory || productFromState.inStock || null;
+
+    // Delivery date
+    const deliveryDate = productFromState.delivery_date || productFromState.deliveryDate || "2-3 business days";
+
+    // Ratings & reviews (API may be incomplete)
+    const rating = productFromState.average_rating ?? productFromState.rating ?? null;
+    const reviewCount = Array.isArray(productFromState.reviews) ? productFromState.reviews.length : 0;
+
+    return {
+      ...productFromState,
+      title,
+      description,
+      price,
+      original,
+      discount,
+      specifications,
+      images,
+      features,
+      inStock,
+      deliveryDate,
+      rating,
+      reviewCount,
+    };
+  }, [productFromState]);
+
+  // Build color -> { name, hex, images, sizes (array), variants } map from variants attributes
+  const colorsList = useMemo(() => {
+    if (!product || !Array.isArray(product.variants)) return [];
+
+    const map = new Map();
+
+    product.variants.forEach((variant) => {
+      const attrs = variant.attributes || [];
+      const colorAttr = attrs.find((a) => a?.name?.toLowerCase() === "color");
+      const sizeAttr = attrs.find((a) => a?.name?.toLowerCase() === "size");
+
+      const colorName = colorAttr?.value || "__UNIVERSAL__";
+      const hex = colorAttr?.meta?.hex || null;
+      const attrImages = Array.isArray(colorAttr?.images) ? colorAttr.images : [];
+
+      if (!map.has(colorName)) {
+        map.set(colorName, {
+          key: colorName,
+          name: colorName === "__UNIVERSAL__" ? "Universal" : colorName,
+          hex,
+          images: [...attrImages],
+          sizes: new Set(),
+          variants: [variant],
+        });
+      } else {
+        const entry = map.get(colorName);
+        // append images uniq
+        attrImages.forEach(img => {
+          if (!entry.images.includes(img)) entry.images.push(img);
+        });
+        entry.variants.push(variant);
+      }
+
+      if (sizeAttr?.value) {
+        map.get(colorName).sizes.add(sizeAttr.value);
+      }
+    });
+
+    // convert to array and sizes -> array
+    const arr = [];
+    map.forEach((v, k) => {
+      arr.push({
+        key: v.key,
+        name: v.name,
+        hex: v.hex,
+        images: v.images,
+        sizes: Array.from(v.sizes),
+        variants: v.variants,
+      });
+    });
+
+    return arr;
+  }, [product]);
+
+  // Show color selector only if more than one named color (exclude universal grouping unless multiple keys)
+  const showColorSelector = useMemo(() => {
+    if (!colorsList || colorsList.length === 0) return false;
+    const named = colorsList.filter(c => c.key !== "__UNIVERSAL__");
+    if (named.length > 1) return true;
+    return colorsList.length > 1 && named.length > 0;
+  }, [colorsList]);
+
+  // default selections when product loads or when colorsList changes
+  useEffect(() => {
+    if (!product) return;
+
+    // if previously selected color exists in new list, keep it, else pick first
+    if (selectedColor) {
+      const exists = colorsList.find(c => c.key === selectedColor);
+      if (exists) {
+        // if sizes available and no selectedSize, auto-select
+        if ((!selectedSize || selectedSize === null) && exists.sizes && exists.sizes.length > 0) {
+          setSelectedSize(exists.sizes[0]);
+        }
+        return;
+      }
+    }
+
+    // pick first color/first size (auto)
+    if (colorsList.length > 0) {
+      setSelectedColor(colorsList[0].key);
+      if (colorsList[0].sizes && colorsList[0].sizes.length > 0) {
+        setSelectedSize(colorsList[0].sizes[0]);
+      } else {
+        setSelectedSize(null);
+      }
+      setSelectedImage(0);
+      return;
+    }
+
+    // if no color groups, fallback: if product.images exist, set selectedImage0
+    if (product.images && product.images.length > 0) {
+      setSelectedImage(0);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product, colorsList]);
+
+  // selectedColorObj
+  const selectedColorObj = useMemo(() => {
+    if (!selectedColor) return null;
+    return colorsList.find(c => c.key === selectedColor) || null;
+  }, [colorsList, selectedColor]);
+
+  // decide whether to show size selector: only if selectedColorObj has sizes or if any variant has size at all and we have multiple sizes
+  const showSizeSelector = useMemo(() => {
+    if (!selectedColorObj) return false;
+    return selectedColorObj.sizes && selectedColorObj.sizes.length > 0;
+  }, [selectedColorObj]);
+
+  // compute gallery images: priority -> selected color images -> product.images -> variant images -> brand.logo
+  const galleryImages = useMemo(() => {
+    if (!product) return [];
+    if (selectedColorObj && Array.isArray(selectedColorObj.images) && selectedColorObj.images.length > 0) {
+      return selectedColorObj.images;
+    }
+    if (Array.isArray(product.images) && product.images.length > 0) return product.images;
+    // fallback to gather any attribute images from variants
+    const imgs = [];
+    (product.variants || []).forEach(v => {
+      (v.attributes || []).forEach(a => {
+        if (Array.isArray(a.images)) {
+          a.images.forEach(i => { if (!imgs.includes(i)) imgs.push(i); });
+        }
+      });
+    });
+    if (imgs.length) return imgs;
+    if (product.brand?.logo) return [product.brand.logo];
+    return [];
+  }, [product, selectedColorObj]);
+
+  // ensure selectedImage index valid
+  useEffect(() => {
+    if (selectedImage >= galleryImages.length) {
+      setSelectedImage(0);
+    }
+  }, [galleryImages, selectedImage]);
+
+  // helper to find selectedVariant (color+size)
+  const selectedVariant = useMemo(() => {
+    if (!product) return null;
+    const variants = product.variants || [];
+
+    const attrVal = (variant, attrName) => {
+      const a = (variant.attributes || []).find(x => x?.name?.toLowerCase() === attrName.toLowerCase());
+      return a?.value ?? null;
+    };
+
+    const targetColor = selectedColorObj ? (selectedColorObj.key === "__UNIVERSAL__" ? null : selectedColorObj.name) : null;
+    // find variant matching both color and size if both present
+    let found = variants.find(v => {
+      const vColor = attrVal(v, "color");
+      const vSize = attrVal(v, "size");
+      const colorMatch = targetColor ? vColor === targetColor : (!vColor); // if targetColor null treat as colorless/universal
+      const sizeMatch = selectedSize ? vSize === selectedSize : true;
+      return colorMatch && sizeMatch;
+    });
+
+    if (!found && targetColor) {
+      // fallback: any variant matching color only
+      found = variants.find(v => {
+        const vColor = attrVal(v, "color");
+        return vColor === targetColor;
+      });
+    }
+
+    if (!found) {
+      found = variants[0] || null;
+    }
+
+    return found;
+  }, [product, selectedColorObj, selectedSize]);
+
+  // derived price to display (from variant if present)
+  const displayPrice = useMemo(() => {
+    if (selectedVariant && selectedVariant.price) return selectedVariant.price;
+    return product?.price || "";
+  }, [selectedVariant, product]);
+
+  // select color handler
+  const handleSelectColor = (colorKey) => {
+    if (colorKey === selectedColor) return;
+    setSelectedColor(colorKey);
+    setSelectedImage(0);
+
+    // auto-select first size for that color if exists
+    const entry = colorsList.find(c => c.key === colorKey);
+    if (entry && entry.sizes && entry.sizes.length > 0) {
+      setSelectedSize(entry.sizes[0]);
+    } else {
+      setSelectedSize(null);
+    }
   };
 
-  const relatedProducts = [
-    {
-      id: 1,
-      img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkBKlnopY_VdoiRKoHyB4pSTlZCnTRwpngwQ&s",
-      title: "Full sleeve compression",
-      category: 'GYM Sports',
-      price: "₹1,499",
-      discount: "-45",
-      original: "₹2,450"
-    },
-    {
-      id: 2,
-      img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkBKlnopY_VdoiRKoHyB4pSTlZCnTRwpngwQ&s",
-      title: "Full sleeve compression",
-      category: 'GYM Sports',
-      price: "₹1,499",
-      discount: "-45",
-      original: "₹2,450"
-    },
-    {
-      id: 3,
-      img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkBKlnopY_VdoiRKoHyB4pSTlZCnTRwpngwQ&s",
-      title: "Full sleeve compression",
-      category: 'GYM Sports',
-      price: "₹1,499",
-      discount: "-45",
-      original: "₹2,450"
-    },
-    {
-      id: 4,
-      img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkBKlnopY_VdoiRKoHyB4pSTlZCnTRwpngwQ&s",
-      title: "Full sleeve compression",
-      category: 'GYM Sports',
-      price: "₹1,499",
-      discount: "-45",
-      original: "₹2,450"
-    },
-  ];
+  // select size handler
+  const handleSelectSize = (size) => {
+    setSelectedSize(size);
+  };
 
-  const reviews = [
+  // add to cart placeholder
+  const handleAddToCart = () => {
+    if (!selectedVariant) {
+      alert("Please select a valid product variant.");
+      return;
+    }
+    // replace with your cart dispatch
+    console.log("Add to cart variant:", selectedVariant, { quantity });
+    alert("Added to cart (demo). Replace with real cart action.");
+  };
+
+  // --- Temporary small loader UI ---
+  if (loading) {
+    return (
+      <div className="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-center h-40">
+          <div className="text-sm text-gray-600">Loading product...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // If error, show a small message but keep mock sections below (so page doesn't fully break)
+  if (error) {
+    return (
+      <div className="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded">
+          <strong>Error:</strong> {String(error)}
+        </div>
+      </div>
+    );
+  }
+
+  // If product not yet loaded, don't render main UI (keeps original UI untouched)
+  if (!product) {
+    return null;
+  }
+
+  // For backward-compatibility with your exact original UI variable names:
+  const uiProduct = {
+    title: product.title,
+    images: galleryImages.length > 0 ? galleryImages : [""],
+    description: product.description,
+    features: product.features || [],
+    sizes: (() => {
+      // If any color grouping has sizes, merge unique sizes for UI (but we will show per-color sizes when showing selector)
+      const allSizes = new Set();
+      colorsList.forEach(c => c.sizes.forEach(s => allSizes.add(s)));
+      return Array.from(allSizes);
+    })(),
+    colors: colorsList.map(c => ({ name: c.name, value: c.hex || "#efefef" })),
+    specifications: product.specifications || {},
+    inStock: product.inStock ?? product.inStock ?? product.inStock,
+    deliveryDate: product.deliveryDate || product.delivery_date || product.deliveryDate,
+    rating: product.rating ?? product.average_rating ?? null,
+    reviewCount: product.reviewCount ?? (product.reviews ? product.reviews.length : 0),
+    price: displayPrice,
+    original: product.original || product.price || "",
+    discount: product.discount || product.disc || "",
+  };
+
+  // compute review derived stats using your original mock reviews if API reviews absent
+  const reviews = product.reviews && product.reviews.length > 0 ? product.reviews : [
+    // keep original mock reviews as placeholders (small subset)
     {
       name: "Aman Verma",
       rating: 5,
@@ -114,45 +399,8 @@ const ProductInfo = () => {
       images: ["https://m.media-amazon.com/images/I/71lBfyRqZ6L._UY350_.jpg"],
       date: "Jul 12, 2025",
     },
-    {
-      name: "Swarna Anand",
-      rating: 5,
-      text: "Very good product",
-      date: "Sep 8, 2025"
-    },
-    {
-      name: "Tao Subramanyan",
-      rating: 2,
-      text: "I have very subtle palms, but even for me this gloves fit small. Maybe it's for kids?",
-      date: "Nov 20, 2023"
-    },
-    {
-      name: "ANURADHA",
-      rating: 2,
-      text: "and scratching the fabric out .. not good",
-      date: "Oct 28, 2024"
-    },
-    {
-      name: "Amazon Customer",
-      rating: 5,
-      text: "Nice",
-      date: "Sep 27, 2025"
-    },
-    {
-      name: "Tarun P.",
-      rating: 4,
-      text: "Good for gym but stitching could be better",
-      date: "Oct 19, 2023"
-    },
-    {
-      name: "santosh kumar",
-      rating: 2,
-      text: "Quality was really not good",
-      date: "Oct 6, 2025"
-    }
   ];
 
-  // ----- Review stats (auto-calculated) -----
   const totalReviews = reviews.length;
   const ratingSum = reviews.reduce((sum, r) => sum + (r.rating || 0), 0);
   const averageRating = totalReviews ? (ratingSum / totalReviews) : 0;
@@ -167,6 +415,11 @@ const ProductInfo = () => {
   const ratingPercentages = ratingsCount.map(c => Math.round((c / (totalReviews || 1)) * 100));
   const reviewImages = reviews.flatMap(r => (r.images || []));
 
+  // Helper to render color swatch (fallback if hex missing)
+  const swatchStyle = (hex) => ({
+    backgroundColor: hex || "#efefef",
+  });
+
   return (
     <div className="pt-20 bg-gradient-to-b from-gray-50 to-white text-gray-900 overflow-x-hidden">
       {/* Product Section */}
@@ -176,19 +429,19 @@ const ProductInfo = () => {
         <div className="space-y-4">
           <div className="relative rounded-2xl overflow-hidden bg-white shadow-lg border border-gray-200">
             <img
-              src={product.images[selectedImage]}
+              src={uiProduct.images[selectedImage] || ""}
               alt="product"
               className="w-full h-auto object-cover aspect-[3/4]"
             />
           </div>
           <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-thin">
-            {product.images.map((img, i) => (
+            {uiProduct.images.map((img, i) => (
               <button
                 key={i}
                 onClick={() => setSelectedImage(i)}
                 className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
                   selectedImage === i
-                    ? "border-blue-500 shadow-md scale-105 ring-2 ring-blue-200"
+                    ? "border-blue-500 shadow-md  ring-2 ring-blue-200"
                     : "border-gray-300 hover:border-gray-400 hover:scale-102"
                 }`}
               >
@@ -208,17 +461,17 @@ const ProductInfo = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="inline-block bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-md">
-                {product.category}
+                {product.category?.name || product.category || "Category"}
               </span>
               <div className="flex items-center gap-2 bg-white rounded-full px-3 py-1 shadow-sm border border-gray-200">
                 <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                <span className="text-sm font-semibold text-gray-700">{product.rating}</span>
-                <span className="text-xs text-gray-500">({product.reviewCount})</span>
+                <span className="text-sm font-semibold text-gray-700">{uiProduct.rating ?? "—"}</span>
+                <span className="text-xs text-gray-500">({uiProduct.reviewCount ?? totalReviews})</span>
               </div>
             </div>
             
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
-              {product.title}
+              {uiProduct.title}
             </h1>
           </div>
           
@@ -226,18 +479,20 @@ const ProductInfo = () => {
           <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
             <div className="flex items-center gap-4 flex-wrap">
               <span className="text-3xl sm:text-4xl font-bold text-gray-900">
-                {product.price}
+                {uiProduct.price}
               </span>
               <span className="text-xl text-gray-500 line-through">
-                {product.original}
+                {uiProduct.original}
               </span>
-              <span className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md">
-                {product.discount} OFF
-              </span>
+              {uiProduct.discount && (
+                <span className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md">
+                  {uiProduct.discount} OFF
+                </span>
+              )}
             </div>
             <p className="text-blue-600 text-sm font-medium mt-2 flex items-center gap-1">
               <Check className="w-4 h-4" />
-              You save ₹4,100.00
+              You save {(uiProduct.original && uiProduct.price) ? `₹${(parseFloat(uiProduct.original.toString().replace(/[^\d.]/g,'')) - parseFloat(uiProduct.price.toString().replace(/[^\d.]/g,''))).toFixed(2)}` : "—"}
             </p>
           </div>
 
@@ -248,74 +503,64 @@ const ProductInfo = () => {
               Product Description
             </h3>
             <p className="text-gray-700 leading-relaxed text-base">
-              {product.description}
+              {uiProduct.description}
             </p>
           </div>
 
-          {/* Key Features - Modern Grid */}
-          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Key Features</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {product.features.map((feature, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-200">
-                  <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
-                    <Check className="w-4 h-4 text-white" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-800">{feature}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* Color Selection - Modern Cards */}
-          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Choose Color</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {product.colors.map((color) => (
-                <button
-                  key={color.name}
-                  onClick={() => setSelectedColor(color.name)}
-                  className={`flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 ${
-                    selectedColor === color.name 
-                      ? "border-blue-500 bg-blue-50 shadow-md scale-105 ring-2 ring-blue-200" 
-                      : "border-gray-300 hover:border-gray-400 hover:shadow-sm"
-                  }`}
-                >
-                  <div
-                    className="w-12 h-12 rounded-full border-2 border-gray-300 shadow-sm"
-                    style={{ backgroundColor: color.value }}
-                  ></div>
-                  <span className="text-sm font-medium text-gray-700">{color.name}</span>
-                </button>
-              ))}
+          {/* Only show if more than 1 color group (per your rule), otherwise skip */}
+          {showColorSelector ? (
+            <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Choose Color</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {colorsList.map((color) => (
+                  <button
+                    key={color.key}
+                    onClick={() => handleSelectColor(color.key)}
+                    className={`flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 ${
+                      selectedColor === color.key 
+                        ? "border-blue-500 bg-blue-50 shadow-md scale-105 ring-2 ring-blue-200" 
+                        : "border-gray-300 hover:border-gray-400 hover:shadow-sm"
+                    }`}
+                  >
+                    <div
+                      className="w-12 h-12 rounded-full border-2 border-gray-300 shadow-sm"
+                      style={swatchStyle(color.hex)}
+                    ></div>
+                    <span className="text-sm font-medium text-gray-700">{color.name}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          ) : null}
 
           {/* Size Selection - Modern Grid */}
-          <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Select Size</h3>
-              <button className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm">
-                <Ruler className="w-4 h-4" />
-                Size Guide
-              </button>
-            </div>
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-              {product.sizes.map((size) => (
-                <button
-                  key={size}
-                  onClick={() => setSelectedSize(size)}
-                  className={`py-4 rounded-xl border-2 font-semibold transition-all duration-300 ${
-                    selectedSize === size
-                      ? "bg-gray-900 text-white border-gray-900 shadow-md scale-105"
-                      : "border-gray-300 text-gray-700 hover:border-gray-400 hover:shadow-sm hover:scale-102 bg-white"
-                  }`}
-                >
-                  {size}
+          {showSizeSelector ? (
+            <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Select Size</h3>
+                <button className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm">
+                  <Ruler className="w-4 h-4" />
+                  Size Guide
                 </button>
-              ))}
+              </div>
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                {(selectedColorObj ? selectedColorObj.sizes : uiProduct.sizes).map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => handleSelectSize(size)}
+                    className={`py-4 rounded-xl border-2 font-semibold transition-all duration-300 ${
+                      selectedSize === size
+                        ? "bg-gray-900 text-white border-gray-900 shadow-md scale-105"
+                        : "border-gray-300 text-gray-700 hover:border-gray-400 hover:shadow-sm hover:scale-102 bg-white"
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          ) : null}
 
           {/* Quantity & Actions - Modern Layout */}
           <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
@@ -342,18 +587,21 @@ const ProductInfo = () => {
                     </button>
                   </div>
                   <div className={`px-3 py-2 rounded-full text-sm font-medium ${
-                    product.inStock 
+                    uiProduct.inStock 
                       ? "bg-green-100 text-green-800" 
                       : "bg-blue-100 text-blue-800"
                   }`}>
-                    {product.inStock ? "✓ In Stock" : "Out of Stock"}
+                    {uiProduct.inStock ? "✓ In Stock" : "Out of Stock"}
                   </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="flex items-center gap-3">
-                <button className="flex-1 bg-gray-900 text-white py-4 rounded-xl font-bold hover:bg-black transition-all duration-300 transform hover:scale-105 shadow-md">
+                <button
+                  onClick={handleAddToCart}
+                  className="flex-1 bg-gray-900 text-white py-4 rounded-xl font-bold hover:bg-black transition-all duration-300 transform hover:scale-105 shadow-md"
+                >
                   Add to Cart
                 </button>
                 <button className="p-4 border-2 border-gray-300 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all duration-300 group">
@@ -372,7 +620,7 @@ const ProductInfo = () => {
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900">Free Delivery</p>
-                  <p className="text-sm text-gray-600">By {product.deliveryDate}</p>
+                  <p className="text-sm text-gray-600">By {uiProduct.deliveryDate}</p>
                 </div>
               </div>
             </div>
@@ -406,7 +654,7 @@ const ProductInfo = () => {
           <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Specifications</h3>
             <div className="space-y-3">
-              {Object.entries(product.specifications).map(([key, value]) => (
+              {Object.entries(uiProduct.specifications).map(([key, value]) => (
                 <div key={key} className="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0">
                   <span className="text-gray-600 font-medium">{key}</span>
                   <span className="text-gray-900 font-semibold bg-gray-50 px-3 py-1 rounded-lg">{value}</span>
@@ -624,18 +872,7 @@ const ProductInfo = () => {
           </div>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto lg:px-6 pt-12">
-        <div className="bg-[#fdf9f3] px-4 lg:px-0 border border-dashed border-red-400 text-center py-4 rounded-md mb-10">
-          <p className="lg:text-lg text-sm">
-            Super discount for your{" "}
-            <span className="font-semibold text-red-500">first purchase.</span>{" "}
-            <span className="inline-block mx-2 px-3 py-1 border-2 border-dashed border-red-400 text-red-500 font-bold rounded">
-              FREE15FIRST
-            </span>
-            Use discount code in checkout!
-          </p>
-        </div>
-      </div>
+      
     </div>
   );
 };

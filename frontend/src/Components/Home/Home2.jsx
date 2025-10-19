@@ -47,12 +47,9 @@ import SkeletonLoader from "./SkeletonLoader";
 const transformProductData = (product) => ({
   id: product.product_uuid,
   title: product.name,
-  price: `₹${product.price}`,
-  original:
-    product.disc > 0
-      ? `₹${(parseFloat(product.price) + parseFloat(product.disc)).toFixed(2)}`
-      : "",
-  discount: product.disc > 0 ? `Save ₹${product.disc}` : "",
+  price: `${product.price}`,
+  original: product.original,
+  discount: product.discount,
   brand: product.brand?.name,
   category: product.category?.name,
   img:

@@ -71,13 +71,13 @@ const Footer = () => {
           <div>
             <h3 className="font-bold mb-2">OUR SERVICES</h3>
             {[
-              "Decathlon for Schools",
-              "Decathlon for Corporates",
-              "Decathlon for Sport Clubs",
-              "Decathlon Gift Cards",
+              "sportswear9 for Schools",
+              "sportswear9 for Corporates",
+              "sportswear9 for Sport Clubs",
+              "sportswear9 Gift Cards",
               "Affiliate Program",
-              "Decathlon Second Life",
-              "Decathlon Buy Back",
+              "sportswear9 Second Life",
+              "sportswear9 Buy Back",
               "Installation & Assembly Services"
             ].map((item, i) => (
               <a key={i} href="#" className="block hover:underline">{item}</a>
@@ -87,7 +87,7 @@ const Footer = () => {
           {/* ABOUT US */}
           <div>
             <h3 className="font-bold mb-2">ABOUT US</h3>
-            {["Careers","News from Decathlon India","Social Initiatives"].map((item, i) => (
+            {["Careers","News from sportswear9 India","Social Initiatives"].map((item, i) => (
               <a key={i} href="#" className="block hover:underline">{item}</a>
             ))}
           </div>
@@ -119,15 +119,15 @@ const Footer = () => {
             <h3 className="font-bold mb-2">SPORT ADVICE FOR YOU</h3>
             <input
               type="text"
-              placeholder="blog.decathlon.in"
+              placeholder="blog.sportswear9.in"
               className="w-full max-w-full border border-gray-300 rounded-md px-3 py-2 mb-4"
             />
 
             <h3 className="font-bold mb-2">EXPLORE SPORTS EVENTS NEAR YOU</h3>
             <input
               type="text"
-              placeholder="play.decathlon.in"
-              className="w-full max-w-full border border-gray-300 rounded-md px-3 py-2"
+              placeholder="play.sportswear9.in"
+              className="w-full max-w-full border border-gray-300 rounded-md px-3 py-2 mb-2"
             />
           </div>
         </div>

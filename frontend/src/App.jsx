@@ -19,6 +19,7 @@ import BrandPage from "./Components/Brands/BrandPage";
 import ProfilePage from "./Components/Profile/ProfilePage";
 import CheckoutPage from "./Components/Checkout/CheckoutPage";
 import Error404 from "./Components/Pages/Error404page";
+import Home2 from "./Components/Home/Home2";
 
 export default function App() {
   const router = createBrowserRouter([
@@ -36,7 +37,7 @@ export default function App() {
       children: [
         {
           path: "/",
-          element: <Home />,
+          element: <Home2 />,
         },
         {
           path: "*",
@@ -47,7 +48,7 @@ export default function App() {
           element: <Product />,
         },
         {
-          path: '/ProductInfo',
+          path: '/ProductInfo/:id',
           element: <ProductInfo />
         },
         {

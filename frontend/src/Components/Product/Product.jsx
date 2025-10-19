@@ -17,7 +17,7 @@ function ProductCard({ product }) {
   const count = product.rating?.count || 100;
 
   return (
-    <Link to={"/ProductInfo"}>
+    <Link to={`/ProductInfo/${product.id}`}>
       <div className="relative max-w-[300px] bg-white overflow-hidden border border-gray-200 hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col rounded-lg">
         
         {/* Image - group moved here */}
@@ -82,14 +82,9 @@ const transformProductData = (apiProduct) => {
   return {
     id: apiProduct.product_uuid,
     title: apiProduct.name,
-    price: `$${apiProduct.price}`,
-    original:
-      apiProduct.disc > 0
-        ? `$${(
-            parseFloat(apiProduct.price) + parseFloat(apiProduct.disc)
-          ).toFixed(2)}`
-        : "",
-    discount: apiProduct.disc > 0 ? `Save $${apiProduct.disc}` : "",
+    price: `${apiProduct.price}`,
+    original: apiProduct.original,
+    discount: apiProduct.discount,
     category: apiProduct.category?.name || "Uncategorized",
     // You'll need to provide an image - using a placeholder for now
     img:

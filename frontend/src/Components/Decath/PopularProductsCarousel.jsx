@@ -55,12 +55,13 @@ const PopularProductsCarousel = ({
 
   // ✅ Map products to ProductCard format
   const mappedProducts = products.map((product) => ({
-    title: product.name,
+    id: product.id,
+    title: product.title,
     img: product.img,
     img2: product.img2, // Hover image
     brand: product.brand,
     price: product.price,
-    original: product.originalPrice,
+    original: product.original,
     discount: product.discount,
     rating: { rate: product.rating, count: product.reviews },
     category: product.category || "" // fallback if missing
