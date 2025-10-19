@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     'products',
     'core',
     'assets',
+    'homepage',
 
 ]
 

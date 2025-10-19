@@ -8,6 +8,7 @@ import ProductList from './pages/Products/ProductList';
 import ProductForm from './pages/Products/ProductForm';
 import BrandList from './pages/Brands/BrandList';
 import CategoryList from './pages/Categories/CategoryList';
+import HomepageManager from './pages/Homepage/HomepageManager';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             }
           >
             <Route index element={<Dashboard />} />
+            <Route path="homepage" element={<HomepageManager />} />
             <Route path="products" element={<ProductList />} />
             <Route path="products/new" element={<ProductForm />} />
             <Route path="products/:id/edit" element={<ProductForm />} />
