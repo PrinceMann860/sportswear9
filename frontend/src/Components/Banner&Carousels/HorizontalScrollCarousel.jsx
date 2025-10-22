@@ -1,14 +1,45 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const HorizontalScrollCarousel = ({ items = [] }) => {
+  const containerRef = useRef(null);
   const [paused, setPaused] = useState(false);
-  const loopedItems = [...items, ...items]; // duplicate for smooth infinite effect
+  const [isUserInteracting, setIsUserInteracting] = useState(false);
+  const resumeTimer = useRef(null);
+
+  const loopedItems = [...items, ...items]; // duplicate for infinite loop
+
+  // 🧠 Detect manual scroll or touch interaction
+  const handleUserInteractionStart = () => {
+    if (isUserInteracting) return;
+    setIsUserInteracting(true);
+    setPaused(true);
+    clearTimeout(resumeTimer.current);
+  };
+
+  const handleUserInteractionEnd = () => {
+    clearTimeout(resumeTimer.current);
+    resumeTimer.current = setTimeout(() => {
+      setIsUserInteracting(false);
+      setPaused(false);
+    }, 4000); // resume after 4s idle
+  };
+
+  // 🧹 Cleanup
+  useEffect(() => {
+    return () => clearTimeout(resumeTimer.current);
+  }, []);
 
   return (
     <div
-      className="relative w-full overflow-hidden"
+      ref={containerRef}
+      className="relative w-full overflow-x-auto no-scrollbar"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onTouchStart={handleUserInteractionStart}
+      onTouchEnd={handleUserInteractionEnd}
+      onMouseDown={handleUserInteractionStart}
+      onMouseUp={handleUserInteractionEnd}
+      onScroll={handleUserInteractionStart}
     >
       <div
         className="flex w-max whitespace-nowrap"
@@ -26,7 +57,7 @@ const HorizontalScrollCarousel = ({ items = [] }) => {
               <img
                 src={item.image || item.img}
                 alt={item.title || ""}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover select-none pointer-events-none"
                 draggable="false"
               />
             </div>
@@ -37,12 +68,14 @@ const HorizontalScrollCarousel = ({ items = [] }) => {
         ))}
       </div>
 
-      {/* Inline keyframes for scroll animation */}
+      {/* Smooth infinite scroll animation */}
       <style>{`
         @keyframes scroll {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
     </div>
   );

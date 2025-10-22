@@ -24,7 +24,7 @@ const SportsGearCarousel = ({ title = "Unite & Play: Shop Sports Gear", items = 
 
   return (
     <div className="my-8">
-      <div className="mx-auto px-2 sm:px-4 md:px-6 lg:px-12 xl:px-14">
+      <div className="">
         <div className="flex flex-wrap">
           <div className="w-full px-4 mb-4">
             <h2 className="font-semibold text-base sm:text-lg md:text-xl">

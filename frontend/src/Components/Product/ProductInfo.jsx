@@ -2,10 +2,21 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Star, Heart, Truck, Shield, RefreshCw, ChevronDown } from "lucide-react";
+import {
+  Star,
+  Heart,
+  Truck,
+  Shield,
+  RefreshCw,
+  ChevronDown,
+} from "lucide-react";
 import { Check, Info, Ruler } from "lucide-react";
 import { fetchProductDetail, clearProductDetail } from "./Productdetailslice"; // adjust if your file path differs
 import { ProductCard } from "./Product";
+import ProductGallery from "../Infopage/ProductGallery";
+import ProductSummary from "../Infopage/ProductSummary";
+import ProductTabs from "../Infopage/ProductTabs";
+import DeliveryInfo from "../Infopage/DeliveryInfo";
 import RecommendedProducts from "../Home/RecommendedProducts";
 
 /**
@@ -59,14 +70,17 @@ const ProductInfo = () => {
 
     // Specifications (API might provide array or object) -> ensure object
     const specifications =
-      productFromState.specifications && typeof productFromState.specifications === "object"
+      productFromState.specifications &&
+      typeof productFromState.specifications === "object"
         ? productFromState.specifications
         : {};
 
     // Images: prefer default_images, else variant attribute images flattened, else brand logo
-    let images = Array.isArray(productFromState.default_images) && productFromState.default_images.length > 0
-      ? productFromState.default_images
-      : [];
+    let images =
+      Array.isArray(productFromState.default_images) &&
+      productFromState.default_images.length > 0
+        ? productFromState.default_images
+        : [];
 
     if (images.length === 0) {
       // gather images from variant attributes
@@ -88,17 +102,26 @@ const ProductInfo = () => {
     }
 
     // Features (if not provided, try to infer or leave empty)
-    const features = Array.isArray(productFromState.features) ? productFromState.features : [];
+    const features = Array.isArray(productFromState.features)
+      ? productFromState.features
+      : [];
 
     // In-stock indicator
-    const inStock = productFromState.inventory || productFromState.inStock || null;
+    const inStock =
+      productFromState.inventory || productFromState.inStock || null;
 
     // Delivery date
-    const deliveryDate = productFromState.delivery_date || productFromState.deliveryDate || "2-3 business days";
+    const deliveryDate =
+      productFromState.delivery_date ||
+      productFromState.deliveryDate ||
+      "2-3 business days";
 
     // Ratings & reviews (API may be incomplete)
-    const rating = productFromState.average_rating ?? productFromState.rating ?? null;
-    const reviewCount = Array.isArray(productFromState.reviews) ? productFromState.reviews.length : 0;
+    const rating =
+      productFromState.average_rating ?? productFromState.rating ?? null;
+    const reviewCount = Array.isArray(productFromState.reviews)
+      ? productFromState.reviews.length
+      : 0;
 
     return {
       ...productFromState,
@@ -130,7 +153,9 @@ const ProductInfo = () => {
 
       const colorName = colorAttr?.value || "__UNIVERSAL__";
       const hex = colorAttr?.meta?.hex || null;
-      const attrImages = Array.isArray(colorAttr?.images) ? colorAttr.images : [];
+      const attrImages = Array.isArray(colorAttr?.images)
+        ? colorAttr.images
+        : [];
 
       if (!map.has(colorName)) {
         map.set(colorName, {
@@ -144,7 +169,7 @@ const ProductInfo = () => {
       } else {
         const entry = map.get(colorName);
         // append images uniq
-        attrImages.forEach(img => {
+        attrImages.forEach((img) => {
           if (!entry.images.includes(img)) entry.images.push(img);
         });
         entry.variants.push(variant);
@@ -174,7 +199,7 @@ const ProductInfo = () => {
   // Show color selector only if more than one named color (exclude universal grouping unless multiple keys)
   const showColorSelector = useMemo(() => {
     if (!colorsList || colorsList.length === 0) return false;
-    const named = colorsList.filter(c => c.key !== "__UNIVERSAL__");
+    const named = colorsList.filter((c) => c.key !== "__UNIVERSAL__");
     if (named.length > 1) return true;
     return colorsList.length > 1 && named.length > 0;
   }, [colorsList]);
@@ -185,10 +210,14 @@ const ProductInfo = () => {
 
     // if previously selected color exists in new list, keep it, else pick first
     if (selectedColor) {
-      const exists = colorsList.find(c => c.key === selectedColor);
+      const exists = colorsList.find((c) => c.key === selectedColor);
       if (exists) {
         // if sizes available and no selectedSize, auto-select
-        if ((!selectedSize || selectedSize === null) && exists.sizes && exists.sizes.length > 0) {
+        if (
+          (!selectedSize || selectedSize === null) &&
+          exists.sizes &&
+          exists.sizes.length > 0
+        ) {
           setSelectedSize(exists.sizes[0]);
         }
         return;
@@ -211,13 +240,13 @@ const ProductInfo = () => {
     if (product.images && product.images.length > 0) {
       setSelectedImage(0);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product, colorsList]);
 
   // selectedColorObj
   const selectedColorObj = useMemo(() => {
     if (!selectedColor) return null;
-    return colorsList.find(c => c.key === selectedColor) || null;
+    return colorsList.find((c) => c.key === selectedColor) || null;
   }, [colorsList, selectedColor]);
 
   // decide whether to show size selector: only if selectedColorObj has sizes or if any variant has size at all and we have multiple sizes
@@ -229,16 +258,23 @@ const ProductInfo = () => {
   // compute gallery images: priority -> selected color images -> product.images -> variant images -> brand.logo
   const galleryImages = useMemo(() => {
     if (!product) return [];
-    if (selectedColorObj && Array.isArray(selectedColorObj.images) && selectedColorObj.images.length > 0) {
+    if (
+      selectedColorObj &&
+      Array.isArray(selectedColorObj.images) &&
+      selectedColorObj.images.length > 0
+    ) {
       return selectedColorObj.images;
     }
-    if (Array.isArray(product.images) && product.images.length > 0) return product.images;
+    if (Array.isArray(product.images) && product.images.length > 0)
+      return product.images;
     // fallback to gather any attribute images from variants
     const imgs = [];
-    (product.variants || []).forEach(v => {
-      (v.attributes || []).forEach(a => {
+    (product.variants || []).forEach((v) => {
+      (v.attributes || []).forEach((a) => {
         if (Array.isArray(a.images)) {
-          a.images.forEach(i => { if (!imgs.includes(i)) imgs.push(i); });
+          a.images.forEach((i) => {
+            if (!imgs.includes(i)) imgs.push(i);
+          });
         }
       });
     });
@@ -260,23 +296,29 @@ const ProductInfo = () => {
     const variants = product.variants || [];
 
     const attrVal = (variant, attrName) => {
-      const a = (variant.attributes || []).find(x => x?.name?.toLowerCase() === attrName.toLowerCase());
+      const a = (variant.attributes || []).find(
+        (x) => x?.name?.toLowerCase() === attrName.toLowerCase()
+      );
       return a?.value ?? null;
     };
 
-    const targetColor = selectedColorObj ? (selectedColorObj.key === "__UNIVERSAL__" ? null : selectedColorObj.name) : null;
+    const targetColor = selectedColorObj
+      ? selectedColorObj.key === "__UNIVERSAL__"
+        ? null
+        : selectedColorObj.name
+      : null;
     // find variant matching both color and size if both present
-    let found = variants.find(v => {
+    let found = variants.find((v) => {
       const vColor = attrVal(v, "color");
       const vSize = attrVal(v, "size");
-      const colorMatch = targetColor ? vColor === targetColor : (!vColor); // if targetColor null treat as colorless/universal
+      const colorMatch = targetColor ? vColor === targetColor : !vColor; // if targetColor null treat as colorless/universal
       const sizeMatch = selectedSize ? vSize === selectedSize : true;
       return colorMatch && sizeMatch;
     });
 
     if (!found && targetColor) {
       // fallback: any variant matching color only
-      found = variants.find(v => {
+      found = variants.find((v) => {
         const vColor = attrVal(v, "color");
         return vColor === targetColor;
       });
@@ -302,7 +344,7 @@ const ProductInfo = () => {
     setSelectedImage(0);
 
     // auto-select first size for that color if exists
-    const entry = colorsList.find(c => c.key === colorKey);
+    const entry = colorsList.find((c) => c.key === colorKey);
     if (entry && entry.sizes && entry.sizes.length > 0) {
       setSelectedSize(entry.sizes[0]);
     } else {
@@ -362,58 +404,72 @@ const ProductInfo = () => {
     sizes: (() => {
       // If any color grouping has sizes, merge unique sizes for UI (but we will show per-color sizes when showing selector)
       const allSizes = new Set();
-      colorsList.forEach(c => c.sizes.forEach(s => allSizes.add(s)));
+      colorsList.forEach((c) => c.sizes.forEach((s) => allSizes.add(s)));
       return Array.from(allSizes);
     })(),
-    colors: colorsList.map(c => ({ name: c.name, value: c.hex || "#efefef" })),
+    colors: colorsList.map((c) => ({
+      name: c.name,
+      value: c.hex || "#efefef",
+    })),
     specifications: product.specifications || {},
     inStock: product.inStock ?? product.inStock ?? product.inStock,
-    deliveryDate: product.deliveryDate || product.delivery_date || product.deliveryDate,
+    deliveryDate:
+      product.deliveryDate || product.delivery_date || product.deliveryDate,
     rating: product.rating ?? product.average_rating ?? null,
-    reviewCount: product.reviewCount ?? (product.reviews ? product.reviews.length : 0),
+    reviewCount:
+      product.reviewCount ?? (product.reviews ? product.reviews.length : 0),
     price: displayPrice,
     original: product.original || product.price || "",
     discount: product.discount || product.disc || "",
   };
 
   // compute review derived stats using your original mock reviews if API reviews absent
-  const reviews = product.reviews && product.reviews.length > 0 ? product.reviews : [
-    // keep original mock reviews as placeholders (small subset)
-    {
-      name: "Aman Verma",
-      rating: 5,
-      text: "Superb quality and fit. The compression feels great and keeps me cool even during intense workouts!",
-      images: ["https://m.media-amazon.com/images/I/71lBfyRqZ6L._UY350_.jpg"],
-      date: "Sep 18, 2025",
-    },
-    {
-      name: "Priya Sharma",
-      rating: 4,
-      text: "Good product! Comfortable and stretchable. Worth the price.",
-      date: "Aug 29, 2025",
-    },
-    {
-      name: "Rohit Singh",
-      rating: 5,
-      text: "Perfect fit and material. Love it!",
-      images: ["https://m.media-amazon.com/images/I/71lBfyRqZ6L._UY350_.jpg"],
-      date: "Jul 12, 2025",
-    },
-  ];
+  const reviews =
+    product.reviews && product.reviews.length > 0
+      ? product.reviews
+      : [
+          // keep original mock reviews as placeholders (small subset)
+          {
+            name: "Aman Verma",
+            rating: 5,
+            text: "Superb quality and fit. The compression feels great and keeps me cool even during intense workouts!",
+            images: [
+              "https://m.media-amazon.com/images/I/71lBfyRqZ6L._UY350_.jpg",
+            ],
+            date: "Sep 18, 2025",
+          },
+          {
+            name: "Priya Sharma",
+            rating: 4,
+            text: "Good product! Comfortable and stretchable. Worth the price.",
+            date: "Aug 29, 2025",
+          },
+          {
+            name: "Rohit Singh",
+            rating: 5,
+            text: "Perfect fit and material. Love it!",
+            images: [
+              "https://m.media-amazon.com/images/I/71lBfyRqZ6L._UY350_.jpg",
+            ],
+            date: "Jul 12, 2025",
+          },
+        ];
 
   const totalReviews = reviews.length;
   const ratingSum = reviews.reduce((sum, r) => sum + (r.rating || 0), 0);
-  const averageRating = totalReviews ? (ratingSum / totalReviews) : 0;
+  const averageRating = totalReviews ? ratingSum / totalReviews : 0;
   const roundedAverage = Math.round(averageRating * 10) / 10;
 
-  const ratingsCount = [0,0,0,0,0];
-  reviews.forEach(r => {
+  const ratingsCount = [0, 0, 0, 0, 0];
+  reviews.forEach((r) => {
     const rt = Math.max(1, Math.min(5, Math.floor(r.rating || 0)));
     ratingsCount[5 - rt] += 1;
   });
 
-  const ratingPercentages = ratingsCount.map(c => Math.round((c / (totalReviews || 1)) * 100));
-  const reviewImages = reviews.flatMap(r => (r.images || []));
+  const ratingPercentages = ratingsCount.map((c) =>
+    Math.round((c / (totalReviews || 1)) * 100)
+  );
+  const reviewImages = reviews.flatMap((r) => r.images || []);
 
   // Helper to render color swatch (fallback if hex missing)
   const swatchStyle = (hex) => ({
@@ -424,36 +480,11 @@ const ProductInfo = () => {
     <div className="pt-20 bg-gradient-to-b from-gray-50 to-white text-gray-900 overflow-x-hidden">
       {/* Product Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-8 lg:gap-16 py-8 lg:py-12">
-        
         {/* Left: Image Gallery */}
-        <div className="space-y-4">
-          <div className="relative rounded-2xl overflow-hidden bg-white shadow-lg border border-gray-200">
-            <img
-              src={uiProduct.images[selectedImage] || ""}
-              alt="product"
-              className="w-full h-auto object-cover aspect-[3/4]"
-            />
-          </div>
-          <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-thin">
-            {uiProduct.images.map((img, i) => (
-              <button
-                key={i}
-                onClick={() => setSelectedImage(i)}
-                className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
-                  selectedImage === i
-                    ? "border-blue-500 shadow-md  ring-2 ring-blue-200"
-                    : "border-gray-300 hover:border-gray-400 hover:scale-102"
-                }`}
-              >
-                <img
-                  src={img}
-                  alt=""
-                  className="w-full h-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
-        </div>
+        <ProductGallery
+          images={product.default_images?.map((img) => img.image_url) || []}
+          brandLogo={product.brand?.logo}
+        />
 
         {/* Right: Modern Product Information */}
         <div className="flex flex-col space-y-8">
@@ -465,16 +496,20 @@ const ProductInfo = () => {
               </span>
               <div className="flex items-center gap-2 bg-white rounded-full px-3 py-1 shadow-sm border border-gray-200">
                 <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                <span className="text-sm font-semibold text-gray-700">{uiProduct.rating ?? "—"}</span>
-                <span className="text-xs text-gray-500">({uiProduct.reviewCount ?? totalReviews})</span>
+                <span className="text-sm font-semibold text-gray-700">
+                  {uiProduct.rating ?? "—"}
+                </span>
+                <span className="text-xs text-gray-500">
+                  ({uiProduct.reviewCount ?? totalReviews})
+                </span>
               </div>
             </div>
-            
+
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
               {uiProduct.title}
             </h1>
           </div>
-          
+
           {/* Pricing - Modern Card Style */}
           <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
             <div className="flex items-center gap-4 flex-wrap">
@@ -485,21 +520,31 @@ const ProductInfo = () => {
                 {uiProduct.original}
               </span>
               {uiProduct.discount && (
-                <span className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md">
+                <span className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md">
                   {uiProduct.discount} OFF
                 </span>
               )}
             </div>
             <p className="text-blue-600 text-sm font-medium mt-2 flex items-center gap-1">
               <Check className="w-4 h-4" />
-              You save {(uiProduct.original && uiProduct.price) ? `₹${(parseFloat(uiProduct.original.toString().replace(/[^\d.]/g,'')) - parseFloat(uiProduct.price.toString().replace(/[^\d.]/g,''))).toFixed(2)}` : "—"}
+              You save{" "}
+              {uiProduct.original && uiProduct.price
+                ? `₹${(
+                    parseFloat(
+                      uiProduct.original.toString().replace(/[^\d.]/g, "")
+                    ) -
+                    parseFloat(
+                      uiProduct.price.toString().replace(/[^\d.]/g, "")
+                    )
+                  ).toFixed(2)}`
+                : "—"}
             </p>
           </div>
 
           {/* Description */}
           <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <Info className="w-5 h-5 text-blue-500" />
+              <Info className="w-5 h-5 text-blue-600" />
               Product Description
             </h3>
             <p className="text-gray-700 leading-relaxed text-base">
@@ -511,15 +556,17 @@ const ProductInfo = () => {
           {/* Only show if more than 1 color group (per your rule), otherwise skip */}
           {showColorSelector ? (
             <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Choose Color</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Choose Color
+              </h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {colorsList.map((color) => (
                   <button
                     key={color.key}
                     onClick={() => handleSelectColor(color.key)}
                     className={`flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 ${
-                      selectedColor === color.key 
-                        ? "border-blue-500 bg-blue-50 shadow-md scale-105 ring-2 ring-blue-200" 
+                      selectedColor === color.key
+                        ? "border-blue-600 bg-blue-50 shadow-md scale-105 ring-2 ring-blue-200"
                         : "border-gray-300 hover:border-gray-400 hover:shadow-sm"
                     }`}
                   >
@@ -527,7 +574,9 @@ const ProductInfo = () => {
                       className="w-12 h-12 rounded-full border-2 border-gray-300 shadow-sm"
                       style={swatchStyle(color.hex)}
                     ></div>
-                    <span className="text-sm font-medium text-gray-700">{color.name}</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      {color.name}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -538,14 +587,19 @@ const ProductInfo = () => {
           {showSizeSelector ? (
             <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Select Size</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Select Size
+                </h3>
                 <button className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm">
                   <Ruler className="w-4 h-4" />
                   Size Guide
                 </button>
               </div>
               <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-                {(selectedColorObj ? selectedColorObj.sizes : uiProduct.sizes).map((size) => (
+                {(selectedColorObj
+                  ? selectedColorObj.sizes
+                  : uiProduct.sizes
+                ).map((size) => (
                   <button
                     key={size}
                     onClick={() => handleSelectSize(size)}
@@ -567,7 +621,9 @@ const ProductInfo = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Quantity Selection */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Quantity</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  Quantity
+                </h3>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden shadow-sm">
                     <button
@@ -586,11 +642,13 @@ const ProductInfo = () => {
                       +
                     </button>
                   </div>
-                  <div className={`px-3 py-2 rounded-full text-sm font-medium ${
-                    uiProduct.inStock 
-                      ? "bg-green-100 text-green-800" 
-                      : "bg-blue-100 text-blue-800"
-                  }`}>
+                  <div
+                    className={`px-3 py-2 rounded-full text-sm font-medium ${
+                      uiProduct.inStock
+                        ? "bg-green-100 text-green-800"
+                        : "bg-blue-100 text-blue-800"
+                    }`}
+                  >
                     {uiProduct.inStock ? "✓ In Stock" : "Out of Stock"}
                   </div>
                 </div>
@@ -600,12 +658,12 @@ const ProductInfo = () => {
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 bg-gray-900 text-white py-4 rounded-xl font-bold hover:bg-black transition-all duration-300 transform hover:scale-105 shadow-md"
+                  className="flex-1 bg-blue-600 text-white py-4 rounded-xl font-bold transition-all duration-300 transform hover:scale-102 shadow-md"
                 >
                   Add to Cart
                 </button>
                 <button className="p-4 border-2 border-gray-300 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all duration-300 group">
-                  <Heart className="w-6 h-6 text-blue-500 group-hover:scale-110 transition-transform" />
+                  <Heart className="w-6 h-6 text-blue-600 group-hover:scale-110 transition-transform" />
                 </button>
               </div>
             </div>
@@ -620,11 +678,13 @@ const ProductInfo = () => {
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900">Free Delivery</p>
-                  <p className="text-sm text-gray-600">By {uiProduct.deliveryDate}</p>
+                  <p className="text-sm text-gray-600">
+                    By {uiProduct.deliveryDate}
+                  </p>
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center">
@@ -636,7 +696,7 @@ const ProductInfo = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center">
@@ -652,12 +712,19 @@ const ProductInfo = () => {
 
           {/* Specifications - Modern Table */}
           <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Specifications</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Specifications
+            </h3>
             <div className="space-y-3">
               {Object.entries(uiProduct.specifications).map(([key, value]) => (
-                <div key={key} className="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0">
+                <div
+                  key={key}
+                  className="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0"
+                >
                   <span className="text-gray-600 font-medium">{key}</span>
-                  <span className="text-gray-900 font-semibold bg-gray-50 px-3 py-1 rounded-lg">{value}</span>
+                  <span className="text-gray-900 font-semibold bg-gray-50 px-3 py-1 rounded-lg">
+                    {value}
+                  </span>
                 </div>
               ))}
             </div>
@@ -670,11 +737,13 @@ const ProductInfo = () => {
         <div className="relative bg-gray-900 text-white rounded-2xl p-6 sm:p-8 lg:p-10 overflow-hidden min-h-[200px]">
           <div className="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1400&q=80')] bg-cover bg-center" />
           <div className="relative z-10 h-full flex flex-col justify-center">
-            <h3 className="text-xl sm:text-2xl font-bold mb-3">Train Hard. Look Good.</h3>
+            <h3 className="text-xl sm:text-2xl font-bold mb-3">
+              Train Hard. Look Good.
+            </h3>
             <p className="text-sm mb-4 text-gray-200 max-w-md">
               Push your limits with SportsWear9's high-performance collection.
             </p>
-            <button className="bg-white text-gray-900 px-5 py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors w-fit text-sm">
+            <button className="bg-white text-gray-900 px-5 py-2 rounded-full font-semibold hover:bg-blue-500 hover:text-white transition-colors w-fit text-sm">
               Shop Now
             </button>
           </div>
@@ -689,7 +758,7 @@ const ProductInfo = () => {
             <p className="text-sm mb-4 text-gray-200 max-w-md">
               Discover the latest designs crafted for speed and comfort.
             </p>
-            <button className="bg-white text-gray-900 px-5 py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors w-fit text-sm">
+            <button className="bg-white text-gray-900 px-5 py-2 rounded-full font-semibold hover:bg-blue-500 hover:text-white transition-colors w-fit text-sm">
               Explore
             </button>
           </div>
@@ -707,36 +776,58 @@ const ProductInfo = () => {
             <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
               <div className="flex items-center gap-4">
                 <div>
-                  <div className="text-3xl sm:text-4xl font-bold text-gray-900">{roundedAverage}</div>
+                  <div className="text-3xl sm:text-4xl font-bold text-gray-900">
+                    {roundedAverage}
+                  </div>
                   <div className="flex items-center mt-2">
                     <div className="flex gap-0.5">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
                           size={18}
-                          className={i < Math.round(averageRating) ? "text-yellow-500" : "text-gray-300"}
-                          fill={i < Math.round(averageRating) ? "currentColor" : "none"}
+                          className={
+                            i < Math.round(averageRating)
+                              ? "text-yellow-500"
+                              : "text-gray-300"
+                          }
+                          fill={
+                            i < Math.round(averageRating)
+                              ? "currentColor"
+                              : "none"
+                          }
                         />
                       ))}
                     </div>
-                    <span className="text-sm text-gray-500 ml-3">{totalReviews} global ratings</span>
+                    <span className="text-sm text-gray-500 ml-3">
+                      {totalReviews} global ratings
+                    </span>
                   </div>
                 </div>
               </div>
 
               {/* Rating breakdown */}
               <div className="mt-6 space-y-3">
-                {[5,4,3,2,1].map((star, idx) => {
+                {[5, 4, 3, 2, 1].map((star, idx) => {
                   const pct = ratingPercentages[idx] ?? 0;
                   return (
-                    <div key={star} className="flex items-center justify-between text-sm">
+                    <div
+                      key={star}
+                      className="flex items-center justify-between text-sm"
+                    >
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1">
                           {Array.from({ length: star }).map((__, i) => (
-                            <Star key={i} size={14} className="text-yellow-500" fill="currentColor" />
+                            <Star
+                              key={i}
+                              size={14}
+                              className="text-yellow-500"
+                              fill="currentColor"
+                            />
                           ))}
                         </div>
-                        <span className="text-gray-600 text-sm w-8">{pct}%</span>
+                        <span className="text-gray-600 text-sm w-8">
+                          {pct}%
+                        </span>
                       </div>
                     </div>
                   );
@@ -756,9 +847,13 @@ const ProductInfo = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Customers say */}
             <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
-              <h4 className="font-semibold text-lg text-gray-900 mb-3">Customers say</h4>
+              <h4 className="font-semibold text-lg text-gray-900 mb-3">
+                Customers say
+              </h4>
               <p className="text-sm text-gray-600 leading-relaxed">
-                Customers find the workout gloves have a nice fit. However, the quality receives mixed feedback, with some customers finding them good while others say they are not of good quality.
+                Customers find the workout gloves have a nice fit. However, the
+                quality receives mixed feedback, with some customers finding
+                them good while others say they are not of good quality.
               </p>
               <div className="mt-4 flex gap-4 text-sm">
                 <button className="text-blue-600 hover:text-blue-700 font-medium px-3 py-1 bg-blue-50 rounded-full transition-colors">
@@ -773,7 +868,9 @@ const ProductInfo = () => {
             {/* Reviews with images */}
             <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
               <div className="flex items-center justify-between">
-                <h4 className="font-semibold text-gray-900">Reviews with images</h4>
+                <h4 className="font-semibold text-gray-900">
+                  Reviews with images
+                </h4>
                 <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
                   See all photos
                 </button>
@@ -782,11 +879,11 @@ const ProductInfo = () => {
               {reviewImages.length > 0 ? (
                 <div className="mt-4 overflow-x-auto flex gap-3 py-2 scrollbar-thin">
                   {reviewImages.map((img, i) => (
-                    <img 
-                      key={i} 
-                      src={img} 
-                      alt={`review-img-${i}`} 
-                      className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-lg border border-gray-200 flex-shrink-0" 
+                    <img
+                      key={i}
+                      src={img}
+                      alt={`review-img-${i}`}
+                      className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-lg border border-gray-200 flex-shrink-0"
                     />
                   ))}
                 </div>
@@ -799,62 +896,79 @@ const ProductInfo = () => {
 
             {/* Enhanced Reviews list */}
             <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-200">
-              <h4 className="font-semibold text-lg text-gray-900 mb-6">Top reviews from India</h4>
+              <h4 className="font-semibold text-lg text-gray-900 mb-6">
+                Top reviews from India
+              </h4>
 
               <div className="space-y-6">
-                {(showAllReviews ? reviews : reviews.slice(0, 3)).map((r, idx) => (
-                  <div key={idx} className="pb-6 border-b border-gray-200 last:border-b-0 last:pb-0">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-start gap-3 flex-1">
-                        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 font-semibold text-sm border border-gray-300">
-                          {r.name ? r.name.charAt(0).toUpperCase() : "U"}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <div className="flex items-center gap-1">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  size={14}
-                                  className={i < r.rating ? "text-yellow-500" : "text-gray-300"}
-                                  fill={i < r.rating ? "currentColor" : "none"}
-                                />
-                              ))}
-                            </div>
-                            <span className="text-sm font-medium text-gray-900 truncate">{r.name}</span>
-                            <span className="text-xs text-gray-500">{r.date}</span>
+                {(showAllReviews ? reviews : reviews.slice(0, 3)).map(
+                  (r, idx) => (
+                    <div
+                      key={idx}
+                      className="pb-6 border-b border-gray-200 last:border-b-0 last:pb-0"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-start gap-3 flex-1">
+                          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 font-semibold text-sm border border-gray-300">
+                            {r.name ? r.name.charAt(0).toUpperCase() : "U"}
                           </div>
-                          
-                          {/* Enhanced Comment Text */}
-                          <p className="text-gray-700 mt-2 leading-relaxed text-sm sm:text-base">
-                            {r.text}
-                          </p>
-
-                          {/* Review Images */}
-                          {r.images && r.images.length > 0 && (
-                            <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
-                              {r.images.map((img, j) => (
-                                <img 
-                                  key={j} 
-                                  src={img} 
-                                  alt={`rev-${idx}-img-${j}`} 
-                                  className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg border border-gray-200 flex-shrink-0" 
-                                />
-                              ))}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <div className="flex items-center gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    size={14}
+                                    className={
+                                      i < r.rating
+                                        ? "text-yellow-500"
+                                        : "text-gray-300"
+                                    }
+                                    fill={
+                                      i < r.rating ? "currentColor" : "none"
+                                    }
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-sm font-medium text-gray-900 truncate">
+                                {r.name}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                {r.date}
+                              </span>
                             </div>
-                          )}
-                        </div>
-                      </div>
 
-                      {/* Verified tag */}
-                      {r.rating >= 4 && (
-                        <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium whitespace-nowrap ml-2">
-                          Verified
+                            {/* Enhanced Comment Text */}
+                            <p className="text-gray-700 mt-2 leading-relaxed text-sm sm:text-base">
+                              {r.text}
+                            </p>
+
+                            {/* Review Images */}
+                            {r.images && r.images.length > 0 && (
+                              <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+                                {r.images.map((img, j) => (
+                                  <img
+                                    key={j}
+                                    src={img}
+                                    alt={`rev-${idx}-img-${j}`}
+                                    className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg border border-gray-200 flex-shrink-0"
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      )}
+
+                        {/* Verified tag */}
+                        {r.rating >= 4 && (
+                          <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium whitespace-nowrap ml-2">
+                            Verified
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
 
               {/* See more / see less */}
@@ -864,7 +978,9 @@ const ProductInfo = () => {
                     onClick={() => setShowAllReviews(!showAllReviews)}
                     className="text-sm text-blue-600 hover:text-blue-700 font-medium px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                   >
-                    {showAllReviews ? "Show Less Reviews" : `Show More Reviews (${reviews.length - 3})`}
+                    {showAllReviews
+                      ? "Show Less Reviews"
+                      : `Show More Reviews (${reviews.length - 3})`}
                   </button>
                 </div>
               )}
@@ -872,7 +988,6 @@ const ProductInfo = () => {
           </div>
         </div>
       </div>
-      
     </div>
   );
 };

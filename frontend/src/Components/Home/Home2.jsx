@@ -1,6 +1,6 @@
 // ✅ START OF UPDATED HOME.JSX
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchProducts,
@@ -10,9 +10,6 @@ import {
 } from "../Product/productslice";
 import { ProductCard } from "../Product/Product";
 import { Link } from "react-router-dom";
-
-// import HeroCarousel from "../Components/HeroCarousel";
-// import CategoryCarousel from "../Components/CategoryCarousel";
 import PopularProductsCarousel from "../Decath/PopularProductsCarousel";
 import ProductCarouselWithTitle from "../Decath/ProductCarouselWithTitle";
 import AnimatedSection from "../Home/AnimatedSection";
@@ -24,22 +21,10 @@ import HorizontalScrollCarousel from "../Banner&Carousels/HorizontalScrollCarous
 import RecommendedProducts from "./RecommendedProducts";
 import VideoGrid from "./VideoGrid";
 import { DealsOfTheDay } from "../Banner&Carousels/DealsOfTheDay";
+import { fetchBrands } from "../Brands/brandlistslice";
 
-// assets
-import footwear from "../../assets/footwear.png";
-import jacket from "../../assets/jacket.png";
-import tshirts from "../../assets/t-shirts.png";
-import tops from "../../assets/tops.png";
 import logo1 from "../../assets/1.svg";
-import logo2 from "../../assets/2.svg";
-import logo3 from "../../assets/3.svg";
-import logo4 from "../../assets/4.svg";
-import logo5 from "../../assets/5.svg";
-import logo6 from "../../assets/6.svg";
-import logo7 from "../../assets/7.svg";
-import logo8 from "../../assets/8.svg";
-import logo9 from "../../assets/9.svg";
-import sportvid from "../../assets/sportvid.mp4"
+import sportvid from "../../assets/sportvid.mp4";
 import SportsCategorySection from "./SportsCategorysection";
 import SkeletonLoader from "./SkeletonLoader";
 
@@ -185,56 +170,6 @@ const belowcategories = [
     link: "/categories?category=tops",
   },
 ];
-const festiveDeals = [
-  {
-    id: 1,
-    image: footwear,
-    title: "SHOES UNDER ₹3999",
-    subtitle: "Epic Shoe Deals for Men & Women",
-  },
-  {
-    id: 2,
-    image: tshirts,
-    title: "T-SHIRTS UNDER ₹999",
-    subtitle: "Unbeatable Tees Under 999",
-  },
-  {
-    id: 3,
-    image: tops,
-    title: "TOPS STARTING ₹799",
-    subtitle: "Wardrobe Refresh. Tops from 799",
-  },
-  {
-    id: 4,
-    image: jacket,
-    title: "JACKETS STARTING ₹1599",
-    subtitle: "Seasonal Must-Haves from 1599",
-  },
-  {
-    id: 5,
-    image: footwear,
-    title: "SHOES UNDER ₹3999",
-    subtitle: "Epic Shoe Deals for Men & Women",
-  },
-  {
-    id: 6,
-    image: tshirts,
-    title: "T-SHIRTS UNDER ₹999",
-    subtitle: "Unbeatable Tees Under 999",
-  },
-  {
-    id: 7,
-    image: tops,
-    title: "TOPS STARTING ₹799",
-    subtitle: "Wardrobe Refresh. Tops from 799",
-  },
-  {
-    id: 8,
-    image: jacket,
-    title: "JACKETS STARTING ₹1599",
-    subtitle: "Seasonal Must-Haves from 1599",
-  },
-];
 const sportsGearItems = [
   {
     name: "Golf",
@@ -306,17 +241,6 @@ const festiveStealDeals = [
   },
 ];
 
-const categories = [
-  { logo: logo1, name: "Work For It", path: "/brand/Work For It" },
-  { logo: logo2, name: "U", path: "/brand/U" },
-  { logo: logo3, name: "WMX", path: "/brand/WMX" },
-  { logo: logo4, name: "SportInger", path: "/brand/SportInger" },
-  { logo: logo5, name: "Ninq", path: "/brand/Ninq" },
-  { logo: logo6, name: "Never Lose", path: "/brand/Never Lose" },
-  { logo: logo7, name: "GYMFIC", path: "/brand/GYMFIC" },
-  { logo: logo8, name: "KYK", path: "/brand/KYK" },
-  { logo: logo9, name: "Train Hard", path: "/brand/Train Hard" },
-];
 const promoCards = [
   {
     image:
@@ -361,12 +285,94 @@ const promoCards = [
     logo: "https://placehold.co/100x40/ffffff/059669?text=Brand+F+Logo",
   },
 ];
+const malecards = [
+  {
+    name: "Shorts",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOKo8RqkmIIBQO35p5jYlWdHMsRfGvAtAEGWPydt4a_gg5R-OuYfmA-d0LV35dL4iZePY&usqp=CAU",
+    link: "#",
+  },
+  {
+    name: "Shorts",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOKo8RqkmIIBQO35p5jYlWdHMsRfGvAtAEGWPydt4a_gg5R-OuYfmA-d0LV35dL4iZePY&usqp=CAU",
+    link: "#",
+  },
+  {
+    name: "Shorts",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOKo8RqkmIIBQO35p5jYlWdHMsRfGvAtAEGWPydt4a_gg5R-OuYfmA-d0LV35dL4iZePY&usqp=CAU",
+    link: "#",
+  },
+  {
+    name: "Shorts",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOKo8RqkmIIBQO35p5jYlWdHMsRfGvAtAEGWPydt4a_gg5R-OuYfmA-d0LV35dL4iZePY&usqp=CAU",
+    link: "#",
+  },
+  {
+    name: "Shorts",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOKo8RqkmIIBQO35p5jYlWdHMsRfGvAtAEGWPydt4a_gg5R-OuYfmA-d0LV35dL4iZePY&usqp=CAU",
+    link: "#",
+  },
+  {
+    name: "Shorts",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOKo8RqkmIIBQO35p5jYlWdHMsRfGvAtAEGWPydt4a_gg5R-OuYfmA-d0LV35dL4iZePY&usqp=CAU",
+    link: "#",
+  },
+];
+const femalecards = [
+  {
+    name: "Leggings",
+    image:
+      "https://d3jbu7vaxvlagf.cloudfront.net/small/v2/category_media/basic_img_16886374027945.jpg",
+    link: "#",
+  },
+  {
+    name: "Leggings",
+    image:
+      "https://d3jbu7vaxvlagf.cloudfront.net/small/v2/category_media/basic_img_16886374027945.jpg",
+    link: "#",
+  },
+  {
+    name: "Leggings",
+    image:
+      "https://d3jbu7vaxvlagf.cloudfront.net/small/v2/category_media/basic_img_16886374027945.jpg",
+    link: "#",
+  },
+  {
+    name: "Leggings",
+    image:
+      "https://d3jbu7vaxvlagf.cloudfront.net/small/v2/category_media/basic_img_16886374027945.jpg",
+    link: "#",
+  },
+  {
+    name: "Leggings",
+    image:
+      "https://d3jbu7vaxvlagf.cloudfront.net/small/v2/category_media/basic_img_16886374027945.jpg",
+    link: "#",
+  },
+  {
+    name: "Leggings",
+    image:
+      "https://d3jbu7vaxvlagf.cloudfront.net/small/v2/category_media/basic_img_16886374027945.jpg",
+    link: "#",
+  },
+];
 
 function Home2() {
   const dispatch = useDispatch();
   const apiProducts = useSelector(selectAllProducts);
   const loading = useSelector(selectProductsLoading);
   const error = useSelector(selectProductsError);
+
+  const { brands } = useSelector((state) => state.brandlist);
+
+  useEffect(() => {
+    dispatch(fetchBrands());
+  }, [dispatch]);
 
   const [selectedGender, setSelectedGender] = useState("men");
 
@@ -390,19 +396,32 @@ function Home2() {
   );
 
   if (loading)
-    return <div className="text-center py-10"><SkeletonLoader /></div>;
+    return (
+      <div className="text-center py-10">
+        <SkeletonLoader />
+      </div>
+    );
   if (error)
     return <div className="text-center py-10 text-red-500">Error: {error}</div>;
 
   return (
     <main className="w-full bg-white pt-20 overflow-x-hidden">
-      <div className="">
-        {" "}
-        {/* ✅ Keeping your existing structure */}
-        <CategoryGrid categories={quickShopCategories} />
-        <div className="w-full max-w-full mx-auto p-5 lg:p-10 rounded-2xl overflow-hidden">
-          <LandscapeCarousel items={mainBanners} />
-        </div>
+      <div>
+        {/* ✅ Top Section */}
+        <AnimatedSection>
+          <CategoryGrid categories={quickShopCategories} />
+          <AnimatedSection>
+            {/* ✅ best selling Products */}
+            <section className="px-2 sm:px-4 md:px-6 max-w-full">
+              <PopularProductsCarousel products={featuredProducts} />
+            </section>
+          </AnimatedSection>
+          <div className="w-full max-w-full mx-auto p-5 lg:p-10 rounded-2xl overflow-hidden">
+            <LandscapeCarousel items={mainBanners} />
+          </div>
+        </AnimatedSection>
+
+        {/* ✅ Shop by Category */}
         <AnimatedSection>
           <div className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full">
             <CategoryGrid
@@ -414,294 +433,331 @@ function Home2() {
             />
           </div>
         </AnimatedSection>
-        <section className="px-2 sm:px-4 md:px-6  max-w-full">
-          <PopularProductsCarousel products={featuredProducts} />
-        </section>
-        <SportsGearCarousel
-          title="Unite & Play: Shop Sports Gear"
-          items={sportsGearItems}
-        />
-        <FestiveDealsGrid
-          title="Festive Steal Deals!"
-          items={festiveStealDeals}
-        />
-        <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full">
-          <ProductCarouselWithTitle
-            title="The perfect cycle is waiting"
-            products={featuredProducts}
+
+        {/* ✅ Recently Viewed */}
+        <AnimatedSection>
+          <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full">
+            <h2 className="text-2xl font-bold mb-4">Recently Viewed</h2>
+            {featuredProducts.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                {featuredProducts.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-600">No featured products available.</p>
+            )}
+          </section>
+        </AnimatedSection>
+
+        {/* ✅ Sports Gear */}
+        <AnimatedSection>
+          <div className="mx-auto px-2 sm:px-4 md:px-6 lg:px-12 xl:px-14">
+          <SportsGearCarousel
+            title="Unite & Play: Shop Sports Gear"
+            items={sportsGearItems}
           />
-        </section>
-        {/* ✅ NEW ARRIVALS — REPLACED CONTENT */}
-        <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full">
-          <h2 className="text-2xl font-bold mb-4">New Arrivals</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {newArrivals.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
           </div>
-        </section>
-        <section className="mt-5 p-5 px-2 sm:px-4 md:px-6 lg:px-12 xl:px-14 mx-auto max-w-full">
-          <h2 className="text-center text-3xl font-bold">
-            Curated Deals for Every Mood
-          </h2>
-          <div className="mt-10">
-            <HorizontalScrollCarousel items={festiveDeals} speed={0.3} />
-          </div>
-        </section>
-        <section className="mt-12 sm:px-4 md:px-6 lg:px-12 xl:px-14 px-6 mx-auto max-w-full">
-          <h2 className="font-semibold text-3xl md:text-4xl text-center">
-            Trusted by Iconic Brands
-          </h2>
-          <p className="text-center text-gray-500 mt-2">
-            Discover collections from globally loved athletic and lifestyle
-            brands.
-          </p>
-          <div className="my-8 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-9 gap-4 sm:gap-6 max-w-full">
-            {categories.map((cat, i) => (
-              <Link
-                to={cat.path}
-                key={i}
-                className="flex flex-col items-center text-center hover:scale-105 transition"
-              >
-                <div className="w-16 h-16 sm:w-30 sm:h-30 rounded-full overflow-hidden border border-gray-400 p-1 md:p-4 shadow-md">
-                  <img
-                    src={cat.logo}
-                    className="w-full h-full object-cover object-center"
-                    alt={cat.name}
-                  />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-        <RecommendedProducts />
-        <section className=" mx-auto text-center px-2  sm:px-4 md:px-6 lg:px-12 xl:px-14 max-w-full">
-          <h2 className="font-semibold text-xl md:text-4xl">
-            Your Passion. Your Performance.
-          </h2>
-          <VideoGrid />
-        </section>
-        <div className="px-2 sm:px-4 md:px-6 lg:px-12 mx-auto max-w-full">
-          <DealsOfTheDay
-            title="Shop Now: Deals of the Day"
-            items={promoCards}
-          />
-        </div>
-        <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full mt-10">
-          <h2 className="text-2xl font-bold mb-4">TRENDING PRODUCTS</h2>
-          {featuredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {featuredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+        </AnimatedSection>
+        {/* ✅ Trusted Brands */}
+        <AnimatedSection>
+          <section className="mt-12 sm:px-4 md:px-6 lg:px-12 xl:px-14 px-6 mx-auto max-w-full">
+            <h2 className="font-semibold text-3xl md:text-4xl text-center">
+              Trusted by Iconic Brands
+            </h2>
+            <p className="text-center text-gray-500 mt-2">
+              Discover collections from globally loved athletic and lifestyle
+              brands.
+            </p>
+            <div className="my-8 grid grid-cols-5 md:grid-cols-6 xl:grid-cols-9 gap-4 sm:gap-6 max-w-full">
+              {brands.map((brand, i) => (
+                <Link
+                  to={`/brand/${brand.name}`}
+                  key={i}
+                  className="flex flex-col items-center text-center hover:scale-105 transition"
+                >
+                  <div className="w-16 h-16 sm:w-30 sm:h-30 rounded-full overflow-hidden border border-gray-400 p-1 md:p-4 shadow-md">
+                    <img
+                      src={brand.logo}
+                      className="w-full h-full object-cover"
+                      alt={brand.name}
+                    />
+                  </div>
+                </Link>
               ))}
             </div>
-          ) : (
-            <p className="text-gray-600">No featured products available.</p>
-          )}
-        </section>
-        <div className="relative w-full max-w-full md:h-[350px] overflow-hidden my-10">
-          <video
-            src={sportvid}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-          />
+          </section>
+        </AnimatedSection>
 
-          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-            <h2 className="text-white text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold tracking-tight text-center px-4">
-              ⚡ SALE — UP TO 50% OFF ⚡
+        {/* ✅ Video Section */}
+        <AnimatedSection>
+          <section className="mx-auto text-center px-2 sm:px-4 md:px-6 lg:px-12 xl:px-14 max-w-full">
+            <h2 className="font-semibold text-xl md:text-4xl">
+              Your Passion. Your Performance.
             </h2>
-          </div>
-        </div>
-        {/* ✅ SHOP BY GENDER */}
-        <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full my-10">
-          <h2 className="text-2xl font-bold mb-4">Shop by Gender</h2>
-          <div className="flex gap-4 mb-6">
-            <button
-              className={`px-4 py-2 rounded-full border ${
-                selectedGender === "men" ? "bg-black text-white" : "bg-white"
-              }`}
-              onClick={() => setSelectedGender("men")}
-            >
-              Men
-            </button>
-            <button
-              className={`px-4 py-2 rounded-full border ${
-                selectedGender === "women" ? "bg-black text-white" : "bg-white"
-              }`}
-              onClick={() => setSelectedGender("women")}
-            >
-              Women
-            </button>
-          </div>
+            <VideoGrid />
+          </section>
+        </AnimatedSection>
 
-          {selectedGender === "men" && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {menProducts.length > 0 ? (
-                menProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))
-              ) : (
-                <p>No men's products available.</p>
-              )}
+        {/* ✅ Festive Deals */}
+        <AnimatedSection>
+          <FestiveDealsGrid
+            title="Festive Steal Deals!"
+            items={festiveStealDeals}
+          />
+        </AnimatedSection>
+
+        {/* ✅ Product Carousel */}
+        <AnimatedSection>
+          <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full">
+            <ProductCarouselWithTitle
+              title="The perfect cycle is waiting"
+              products={featuredProducts}
+            />
+          </section>
+        </AnimatedSection>
+
+        {/* ✅ Horizontal Scroll Carousel */}
+        {/* <AnimatedSection>
+          <section className="mt-5 p-5 px-2 sm:px-4 md:px-6 lg:px-12 xl:px-14 mx-auto max-w-full">
+            <h2 className="text-center text-3xl font-bold">
+              Curated Deals for Every Mood
+            </h2>
+            <div className="mt-10">
+              <HorizontalScrollCarousel items={festiveDeals} speed={0.3} />
             </div>
-          )}
+          </section>
+        </AnimatedSection> */}
 
-          {selectedGender === "women" &&
-            (womenProducts.length > 0 ? (
+        {/* ✅ Recommended Products */}
+        {/* <AnimatedSection>
+          <RecommendedProducts />
+        </AnimatedSection> */}
+
+        {/* ✅ Deals of the Day */}
+        <AnimatedSection>
+          <div className="px-2 sm:px-4 md:px-6 lg:px-12 mx-auto max-w-full">
+            <DealsOfTheDay
+              title="Shop Now: Deals of the Day"
+              items={promoCards}
+            />
+          </div>
+        </AnimatedSection>
+
+        {/* ✅ Trending Products */}
+        <AnimatedSection>
+          <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full mt-10">
+            <h2 className="text-2xl font-bold mb-4">TRENDING PRODUCTS</h2>
+            {featuredProducts.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                {womenProducts.map((product) => (
+                {featuredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
             ) : (
-              <div>
-                <p className="text-gray-700 mb-4">
-                  There are currently no women's products available. However,
-                  here are some unisex options you may find suitable:
-                </p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                  {unisexProducts.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
+              <p className="text-gray-600">No featured products available.</p>
+            )}
+          </section>
+        </AnimatedSection>
+
+        {/* ✅ Sale Video Banner */}
+        <AnimatedSection>
+          <div className="relative w-full max-w-full md:h-[350px] overflow-hidden my-10">
+            <video
+              src={sportvid}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+            />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+              <h2 className="text-white text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold tracking-tight text-center px-4">
+                ⚡ SALE — UP TO 50% OFF ⚡
+              </h2>
+            </div>
+          </div>
+        </AnimatedSection>
+
+        {/* ✅ Shop by Gender */}
+        <AnimatedSection>
+          <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full my-10">
+            <div className="w-full flex justify-between">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">FEATURED <span className="font-semibold">CATEGORIES</span></h2>
+              <div className="flex gap-4 mb-6 border p-1 lg:p-2 rounded-lg lg:mr-[10%]">
+                {["men", "women"].map((gender) => (
+                  <button
+                    key={gender}
+                    className={`px-4 md:px-10 py-1 lg:px-16 sm:py-2 rounded-lg md:text-xl lg:text-2xl xl:text-3xl ${
+                      selectedGender === gender
+                        ? "bg-black text-white"
+                        : "bg-white"
+                    }`}
+                    onClick={() => setSelectedGender(gender)}
+                  >
+                    {gender.charAt(0).toUpperCase() + gender.slice(1)}
+                  </button>
+                ))}
               </div>
-            ))}
-        </section>
-        {/* ✅ FEATURED PRODUCTS SECTIONS (Replacing Trending / Popular / Best Sellers / Carousels) */}
-        {/* ✅ TRENDING PRODUCTS (Title stays same — Data replaced with Featured) */}
-        {/* ✅ POPULAR PRODUCTS CAROUSEL */}
-        {/* ✅ PRODUCT CAROUSEL WITH TITLE */}
-        {/* ✅ RECENTLY VIEWED (Replaced with Featured or Removed if empty) */}
-        <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full">
-          <h2 className="text-2xl font-bold mb-4">Recently Viewed</h2>
-          {featuredProducts.length > 0 ? (
+            </div>
+
+            {selectedGender === "men" && (
+              <SportsGearCarousel title="Mens Products" items={malecards} />
+            )}
+
+            {selectedGender === "women" && (
+              <SportsGearCarousel title="Women Products" items={femalecards} />
+            )}
+          </section>
+        </AnimatedSection>
+        {/* ✅ New Arrivals */}
+        <AnimatedSection>
+          <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full">
+            <h2 className="text-2xl font-bold mb-4">New Arrivals</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {featuredProducts.map((product) => (
+              {newArrivals.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
-          ) : (
-            <p className="text-gray-600">No featured products available.</p>
-          )}
-        </section>
-        <SportsCategorySection />
-        <div className="px-2 sm:px-4 md:px-6 lg:px-12 mx-auto hover:shadow-lg lg:mt-10 transition cursor-pointer grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 lg:gap-6 w-full mb-10 overflow-hidden max-w-full">
-        {[
-          {
-            image:
-              "https://contents.mediadecathlon.com/s1313100/k$8882b7bc41a4b99d470f8f348f5db0ce/defaut.jpg?format=auto&quality=70&f=384x0",
-          },
-          {
-            image:
-              "https://contents.mediadecathlon.com/s1313098/k$695dad62a39fd430cc8f6e67cf0a1026/defaut.jpg?format=auto&quality=70&f=384x0",
-          },
-          {
-            image:
-              "https://contents.mediadecathlon.com/s1313099/k$ed72d795df00b80e825a6984e7624439/defaut.jpg?format=auto&quality=70&f=384x0",
-          },
-          {
-            image:
-              "https://contents.mediadecathlon.com/s1320224/k$221c44ffdc1c81b9324ce0a06b6cd905/defaut.jpg?format=auto&quality=70&f=384x0",
-          },
-        ].map((imgs, index) => (
-          <div key={index}>
+          </section>
+        </AnimatedSection>
+
+        {/* ✅ Sports Category Section */}
+        <AnimatedSection>
+          <SportsCategorySection />
+        </AnimatedSection>
+
+        {/* ✅ Final Banner Images */}
+        <AnimatedSection>
+          <div className="px-2 sm:px-4 md:px-6 lg:px-12 mx-auto grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 lg:gap-6 w-full mb-10 overflow-hidden max-w-full">
+            {[
+              {
+                image:
+                  "https://contents.mediadecathlon.com/s1313100/k$8882b7bc41a4b99d470f8f348f5db0ce/defaut.jpg",
+              },
+              {
+                image:
+                  "https://contents.mediadecathlon.com/s1313098/k$695dad62a39fd430cc8f6e67cf0a1026/defaut.jpg",
+              },
+              {
+                image:
+                  "https://contents.mediadecathlon.com/s1313099/k$ed72d795df00b80e825a6984e7624439/defaut.jpg",
+              },
+              {
+                image:
+                  "https://contents.mediadecathlon.com/s1320224/k$221c44ffdc1c81b9324ce0a06b6cd905/defaut.jpg",
+              },
+            ].map((imgs, index) => (
+              <img
+                key={index}
+                src={imgs.image}
+                alt=""
+                className="w-full h-full object-fill cursor-pointer hover:scale-102"
+              />
+            ))}
+          </div>
+        </AnimatedSection>
+
+        {/* ✅ Final Banner */}
+        <AnimatedSection>
+          <div className="max-w-full">
             <img
-              src={imgs.image}
-              alt=""
-              className="w-full h-full object-fill cursor-pointer hover:scale-102"
+              src="https://contents.mediadecathlon.com/s1319284/k$ddfbbd6b132bc4e201e266616da202c5/defaut.jpg"
+              alt="Buy More Save More"
+              className="w-full px-2 md:px-5 lg:px-10 max-w-full"
             />
           </div>
-        ))}
+        </AnimatedSection>
       </div>
 
-      <div className="max-w-full">
-        <img
-          src="https://contents.mediadecathlon.com/s1319284/k$ddfbbd6b132bc4e201e266616da202c5/defaut.jpg?format=auto&quality=70&f=1440x0"
-          alt="Buy More Save More"
-          className="w-full px-2 md:px-5 lg:px-10 max-w-full"
-        />
-      </div>
-      </div>
-      <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-14 mx-auto py-12 max-w-full">
-        <h2 className="text-3xl md:text-4xl font-semibold text-center">
-          Hear from Our Community
-        </h2>
-        <p className="text-center text-gray-500 mt-2 mb-10">
-          Real people. Real stories. Designed to move with your life.
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            {
-              quote: "Reliable product, consistently delivers.",
-              text: "Beautifully made and incredibly soft. My go-to for yoga and travel days.",
-              name: "Anaya Verma",
-            },
-            {
-              quote: "Excellent product, A+ customer service.",
-              text: "These leggings are perfection - supportive, breathable, and stylish.",
-              name: "Ritika Joshi",
-            },
-            {
-              quote: "Impressive quality, durable and reliable.",
-              text: "I wear their tees everywhere - gym, coffee runs, even brunch.",
-              name: "Reema Ghurde",
-            },
-          ].map((review, i) => (
-            <div
-              key={i}
-              className="border rounded-lg p-6 shadow-sm hover:shadow-lg hover:translate-y-1 hover:scale-102 transition bg-white"
-            >
-              <div className="">
-                <div className="bg-black text-white py-1 px-3.5 rounded-full text-4xl inline-block">
-                  ❝
-                </div>
-                <p className="font-semibold text-lg italic mt-4">
-                  “{review.quote}”
-                </p>
-              </div>
-              <p className="text-gray-600 mt-3 text-sm leading-relaxed">
-                {review.text}
-              </p>
-              <p className="mt-4 font-medium">- {review.name}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="max-w-full">
-        <div className="text-center lg:px-4 pt-10 lg:pb-10 max-w-full">
-          <h2 className="text-2xl md:text-3xl font-bold mb-8 underline underline-offset-4">
-            WE ARE AVAILABLE ON
+      {/* ✅ Testimonials Section */}
+      <AnimatedSection>
+        <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-14 mx-auto py-12 max-w-full">
+          <h2 className="text-3xl md:text-4xl font-semibold text-center">
+            Hear from Our Community
           </h2>
+          <p className="text-center text-gray-500 mt-2 mb-10">
+            Real people. Real stories. Designed to move with your life.
+          </p>
 
-          <div className="flex items-center justify-center gap-4 sm:gap-8 flex-wrap w-full my-10 max-w-full px-4">
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
-              alt="Amazon"
-              className="h-5 sm:h-6 md:h-8 lg:h-10 xl:h-16 w-auto object-contain transition-transform duration-300 hover:scale-105"
-            />
-            <img
-              src="https://images.ctfassets.net/drk57q8lctrm/4QgGDTtQYDx6oDaW3aU7KS/34163f3bef6d82fd354a7455d07102eb/flipkart-logo.webp"
-              alt="Flipkart"
-              className="h-5 sm:h-6 md:h-8 lg:h-10 xl:h-16 w-auto object-contain transition-transform duration-300 hover:scale-105"
-            />
-            <img
-              src="https://www.corecommunique.com/wp-content/uploads/2017/07/Shopclues-new.png"
-              alt="ShopClues"
-              className="h-5 sm:h-6 md:h-8 lg:h-10 xl:h-16 w-auto object-contain transition-transform duration-300 hover:scale-105"
-            />
-            <img
-              src="https://vectorseek.com/wp-content/uploads/2025/05/Meesho-Logo-PNG-SVG-Vector.png"
-              alt="Meesho"
-              className="h-5 sm:h-6 md:h-8 lg:h-10 xl:h-16 w-auto object-contain transition-transform duration-300 hover:scale-105"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                quote: "Reliable product, consistently delivers.",
+                text: "Beautifully made and incredibly soft. My go-to for yoga and travel days.",
+                name: "Anaya Verma",
+              },
+              {
+                quote: "Excellent product, A+ customer service.",
+                text: "These leggings are perfection - supportive, breathable, and stylish.",
+                name: "Ritika Joshi",
+              },
+              {
+                quote: "Impressive quality, durable and reliable.",
+                text: "I wear their tees everywhere - gym, coffee runs, even brunch.",
+                name: "Reema Ghurde",
+              },
+            ].map((review, i) => (
+              <div
+                key={i}
+                className="border rounded-lg p-6 shadow-sm hover:shadow-lg hover:translate-y-1 hover:scale-102 transition bg-white"
+              >
+                <div>
+                  <div className="bg-black text-white py-1 px-3.5 rounded-full text-4xl inline-block">
+                    ❝
+                  </div>
+                  <p className="font-semibold text-lg italic mt-4">
+                    “{review.quote}”
+                  </p>
+                </div>
+                <p className="text-gray-600 mt-3 text-sm leading-relaxed">
+                  {review.text}
+                </p>
+                <p className="mt-4 font-medium">- {review.name}</p>
+              </div>
+            ))}
           </div>
-        </div>
-      </section>
+        </section>
+      </AnimatedSection>
+
+      {/* ✅ Available On */}
+      <AnimatedSection>
+        <section className="max-w-full">
+          <div className="text-center lg:px-4 pt-10 lg:pb-10 max-w-full">
+            <h2 className="text-2xl md:text-3xl font-bold mb-8 underline underline-offset-4">
+              WE ARE AVAILABLE ON
+            </h2>
+
+            <div className="flex items-center justify-center gap-4 sm:gap-8 flex-wrap w-full my-10 max-w-full px-4">
+              {[
+                {
+                  src: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
+                  alt: "Amazon",
+                },
+                {
+                  src: "https://images.ctfassets.net/drk57q8lctrm/4QgGDTtQYDx6oDaW3aU7KS/34163f3bef6d82fd354a7455d07102eb/flipkart-logo.webp",
+                  alt: "Flipkart",
+                },
+                {
+                  src: "https://www.corecommunique.com/wp-content/uploads/2017/07/Shopclues-new.png",
+                  alt: "ShopClues",
+                },
+                {
+                  src: "https://vectorseek.com/wp-content/uploads/2025/05/Meesho-Logo-PNG-SVG-Vector.png",
+                  alt: "Meesho",
+                },
+              ].map((brand, i) => (
+                <img
+                  key={i}
+                  src={brand.src}
+                  alt={brand.alt}
+                  className="h-5 sm:h-6 md:h-8 lg:h-10 xl:h-16 w-auto object-contain transition-transform duration-300 hover:scale-105"
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      </AnimatedSection>
     </main>
   );
 }

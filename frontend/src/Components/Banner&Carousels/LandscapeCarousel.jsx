@@ -11,6 +11,9 @@ const LandscapeCarousel = ({ items = [] }) => {
     direction: "next",
   });
   const isAnimating = useRef(false);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+  const autoSlideTimer = useRef(null);
 
   const Maps = (newIndex, direction) => {
     if (isAnimating.current || items.length <= 1) return;
@@ -38,6 +41,7 @@ const LandscapeCarousel = ({ items = [] }) => {
     Maps(index, direction);
   };
 
+  // ✅ Handle animation and auto-slide reset
   useEffect(() => {
     if (slideState.prevIndex !== -1) {
       const timer = setTimeout(() => {
@@ -48,11 +52,42 @@ const LandscapeCarousel = ({ items = [] }) => {
     }
   }, [slideState.index, slideState.prevIndex]);
 
+  // ✅ Auto-slide interval
   useEffect(() => {
     if (items.length <= 1) return;
-    const interval = setInterval(nextSlide, AUTO_SLIDE_INTERVAL);
-    return () => clearInterval(interval);
+
+    const startAutoSlide = () => {
+      clearInterval(autoSlideTimer.current);
+      autoSlideTimer.current = setInterval(nextSlide, AUTO_SLIDE_INTERVAL);
+    };
+
+    startAutoSlide();
+    return () => clearInterval(autoSlideTimer.current);
   }, [slideState.index, items.length]);
+
+  // ✅ Touch events for swipe
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchEndX.current = e.touches[0].clientX;
+    clearInterval(autoSlideTimer.current); // pause auto slide on touch
+  };
+
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    const distance = touchStartX.current - touchEndX.current;
+    const threshold = 40; // pixels to trigger slide
+    if (Math.abs(distance) > threshold) {
+      if (distance > 0) nextSlide(); // swipe left → next
+      else prevSlide(); // swipe right → prev
+    }
+
+    // restart auto-slide after swipe
+    clearInterval(autoSlideTimer.current);
+    autoSlideTimer.current = setInterval(nextSlide, AUTO_SLIDE_INTERVAL);
+  };
 
   const getSlideClasses = (itemIndex) => {
     const baseClasses = "carousel-slide absolute inset-0 w-full h-full";
@@ -83,10 +118,14 @@ const LandscapeCarousel = ({ items = [] }) => {
   }
 
   return (
-    <div className="relative w-full group">
-      <div className="relative w-full overflow-hidden">
-        <div
-          className="relative w-full h-[20vh] md:h-[50vh] lg:h-[50vh] ">
+    <div className="relative w-full group select-none">
+      <div
+        className="relative w-full overflow-hidden"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div className="relative w-full h-[20vh] md:h-[50vh] lg:h-[50vh]">
           {items.map((item, index) => (
             <div key={item.id || index} className={getSlideClasses(index)}>
               <div className="relative w-full h-full">
@@ -97,12 +136,13 @@ const LandscapeCarousel = ({ items = [] }) => {
                   draggable="false"
                   loading="lazy"
                 />
-                </div>
+              </div>
             </div>
           ))}
         </div>
       </div>
 
+      {/* Navigation buttons */}
       {items.length > 1 && (
         <>
           <button
@@ -122,6 +162,7 @@ const LandscapeCarousel = ({ items = [] }) => {
             <ChevronRight className="w-5 h-5 md:w-6 md:h-6 lg:w-8 lg:h-8" />
           </button>
 
+          {/* Dots */}
           <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 flex justify-center items-center gap-2 md:gap-3 z-10">
             {items.map((_, index) => (
               <button
@@ -163,62 +204,23 @@ const LandscapeCarousel = ({ items = [] }) => {
         }
 
         @keyframes slideInRight {
-          0% {
-            transform: translateX(100%) scale(0.95);
-            opacity: 0;
-          }
-          100% {
-            transform: translateX(0) scale(1);
-            opacity: 1;
-          }
+          0% { transform: translateX(100%) scale(0.95); opacity: 0; }
+          100% { transform: translateX(0) scale(1); opacity: 1; }
         }
 
         @keyframes slideInLeft {
-          0% {
-            transform: translateX(-100%) scale(0.95);
-            opacity: 0;
-          }
-          100% {
-            transform: translateX(0) scale(1);
-            opacity: 1;
-          }
+          0% { transform: translateX(-100%) scale(0.95); opacity: 0; }
+          100% { transform: translateX(0) scale(1); opacity: 1; }
         }
 
         @keyframes slideOutLeft {
-          0% {
-            transform: translateX(0) scale(1);
-            opacity: 1;
-          }
-          100% {
-            transform: translateX(-100%) scale(0.95);
-            opacity: 0;
-          }
+          0% { transform: translateX(0) scale(1); opacity: 1; }
+          100% { transform: translateX(-100%) scale(0.95); opacity: 0; }
         }
 
         @keyframes slideOutRight {
-          0% {
-            transform: translateX(0) scale(1);
-            opacity: 1;
-          }
-          100% {
-            transform: translateX(100%) scale(0.95);
-            opacity: 0;
-          }
-        }
-
-        .animate-fade-in {
-          animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes fadeIn {
-          0% {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          0% { transform: translateX(0) scale(1); opacity: 1; }
+          100% { transform: translateX(100%) scale(0.95); opacity: 0; }
         }
 
         @media (max-width: 768px) {

@@ -4,7 +4,6 @@ import ScrollToTop from "./Components/fix/ScrollToTop";
 import Navbar from "./Components/Common/Navbar";
 import Footer from "./Components/Common/Footer";
 import BottomNav from "./Components/Common/BottomNav";
-import Home from "./Components/Home/Home";
 import Product from "./Components/Product/Product";
 import ProductInfo from "./Components/Product/ProductInfo";
 import PrivacyPolicy from "./Components/Terms&Policy/PrivacyPolicy";
@@ -32,7 +31,6 @@ export default function App() {
           <Outlet />
           <Footer />
           <BottomNav />
-          
         </>,
       children: [
         {
@@ -44,9 +42,18 @@ export default function App() {
           element: <Error404 />
         },
         {
-          path: "/Product",
+          path: "/product/*",
           element: <Product />,
         },
+        {
+          path: "/sports",
+          element: <Product />
+        },
+        {
+          path: "/categories",
+          element: <CategoriesPage />
+        },
+        // Other routes remain the same
         {
           path: '/ProductInfo/:id',
           element: <ProductInfo />
@@ -78,10 +85,6 @@ export default function App() {
         {
           path: '/search',
           element: <SearchPage />
-        },
-        {
-          path: '/categories',
-          element: <CategoriesPage />
         },
         {
           path: '/wishlist',

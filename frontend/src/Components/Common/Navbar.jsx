@@ -161,9 +161,9 @@ function Navbar() {
             <div className="hidden lg:flex xl:space-x-8 lg:space-x-6 relative">
               {[
                 { name: "Home", to: "/" },
-                { name: "Men", to: "/men" },
-                { name: "Women", to: "/women" },
-                { name: "Kids", to: "/kids" },
+                { name: "Men", to: "/product/men" },
+                { name: "Women", to: "/product/women" },
+                { name: "Kids", to: "/product/kids" },
                 { name: "Sports&Lifestyle", to: "/sports" },
                 { name: "Outlet", to: "/Categories" },
               ].map((link) => (
@@ -204,18 +204,26 @@ function Navbar() {
                             NEW & TRENDING
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              New Drops
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Gym Essentials
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Performance Range
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Athleisure
-                            </li>
+                            <Link to="/product/men/new-drops">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                New Drops
+                              </li>
+                            </Link>
+                            <Link to="/product/men/gym-essentials">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Gym Essentials
+                              </li>
+                            </Link>
+                            <Link to="/product/men/performance-range">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Performance Range
+                              </li>
+                            </Link>
+                            <Link to="/product/men/athleisure">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Athleisure
+                              </li>
+                            </Link>
                           </ul>
                         </div>
 
@@ -224,18 +232,26 @@ function Navbar() {
                             TOPS
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              T-Shirts
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Stringers
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Oversized Tees
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Hoodies
-                            </li>
+                            <Link to="/product/men/t-shirts">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                T-Shirts
+                              </li>
+                            </Link>
+                            <Link to="/product/men/stringers">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Stringers
+                              </li>
+                            </Link>
+                            <Link to="/product/men/oversized-tees">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Oversized Tees
+                              </li>
+                            </Link>
+                            <Link to="/product/men/hoodies">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Hoodies
+                              </li>
+                            </Link>
                           </ul>
                         </div>
 
@@ -244,15 +260,21 @@ function Navbar() {
                             BOTTOMS
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Shorts
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Joggers
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Cargo Pants
-                            </li>
+                            <Link to="/product/men/shorts">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Shorts
+                              </li>
+                            </Link>
+                            <Link to="/product/men/joggers">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Joggers
+                              </li>
+                            </Link>
+                            <Link to="/product/men/cargo-pants">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Cargo Pants
+                              </li>
+                            </Link>
                           </ul>
                         </div>
 
@@ -261,39 +283,49 @@ function Navbar() {
                             ACCESSORIES
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Training Bags
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Caps
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Socks
-                            </li>
+                            <Link to="/product/men/training-bags">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Training Bags
+                              </li>
+                            </Link>
+                            <Link to="/product/men/caps">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Caps
+                              </li>
+                            </Link>
+                            <Link to="/product/men/socks">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Socks
+                              </li>
+                            </Link>
                           </ul>
                         </div>
 
                         <div className="col-span-1 flex flex-col gap-4">
-                          <div className="relative rounded-lg overflow-hidden h-[150px] hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-xl">
-                            <img
-                              src="https://media.istockphoto.com/id/1783827855/photo/talking-on-the-way-to-training.jpg?s=612x612&w=0&k=20&c=jrpRpIDarDFZU04wdh5l-c5SK0xKffejXcqHbJQ4ygg="
-                              alt=""
-                              className="w-full h-full object-cover"
-                            />
-                            <div className="absolute bottom-2 left-2 text-white font-semibold text-sm bg-black/50 px-3 py-1.5 rounded-md backdrop-blur-sm">
-                              Power Collection
+                          <Link to="/product/men/power-collection">
+                            <div className="relative rounded-lg overflow-hidden h-[150px] hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-xl">
+                              <img
+                                src="https://media.istockphoto.com/id/1783827855/photo/talking-on-the-way-to-training.jpg?s=612x612&w=0&k=20&c=jrpRpIDarDFZU04wdh5l-c5SK0xKffejXcqHbJQ4ygg="
+                                alt=""
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute bottom-2 left-2 text-white font-semibold text-sm bg-black/50 px-3 py-1.5 rounded-md backdrop-blur-sm">
+                                Power Collection
+                              </div>
                             </div>
-                          </div>
-                          <div className="relative rounded-lg overflow-hidden h-[150px] hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-xl">
-                            <img
-                              src="https://hummel.net.in/cdn/shop/files/Artboard_1_copy_6_324acf56-9d3a-4856-a326-06a8d52b5d08.jpg?v=1759494799&width=400"
-                              alt=""
-                              className="w-full h-full object-cover"
-                            />
-                            <div className="absolute bottom-2 left-2 text-white font-semibold text-sm bg-black/50 px-3 py-1.5 rounded-md backdrop-blur-sm">
-                              Athletic Fit
+                          </Link>
+                          <Link to="/product/men/athletic-fit">
+                            <div className="relative rounded-lg overflow-hidden h-[150px] hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-xl">
+                              <img
+                                src="https://hummel.net.in/cdn/shop/files/Artboard_1_copy_6_324acf56-9d3a-4856-a326-06a8d52b5d08.jpg?v=1759494799&width=400"
+                                alt=""
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute bottom-2 left-2 text-white font-semibold text-sm bg-black/50 px-3 py-1.5 rounded-md backdrop-blur-sm">
+                                Athletic Fit
+                              </div>
                             </div>
-                          </div>
+                          </Link>
                         </div>
                       </div>
                     </div>
@@ -315,18 +347,26 @@ function Navbar() {
                             WHAT'S HOT
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              New Arrivals
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Bestsellers
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Gym to Street
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Performance Luxe
-                            </li>
+                            <Link to="/product/women/new-arrivals">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                New Arrivals
+                              </li>
+                            </Link>
+                            <Link to="/product/women/bestsellers">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Bestsellers
+                              </li>
+                            </Link>
+                            <Link to="/product/women/gym-to-street">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Gym to Street
+                              </li>
+                            </Link>
+                            <Link to="/product/women/performance-luxe">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Performance Luxe
+                              </li>
+                            </Link>
                           </ul>
                         </div>
 
@@ -335,18 +375,26 @@ function Navbar() {
                             TOPS
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Crop Tops
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Sports Bras
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Oversized Tees
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Sweatshirts
-                            </li>
+                            <Link to="/product/women/crop-tops">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Crop Tops
+                              </li>
+                            </Link>
+                            <Link to="/product/women/sports-bras">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Sports Bras
+                              </li>
+                            </Link>
+                            <Link to="/product/women/oversized-tees">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Oversized Tees
+                              </li>
+                            </Link>
+                            <Link to="/product/women/sweatshirts">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Sweatshirts
+                              </li>
+                            </Link>
                           </ul>
                         </div>
 
@@ -355,15 +403,21 @@ function Navbar() {
                             BOTTOMS
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Leggings
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Shorts
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Track Pants
-                            </li>
+                            <Link to="/product/women/leggings">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Leggings
+                              </li>
+                            </Link>
+                            <Link to="/product/women/shorts">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Shorts
+                              </li>
+                            </Link>
+                            <Link to="/product/women/track-pants">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Track Pants
+                              </li>
+                            </Link>
                           </ul>
                         </div>
 
@@ -372,39 +426,49 @@ function Navbar() {
                             ACCESSORIES
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Tote Bags
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Headbands
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Water Bottles
-                            </li>
+                            <Link to="/product/women/tote-bags">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Tote Bags
+                              </li>
+                            </Link>
+                            <Link to="/product/women/headbands">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Headbands
+                              </li>
+                            </Link>
+                            <Link to="/product/women/water-bottles">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Water Bottles
+                              </li>
+                            </Link>
                           </ul>
                         </div>
 
                         <div className="col-span-1 flex flex-col gap-4">
-                          <div className="relative rounded-lg overflow-hidden h-[150px] hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-xl">
-                            <img
-                              src="https://i.pinimg.com/736x/29/63/0c/29630ce63c84d033dabde652f3e49664.jpg"
-                              alt=""
-                              className="w-full h-full object-cover"
-                            />
-                            <div className="absolute bottom-2 left-2 text-white font-semibold text-sm bg-black/50 px-3 py-1.5 rounded-md backdrop-blur-sm">
-                              Seamless Collection
+                          <Link to="/product/women/seamless-collection">
+                            <div className="relative rounded-lg overflow-hidden h-[150px] hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-xl">
+                              <img
+                                src="https://i.pinimg.com/736x/29/63/0c/29630ce63c84d033dabde652f3e49664.jpg"
+                                alt=""
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute bottom-2 left-2 text-white font-semibold text-sm bg-black/50 px-3 py-1.5 rounded-md backdrop-blur-sm">
+                                Seamless Collection
+                              </div>
                             </div>
-                          </div>
-                          <div className="relative rounded-lg overflow-hidden h-[150px] hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-xl">
-                            <img
-                              src="https://d1csarkz8obe9u.cloudfront.net/posterpreviews/woman-sports-wear-fashion-sale-shop-store-ad-design-template-8843cd2ac8f9fcd7d9911d3afd7a3e10_screen.jpg?ts=1735477277"
-                              alt=""
-                              className="w-full h-full object-cover"
-                            />
-                            <div className="absolute bottom-2 left-2 text-white font-semibold text-sm bg-black/50 px-3 py-1.5 rounded-md backdrop-blur-sm">
-                              Power Shorts
+                          </Link>
+                          <Link to="/product/women/power-shorts">
+                            <div className="relative rounded-lg overflow-hidden h-[150px] hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-xl">
+                              <img
+                                src="https://d1csarkz8obe9u.cloudfront.net/posterpreviews/woman-sports-wear-fashion-sale-shop-store-ad-design-template-8843cd2ac8f9fcd7d9911d3afd7a3e10_screen.jpg?ts=1735477277"
+                                alt=""
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute bottom-2 left-2 text-white font-semibold text-sm bg-black/50 px-3 py-1.5 rounded-md backdrop-blur-sm">
+                                Power Shorts
+                              </div>
                             </div>
-                          </div>
+                          </Link>
                         </div>
                       </div>
                     </div>
@@ -426,15 +490,21 @@ function Navbar() {
                             TRENDING
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              New In
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Mini Athletes
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Playwear
-                            </li>
+                            <Link to="/product/kids/new-in">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                New In
+                              </li>
+                            </Link>
+                            <Link to="/product/kids/mini-athletes">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Mini Athletes
+                              </li>
+                            </Link>
+                            <Link to="/product/kids/playwear">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Playwear
+                              </li>
+                            </Link>
                           </ul>
                         </div>
 
@@ -443,15 +513,21 @@ function Navbar() {
                             TOPS
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              T-Shirts
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Sweatshirts
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Hoodies
-                            </li>
+                            <Link to="/product/kids/t-shirts">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                T-Shirts
+                              </li>
+                            </Link>
+                            <Link to="/product/kids/sweatshirts">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Sweatshirts
+                              </li>
+                            </Link>
+                            <Link to="/product/kids/hoodies">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Hoodies
+                              </li>
+                            </Link>
                           </ul>
                         </div>
 
@@ -460,12 +536,16 @@ function Navbar() {
                             BOTTOMS
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Joggers
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Shorts
-                            </li>
+                            <Link to="/product/kids/joggers">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Joggers
+                              </li>
+                            </Link>
+                            <Link to="/product/kids/shorts">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Shorts
+                              </li>
+                            </Link>
                           </ul>
                         </div>
 
@@ -474,39 +554,49 @@ function Navbar() {
                             ACCESSORIES
                           </h3>
                           <ul className="space-y-2.5 text-sm text-gray-600">
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Bags
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Caps
-                            </li>
-                            <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
-                              Socks
-                            </li>
+                            <Link to="/product/kids/bags">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Bags
+                              </li>
+                            </Link>
+                            <Link to="/product/kids/caps">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Caps
+                              </li>
+                            </Link>
+                            <Link to="/product/kids/socks">
+                              <li className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 cursor-pointer">
+                                Socks
+                              </li>
+                            </Link>
                           </ul>
                         </div>
 
                         <div className="col-span-1 flex flex-col gap-4">
-                          <div className="relative rounded-lg overflow-hidden h-[150px] hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-xl">
-                            <img
-                              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTL1hDiO-P1vrcDxseQT-E0Q9GD8tlIBEIX7jLQ4HCNWPgJ16iqusa6ZWdFnMxRJhTy-ac&usqp=CAU"
-                              alt=""
-                              className="w-full h-full object-cover"
-                            />
-                            <div className="absolute bottom-2 left-2 text-white font-semibold text-sm bg-black/50 px-3 py-1.5 rounded-md backdrop-blur-sm">
-                              Play Hard
+                          <Link to="/product/kids/play-hard">
+                            <div className="relative rounded-lg overflow-hidden h-[150px] hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-xl">
+                              <img
+                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTL1hDiO-P1vrcDxseQT-E0Q9GD8tlIBEIX7jLQ4HCNWPgJ16iqusa6ZWdFnMxRJhTy-ac&usqp=CAU"
+                                alt=""
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute bottom-2 left-2 text-white font-semibold text-sm bg-black/50 px-3 py-1.5 rounded-md backdrop-blur-sm">
+                                Play Hard
+                              </div>
                             </div>
-                          </div>
-                          <div className="relative rounded-lg overflow-hidden h-[150px] hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-xl">
-                            <img
-                              src="https://www.buffalolib.org/sites/default/files/styles/branch_image/public/inline-images/heading/Kids-Sports-Page-Banner.jpg?itok=yUAz0htp"
-                              alt=""
-                              className="w-full h-full object-cover"
-                            />
-                            <div className="absolute bottom-2 left-2 text-white font-semibold text-sm bg-black/50 px-3 py-1.5 rounded-md backdrop-blur-sm">
-                              Everyday Comfort
+                          </Link>
+                          <Link to="/product/kids/everyday-comfort">
+                            <div className="relative rounded-lg overflow-hidden h-[150px] hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-xl">
+                              <img
+                                src="https://www.buffalolib.org/sites/default/files/styles/branch_image/public/inline-images/heading/Kids-Sports-Page-Banner.jpg?itok=yUAz0htp"
+                                alt=""
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute bottom-2 left-2 text-white font-semibold text-sm bg-black/50 px-3 py-1.5 rounded-md backdrop-blur-sm">
+                                Everyday Comfort
+                              </div>
                             </div>
-                          </div>
+                          </Link>
                         </div>
                       </div>
                     </div>
