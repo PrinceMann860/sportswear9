@@ -36,10 +36,20 @@ class ProductAttributeSerializer(serializers.ModelSerializer):
         fields = ['attribute_name', 'value']
 
 
-class ProductImageSerializer(serializers.ModelSerializer):
+class ProductImageNestedSerializer(serializers.ModelSerializer):
+    image_uuid = serializers.ReadOnlyField()
+    original_url = serializers.ReadOnlyField(source="original_url")
+    thumbnail_url = serializers.ReadOnlyField(source="thumbnail_url")
+    medium_url = serializers.ReadOnlyField(source="medium_url")
+    large_url = serializers.ReadOnlyField(source="large_url")
+
     class Meta:
         model = ProductImage
-        fields = ['id', 'image', 'is_main', 'alt_text']
+        fields = [
+            "id", "image_uuid", "image", "original_url",
+            "thumbnail_url", "medium_url", "large_url",
+            "alt_text", "is_main", "uploaded_at"
+        ]
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -83,25 +93,30 @@ class ProductListSerializer(serializers.ModelSerializer):
 
 
     def get_img(self, obj):
-        # Try default variant first
-        variant = obj.variants.filter(is_default=True).first() or obj.variants.first()
+        variant = (
+            obj.variants.filter(is_default=True, images__isnull=False).first()
+            or obj.variants.filter(images__isnull=False).first()
+            or obj.variants.first()
+        )
         if not variant:
             return None
 
         image = variant.images.filter(is_main=True).first() or variant.images.first()
-        if image:
-            return image.medium_url
-        return None
+        return image.medium_url if image else None
+
 
     def get_img2(self, obj):
-        variant = obj.variants.filter(is_default=True).first() or obj.variants.first()
+        variant = (
+            obj.variants.filter(is_default=True, images__isnull=False).first()
+            or obj.variants.filter(images__isnull=False).first()
+            or obj.variants.first()
+        )
         if not variant:
             return None
 
-        images = variant.images.all()[1:3]  # get 2nd image if exists
-        if images:
-            return images[0].medium_url
-        return None
+        images = variant.images.all()[1:3]
+        return images[0].medium_url if images else None
+
 
     def get_price(self, obj):
         return f"₹{obj.net:,.2f}"
@@ -136,16 +151,25 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         return round(sum(ratings) / len(ratings), 1) if ratings else None
 
     def get_default_images(self, obj):
-        variant = obj.variants.filter(is_default=True).first() or obj.variants.first()
+        # Try default variant with images; if none, pick the first variant that has images
+        variant = (
+            obj.variants.filter(is_default=True, images__isnull=False).first()
+            or obj.variants.filter(images__isnull=False).first()
+            or obj.variants.first()
+        )
+
         if not variant:
             return []
+
         imgs = variant.images.all()[:5]
         return [
             {
                 "id": img.image_uuid,
                 "url": img.medium_url,
                 "is_main": img.is_main,
-                "alt": img.alt_text
-            } for img in imgs
+                "alt": img.alt_text,
+            }
+            for img in imgs
         ]
+
 

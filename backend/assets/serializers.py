@@ -2,17 +2,23 @@ from rest_framework import serializers
 from .models import ProductImage, ProductVideo
 
 class ProductImageSerializer(serializers.ModelSerializer):
-    original_url = serializers.ReadOnlyField()
-    thumbnail_url = serializers.ReadOnlyField()
-    medium_url = serializers.ReadOnlyField()
-    large_url = serializers.ReadOnlyField()
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductImage
         fields = [
-            'image_uuid', 'variant', 'image', 'alt_text', 'is_main',
-            'original_url', 'thumbnail_url', 'medium_url', 'large_url'
+            "image_uuid",
+            "image_url",
+            "alt_text",
+            "is_main",
+            "uploaded_at"
         ]
+
+    def get_image_url(self, obj):
+        request = self.context.get("request")
+        if request:
+            return request.build_absolute_uri(obj.image.url)
+        return obj.image.url
 
 class ProductVideoSerializer(serializers.ModelSerializer):
     class Meta:
