@@ -26,7 +26,7 @@ export default function LoginForm({ onSwitchToSignup, onSwitchToForgot, onClose 
       <h3 className="text-lg sm:text-2xl font-bold text-center mb-4">Welcome Back 👋</h3>
 
       {error && (
-        <div className="bg-red-50 text-red-600 p-2 rounded-lg mb-3 text-xs sm:text-sm text-center">
+        <div className="bg-blue-50 text-blue-600 p-2 rounded-lg mb-3 text-xs sm:text-sm text-center">
           {error}
         </div>
       )}
@@ -39,7 +39,7 @@ export default function LoginForm({ onSwitchToSignup, onSwitchToForgot, onClose 
           value={formData.email}
           onChange={handleChange}
           required
-          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500 focus:shadow-md transition"
+          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-md transition"
         />
 
         <input
@@ -49,7 +49,7 @@ export default function LoginForm({ onSwitchToSignup, onSwitchToForgot, onClose 
           value={formData.password}
           onChange={handleChange}
           required
-          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500 focus:shadow-md transition"
+          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-md transition"
         />
 
         <button
@@ -63,7 +63,7 @@ export default function LoginForm({ onSwitchToSignup, onSwitchToForgot, onClose 
         <button
           type="submit"
           disabled={loading}
-          className="bg-black text-white py-2.5 rounded-lg hover:bg-gray-800 transition font-semibold disabled:opacity-50"
+          className="bg-blue-500 text-white py-2.5 rounded-lg hover:bg-blue-600 transition font-semibold disabled:opacity-50"
         >
           {loading ? "Logging in..." : "Login"}
         </button>
@@ -92,7 +92,7 @@ export default function LoginForm({ onSwitchToSignup, onSwitchToForgot, onClose 
         Don’t have an account?{" "}
         <button
           onClick={onSwitchToSignup}
-          className="text-red-500 hover:underline font-semibold"
+          className="text-blue-500 hover:underline font-semibold"
         >
           Sign Up
         </button>

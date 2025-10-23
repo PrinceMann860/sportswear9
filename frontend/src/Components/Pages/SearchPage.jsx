@@ -129,7 +129,7 @@ const SearchPage = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for products, brands, categories..."
-                className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               {searchQuery && (
                 <button
@@ -165,7 +165,7 @@ const SearchPage = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="relevance">Sort by Relevance</option>
               <option value="price-low">Price: Low to High</option>
@@ -183,7 +183,7 @@ const SearchPage = () => {
               <h3 className="font-semibold text-lg">Filters</h3>
               <button
                 onClick={clearFilters}
-                className="text-sm text-red-500 hover:text-red-600"
+                className="text-sm text-blue-500 hover:text-blue-600"
               >
                 Clear All
               </button>
@@ -240,7 +240,7 @@ const SearchPage = () => {
                       onClick={() => handleFilterChange('size', filters.size === size ? '' : size)}
                       className={`py-2 px-3 border rounded text-sm ${
                         filters.size === size
-                          ? 'border-red-500 bg-red-50 text-red-600'
+                          ? 'border-blue-500 bg-blue-50 text-blue-600'
                           : 'border-gray-300 hover:border-gray-400'
                       }`}
                     >

@@ -34,7 +34,7 @@ export default function OTPForm({ onClose, onSwitchToSetPassword }) {
       </p>
 
       {error && (
-        <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">
+        <div className="bg-blue-50 text-blue-600 p-3 rounded-lg mb-4 text-sm">
           {error}
         </div>
       )}
@@ -50,13 +50,13 @@ export default function OTPForm({ onClose, onSwitchToSetPassword }) {
           }}
           maxLength={6}
           required
-          className="border border-gray-300 rounded-lg p-3 text-center text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+          className="border border-gray-300 rounded-lg p-3 text-center text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
         />
 
         <button
           type="submit"
           disabled={loading || otp.length !== 6}
-          className="bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+          className="bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
         >
           {loading ? 'Verifying...' : 'Verify & Continue'}
         </button>
@@ -64,7 +64,7 @@ export default function OTPForm({ onClose, onSwitchToSetPassword }) {
 
       <button
         onClick={handleResend}
-        className="w-full text-center text-sm text-gray-600 hover:text-red-500 mt-4 transition"
+        className="w-full text-center text-sm text-gray-600 hover:text-blue-500 mt-4 transition"
       >
         Didn't receive OTP? <span className="font-semibold">Resend</span>
       </button>

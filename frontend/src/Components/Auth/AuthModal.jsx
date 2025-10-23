@@ -53,10 +53,12 @@ export default function AuthModal({ isOpen, onClose, mode = "login", setMode }) 
         <button
           onClick={onClose}
           aria-label="Close"
-          className="absolute top-3 right-3 text-gray-600 hover:text-red-500 transition text-2xl font-bold"
+          className="absolute top-3 right-3 text-gray-600 hover:text-blue-500 transition text-2xl font-bold"
         >
           ×
         </button>
+        
+
 
         {/* Brand */}
         <img src={logo} alt="SPORTSWEAR9" className="w-40 mx-auto"/>

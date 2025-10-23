@@ -46,9 +46,9 @@ const OrdersPage = () => {
     <div className="min-h-screen bg-gray-50 pt-20 pb-20 md:pb-0">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center gap-3 mb-8">
-          <Heart className="text-red-500" size={28} />
+          <Heart className="text-blue-500" size={28} />
           <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>
-          <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-medium">
+          <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">
             {wishlistItems.length} items
           </span>
         </div>
@@ -62,10 +62,10 @@ const OrdersPage = () => {
                   <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => removeFromWishlist(item.id)}
-                      className="p-2 bg-white rounded-full shadow-md hover:bg-red-50 transition-colors"
+                      className="p-2 bg-white rounded-full shadow-md hover:bg-blue-50 transition-colors"
                       title="Remove from wishlist"
                     >
-                      <X size={16} className="text-red-500" />
+                      <X size={16} className="text-blue-500" />
                     </button>
                     <button
                       onClick={() => addToCart(item)}

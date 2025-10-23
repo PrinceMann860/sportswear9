@@ -55,7 +55,7 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP, onClose }) 
       <h3 className="text-lg sm:text-2xl font-bold text-center mb-4">Create Account ✨</h3>
 
       {(error || validationError) && (
-        <div className="bg-red-50 text-red-600 p-2 rounded-lg mb-3 text-xs sm:text-sm text-center">
+        <div className="bg-blue-50 text-blue-600 p-2 rounded-lg mb-3 text-xs sm:text-sm text-center">
           {validationError || error}
         </div>
       )}
@@ -68,7 +68,7 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP, onClose }) 
           value={formData.fullName}
           onChange={handleChange}
           required
-          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500 focus:shadow-md transition"
+          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-md transition"
         />
 
         <select
@@ -76,7 +76,7 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP, onClose }) 
           value={formData.gender}
           onChange={handleChange}
           required
-          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
         >
           <option value="">Select Gender</option>
           <option>Male</option>
@@ -92,7 +92,7 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP, onClose }) 
           value={formData.email}
           onChange={handleChange}
           required
-          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
         />
 
         <input
@@ -102,7 +102,7 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP, onClose }) 
           value={formData.password}
           onChange={handleChange}
           required
-          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
         />
 
         <input
@@ -112,7 +112,7 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP, onClose }) 
           value={formData.confirmPassword}
           onChange={handleChange}
           required
-          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+          className="border border-gray-300 rounded-lg p-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
         />
 
         <label className="flex items-start gap-2 text-xs sm:text-sm">
@@ -121,15 +121,15 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP, onClose }) 
             name="agreeToTerms"
             checked={formData.agreeToTerms}
             onChange={handleChange}
-            className="mt-0.5 w-4 h-4 text-red-500 focus:ring-red-500 border-gray-300 rounded"
+            className="mt-0.5 w-4 h-4 text-blue-500 focus:ring-blue-500 border-gray-300 rounded"
           />
           <span className="text-gray-600 leading-snug">
             By continuing, I agree to the{" "}
-            <Link to="/terms" className="text-red-500 hover:underline">
+            <Link to="/terms" className="text-blue-500 hover:underline">
               Terms
             </Link>{" "}
             &{" "}
-            <Link to="/privacy" className="text-red-500 hover:underline">
+            <Link to="/privacy" className="text-blue-500 hover:underline">
               Policy
             </Link>
             .
@@ -139,7 +139,7 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP, onClose }) 
         <button
           type="submit"
           disabled={loading}
-          className="bg-black text-white py-2.5 rounded-lg hover:bg-gray-800 transition font-semibold text-sm sm:text-base disabled:opacity-50"
+          className="bg-blue-500 text-white py-2.5 rounded-lg hover:bg-blue-600 transition font-semibold text-sm sm:text-base disabled:opacity-50"
         >
           {loading ? "Creating Account..." : "Continue"}
         </button>
@@ -166,7 +166,7 @@ export default function SignupForm({ onSwitchToLogin, onSwitchToOTP, onClose }) 
         Already have an account?{" "}
         <button
           onClick={onSwitchToLogin}
-          className="text-red-500 hover:underline font-semibold"
+          className="text-blue-500 hover:underline font-semibold"
         >
           Login
         </button>
