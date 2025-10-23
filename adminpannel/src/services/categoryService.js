@@ -32,7 +32,7 @@ export const categoryService = {
   // Update category
   async updateCategory(uuid, categoryData) {
     try {
-      const response = await api.put(`/api/categories/admin/${uuid}/update/`, categoryData);
+      const response = await api.patch(`/api/categories/admin/${uuid}/update/`, categoryData);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to update category' };

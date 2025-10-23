@@ -1,5 +1,6 @@
+import React from 'react';
 import { useState, useEffect } from 'react';
-import { Plus, CreditCard as Edit, Trash2 } from 'lucide-react';
+import { Plus, CreditCard as Edit, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
 import { categoryService } from '../../services/categoryService';
 
 const CategoryList = () => {
@@ -7,10 +8,12 @@ const CategoryList = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
+  const [expandedCategories, setExpandedCategories] = useState(new Set());
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
     parent: '',
+    is_active: true,
   });
 
   useEffect(() => {
@@ -44,7 +47,7 @@ const CategoryList = () => {
       }
       setShowForm(false);
       setEditingCategory(null);
-      setFormData({ name: '', slug: '', parent: '' });
+      setFormData({ name: '', slug: '', parent: '', is_active: true });
       fetchCategories();
     } catch (error) {
       console.error('Failed to save category:', error);
@@ -57,6 +60,7 @@ const CategoryList = () => {
       name: category.name,
       slug: category.slug || '',
       parent: category.parent || '',
+      is_active: category.is_active ?? true,
     });
     setShowForm(true);
   };
@@ -75,7 +79,7 @@ const CategoryList = () => {
   const resetForm = () => {
     setShowForm(false);
     setEditingCategory(null);
-    setFormData({ name: '', slug: '', parent: '' });
+    setFormData({ name: '', slug: '', parent: '', is_active: true });
   };
 
   const generateSlug = (name) => {
@@ -94,6 +98,26 @@ const CategoryList = () => {
     });
   };
 
+  const toggleExpanded = (categoryUuid) => {
+    const newExpanded = new Set(expandedCategories);
+    if (newExpanded.has(categoryUuid)) {
+      newExpanded.delete(categoryUuid);
+    } else {
+      newExpanded.add(categoryUuid);
+    }
+    setExpandedCategories(newExpanded);
+  };
+
+  const toggleActive = async (category) => {
+    try {
+      const updatedData = { ...category, is_active: !category.is_active };
+      await categoryService.updateCategory(category.category_uuid, updatedData);
+      fetchCategories();
+    } catch (error) {
+      console.error('Failed to update category status:', error);
+    }
+  };
+
   const renderCategoryOptions = (categories, level = 0) => {
     let options = [];
     categories.forEach((category) => {
@@ -110,47 +134,88 @@ const CategoryList = () => {
     return options;
   };
 
-  const renderCategoryCard = (category, level = 0) => {
-    const marginLeft = level * 24;
+  const renderCategoryRow = (category, level = 0) => {
+    const hasChildren = category.children && category.children.length > 0;
+    const isExpanded = expandedCategories.has(category.category_uuid);
+    const paddingLeft = level * 24;
+
     return (
-      <div key={category.category_uuid} className="space-y-4">
-        <div className="border border-gray-200 rounded-lg p-4" style={{ marginLeft: `${marginLeft}px` }}>
-          <div className="flex justify-between items-start mb-3">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">{category.name}</h3>
-              {category.slug && (
-                <p className="text-gray-600 text-sm mt-1">Slug: {category.slug}</p>
+      <React.Fragment key={category.category_uuid}>
+        <tr className="hover:bg-gray-50 border-b border-gray-100">
+          <td className="px-6 py-4 whitespace-nowrap" style={{ paddingLeft: `${24 + paddingLeft}px` }}>
+            <div className="flex items-center">
+              {hasChildren ? (
+                <button
+                  onClick={() => toggleExpanded(category.category_uuid)}
+                  className="mr-2 p-1 hover:bg-gray-200 rounded transition-colors duration-150"
+                >
+                  {isExpanded ? (
+                    <ChevronDown className="h-4 w-4 text-gray-600" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 text-gray-600" />
+                  )}
+                </button>
+              ) : (
+                <div className="w-6 h-6 mr-2"></div>
               )}
-              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-2 ${
-                category.is_active
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-red-100 text-red-800'
+              <div>
+                <div className="text-sm font-medium text-gray-900">{category.name}</div>
+                {category.slug && (
+                  <div className="text-xs text-gray-500">/{category.slug}</div>
+                )}
+              </div>
+            </div>
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap">
+            <div className="flex items-center">
+              <button
+                onClick={() => toggleActive(category)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  category.is_active ? 'bg-blue-600' : 'bg-gray-200'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+                    category.is_active ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+              <span className={`ml-3 text-sm font-medium ${
+                category.is_active ? 'text-green-700' : 'text-gray-500'
               }`}>
                 {category.is_active ? 'Active' : 'Inactive'}
               </span>
             </div>
-            <div className="flex space-x-2">
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {hasChildren ? `${category.children.length} subcategories` : 'No subcategories'}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {category.created_at ? new Date(category.created_at).toLocaleDateString() : 'N/A'}
+          </td>
+          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            <div className="flex space-x-3">
               <button
                 onClick={() => handleEdit(category)}
-                className="text-yellow-600 hover:text-yellow-900"
+                className="text-blue-600 hover:text-blue-900 transition-colors duration-150"
               >
                 <Edit className="h-4 w-4" />
               </button>
               <button
                 onClick={() => handleDelete(category.category_uuid)}
-                className="text-red-600 hover:text-red-900"
+                className="text-red-600 hover:text-red-900 transition-colors duration-150"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
-          </div>
-        </div>
-        {category.children && category.children.length > 0 && (
-          <div className="space-y-4">
-            {category.children.map((child) => renderCategoryCard(child, level + 1))}
-          </div>
+          </td>
+        </tr>
+        {hasChildren && isExpanded && (
+          <>
+            {category.children.map((child) => renderCategoryRow(child, level + 1))}
+          </>
         )}
-      </div>
+      </React.Fragment>
     );
   };
 
@@ -216,6 +281,17 @@ const CategoryList = () => {
                   {renderCategoryOptions(categories)}
                 </select>
               </div>
+              <div>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_active}
+                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">Active</span>
+                </label>
+              </div>
               <div className="flex justify-end space-x-3">
                 <button
                   type="button"
@@ -233,19 +309,42 @@ const CategoryList = () => {
         </div>
       )}
 
-      {/* Categories Grid */}
+      {/* Categories Table */}
       <div className="card">
         {loading ? (
           <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
         ) : categories.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             No categories found. Create your first category to get started.
           </div>
         ) : (
-          <div className="space-y-4">
-            {categories.map((category) => renderCategoryCard(category))}
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Category Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Subcategories
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Created
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {categories.map((category) => renderCategoryRow(category))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

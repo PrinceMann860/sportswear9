@@ -33,7 +33,14 @@ class ProductUpdateAPIView(generics.UpdateAPIView):
     permission_classes = [IsAdminUser]
     lookup_field = 'product_uuid'
 
-
+    def delete(self, request, *args, **kwargs):
+        product = self.get_object()
+        product_name = product.name
+        product.delete()
+        return Response(
+            {"message": f"Product '{product_name}' deleted successfully."},
+            status=status.HTTP_204_NO_CONTENT
+        )
 
 class AddVariantAPIView(APIView):
     permission_classes = [IsAdminUser]

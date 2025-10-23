@@ -1,14 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { ArrowLeft, Save } from 'lucide-react';
-import { productService } from '../../services/productService';
-import { brandService } from '../../services/brandService';
-import { categoryService } from '../../services/categoryService';
+import { 
+  useGetProductQuery,
+  useCreateProductMutation,
+  useUpdateProductMutation,
+  useGetBrandsQuery,
+  useGetCategoriesQuery 
+} from '../../store/api/apiSlice';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
+import NestedDropdown from '../../components/ui/NestedDropdown';
+import { useToast } from '../../hooks/useToast';
 
 const ProductForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
+  const { showSuccess, showError } = useToast();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -21,34 +30,25 @@ const ProductForm = () => {
     is_featured: false,
   });
 
-  const [brands, setBrands] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // API queries
+  const { data: brands = [] } = useGetBrandsQuery();
+  const { data: categories = [] } = useGetCategoriesQuery();
+  
+  const { 
+    data: product, 
+    isLoading: productLoading 
+  } = useGetProductQuery(id, { skip: !isEdit });
+  
+  const [createProduct, { isLoading: createLoading }] = useCreateProductMutation();
+  const [updateProduct, { isLoading: updateLoading }] = useUpdateProductMutation();
+
+  const loading = createLoading || updateLoading;
+
   useEffect(() => {
-    fetchBrandsAndCategories();
-    if (isEdit) {
-      fetchProduct();
-    }
-  }, [id]);
-
-  const fetchBrandsAndCategories = async () => {
-    try {
-      const [brandsData, categoriesData] = await Promise.all([
-        brandService.getBrands(),
-        categoryService.getCategories(),
-      ]);
-      setBrands(brandsData);
-      setCategories(categoriesData);
-    } catch (error) {
-      console.error('Failed to fetch brands and categories:', error);
-    }
-  };
-
-  const fetchProduct = async () => {
-    try {
-      const product = await productService.getProduct(id);
+    if (isEdit && product) {
+      // Extract UUIDs from brand and category objects
       const brandUuid = typeof product.brand === 'object' ? product.brand.brand_uuid : product.brand;
       const categoryUuid = typeof product.category === 'object' ? product.category.category_uuid : product.category;
 
@@ -62,27 +62,8 @@ const ProductForm = () => {
         is_active: product.is_active ?? true,
         is_featured: product.is_featured ?? false,
       });
-    } catch (error) {
-      console.error('Failed to fetch product:', error);
-      setError('Failed to load product data');
     }
-  };
-
-  const renderCategoryOptions = (categories, level = 0) => {
-    let options = [];
-    categories.forEach((category) => {
-      const prefix = '  '.repeat(level);
-      options.push(
-        <option key={category.category_uuid} value={category.category_uuid}>
-          {prefix}{category.name}
-        </option>
-      );
-      if (category.children && category.children.length > 0) {
-        options = options.concat(renderCategoryOptions(category.children, level + 1));
-      }
-    });
-    return options;
-  };
+  }, [isEdit, product]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -94,29 +75,45 @@ const ProductForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
 
     try {
+      // Prepare data with string values for price and disc as expected by API
       const productData = {
-        ...formData,
-        price: parseFloat(formData.price),
-        disc: parseFloat(formData.disc) || 0,
+        name: formData.name,
+        description: formData.description,
+        price: formData.price.toString(),
+        disc: formData.disc.toString(),
+        brand: formData.brand, // Send UUID directly
+        category: formData.category, // Send UUID directly
+        is_active: formData.is_active,
+        is_featured: formData.is_featured,
       };
 
       if (isEdit) {
-        await productService.updateProduct(id, productData);
+        await updateProduct({ id, ...productData }).unwrap();
+        showSuccess('Product updated successfully');
       } else {
-        await productService.createProduct(productData);
+        await createProduct(productData).unwrap();
+        showSuccess('Product created successfully');
       }
 
       navigate('/products');
     } catch (error) {
-      setError(error.message || 'Failed to save product');
-    } finally {
-      setLoading(false);
+      console.error('API Error:', error);
+      const errorMessage = error.data?.message || error.message || 'Failed to save product';
+      setError(errorMessage);
+      showError(errorMessage);
     }
   };
+
+  if (isEdit && productLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -217,16 +214,12 @@ const ProductForm = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category *
               </label>
-              <select
-                name="category"
-                required
+              <NestedDropdown
+                categories={categories}
                 value={formData.category}
-                onChange={handleChange}
-                className="input-field"
-              >
-                <option value="">Select a category</option>
-                {renderCategoryOptions(categories)}
-              </select>
+                onChange={(value) => setFormData({ ...formData, category: value })}
+                placeholder="Select a category"
+              />
             </div>
           </div>
 
@@ -245,27 +238,49 @@ const ProductForm = () => {
           </div>
 
           <div className="mt-6 flex space-x-6">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                name="is_active"
-                checked={formData.is_active}
-                onChange={handleChange}
-                className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-              />
-              <span className="ml-2 text-sm text-gray-700">Active</span>
-            </label>
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    formData.is_active ? 'bg-blue-600' : 'bg-gray-200'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+                      formData.is_active ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+                <span className={`ml-3 text-sm font-medium ${
+                  formData.is_active ? 'text-green-700' : 'text-gray-500'
+                }`}>
+                  {formData.is_active ? 'Active' : 'Inactive'}
+                </span>
+              </div>
 
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                name="is_featured"
-                checked={formData.is_featured}
-                onChange={handleChange}
-                className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-              />
-              <span className="ml-2 text-sm text-gray-700">Featured</span>
-            </label>
+              <div className="flex items-center">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, is_featured: !formData.is_featured })}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    formData.is_featured ? 'bg-blue-600' : 'bg-gray-200'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+                      formData.is_featured ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+                <span className={`ml-3 text-sm font-medium ${
+                  formData.is_featured ? 'text-blue-700' : 'text-gray-500'
+                }`}>
+                  {formData.is_featured ? 'Featured' : 'Not Featured'}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 

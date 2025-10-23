@@ -10,6 +10,7 @@ const BrandList = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    is_active: true,
   });
 
   useEffect(() => {
@@ -38,7 +39,7 @@ const BrandList = () => {
       }
       setShowForm(false);
       setEditingBrand(null);
-      setFormData({ name: '', description: '' });
+      setFormData({ name: '', description: '', is_active: true });
       fetchBrands();
     } catch (error) {
       console.error('Failed to save brand:', error);
@@ -50,6 +51,7 @@ const BrandList = () => {
     setFormData({
       name: brand.name,
       description: brand.description || '',
+      is_active: brand.is_active ?? true,
     });
     setShowForm(true);
   };
@@ -68,7 +70,17 @@ const BrandList = () => {
   const resetForm = () => {
     setShowForm(false);
     setEditingBrand(null);
-    setFormData({ name: '', description: '' });
+    setFormData({ name: '', description: '', is_active: true });
+  };
+
+  const toggleActive = async (brand) => {
+    try {
+      const updatedData = { ...brand, is_active: !brand.is_active };
+      await brandService.updateBrand(brand.brand_uuid, updatedData);
+      fetchBrands();
+    } catch (error) {
+      console.error('Failed to update brand status:', error);
+    }
   };
 
   return (
@@ -120,6 +132,17 @@ const BrandList = () => {
                   placeholder="Enter brand description"
                 />
               </div>
+              <div>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_active}
+                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">Active</span>
+                </label>
+              </div>
               <div className="flex justify-end space-x-3">
                 <button
                   type="button"
@@ -168,25 +191,37 @@ const BrandList = () => {
                       <div className="flex space-x-2">
                         <button
                           onClick={() => handleEdit(brand)}
-                          className="text-yellow-600 hover:text-yellow-900"
+                          className="text-blue-600 hover:text-blue-900 transition-colors duration-150"
                         >
                           <Edit className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(brand.brand_uuid)}
-                          className="text-red-600 hover:text-red-900"
+                          className="text-red-600 hover:text-red-900 transition-colors duration-150"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-1 ${
-                      brand.is_active
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {brand.is_active ? 'Active' : 'Inactive'}
-                    </span>
+                    <div className="flex items-center mt-2">
+                      <button
+                        onClick={() => toggleActive(brand)}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                          brand.is_active ? 'bg-blue-600' : 'bg-gray-200'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform duration-200 ${
+                            brand.is_active ? 'translate-x-5' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                      <span className={`ml-2 text-sm font-medium ${
+                        brand.is_active ? 'text-green-700' : 'text-gray-500'
+                      }`}>
+                        {brand.is_active ? 'Active' : 'Inactive'}
+                      </span>
+                    </div>
                   </div>
                 </div>
                 {brand.description && (

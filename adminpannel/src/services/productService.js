@@ -4,7 +4,7 @@ export const productService = {
   // Get all products
   async getProducts(params = {}) {
     try {
-      const response = await api.get('/api/products/admin/list/', { params });
+      const response = await api.get('/api/products/', { params });
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch products' };
@@ -12,9 +12,9 @@ export const productService = {
   },
 
   // Get single product
-  async getProduct(id) {
+  async getProduct(productUuid) {
     try {
-      const response = await api.get(`/api/products/admin/${id}/`);
+      const response = await api.get(`/api/products/${productUuid}/`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch product' };
@@ -31,10 +31,10 @@ export const productService = {
     }
   },
 
-  // Update product
-  async updateProduct(id, productData) {
+  // Update product - using PATCH instead of PUT
+  async updateProduct(productUuid, productData) {
     try {
-      const response = await api.put(`/api/products/admin/${id}/update/`, productData);
+      const response = await api.patch(`/api/products/admin/${productUuid}/`, productData);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to update product' };
@@ -42,9 +42,9 @@ export const productService = {
   },
 
   // Delete product
-  async deleteProduct(id) {
+  async deleteProduct(productUuid) {
     try {
-      const response = await api.delete(`/api/products/admin/${id}/delete/`);
+      const response = await api.delete(`/api/products/admin/${productUuid}/`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to delete product' };

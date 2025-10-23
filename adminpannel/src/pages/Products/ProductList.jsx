@@ -1,95 +1,96 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Search, ListFilter as Filter, CreditCard as Edit, Trash2, Eye } from 'lucide-react';
-import { productService } from '../../services/productService';
-import { brandService } from '../../services/brandService';
-import { categoryService } from '../../services/categoryService';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { Plus, Search, CreditCard as Edit, Trash2 } from 'lucide-react';
+import { 
+  useGetProductsQuery, 
+  useDeleteProductMutation,
+  useGetBrandsQuery,
+  useGetCategoriesQuery 
+} from '../../store/api/apiSlice';
+import { setFilters } from '../../store/slices/productsSlice';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
+import NestedDropdown from '../../components/ui/NestedDropdown';
+import { useToast } from '../../hooks/useToast';
 
 const ProductList = () => {
-  const [products, setProducts] = useState([]);
-  const [brands, setBrands] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { showSuccess, showError } = useToast();
+  
+  const filters = useSelector(state => state.products.filters);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState({
+  const [localFilters, setLocalFilters] = useState({
     brand: '',
     category: '',
   });
 
+  // Debounced search
   useEffect(() => {
-    fetchBrandsAndCategories();
-  }, []);
+    const timer = setTimeout(() => {
+      dispatch(setFilters({ search: searchTerm }));
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm, dispatch]);
 
   useEffect(() => {
-    fetchProducts();
-  }, [searchTerm, filters]);
+    dispatch(setFilters(localFilters));
+  }, [localFilters, dispatch]);
 
-  const fetchBrandsAndCategories = async () => {
-    try {
-      const [brandsData, categoriesData] = await Promise.all([
-        brandService.getBrands(),
-        categoryService.getCategories(),
-      ]);
-      setBrands(brandsData);
-      setCategories(categoriesData);
-    } catch (error) {
-      console.error('Failed to fetch brands and categories:', error);
-    }
-  };
+  // API queries
+  const { 
+    data: products = [], 
+    isLoading: productsLoading, 
+    error: productsError 
+  } = useGetProductsQuery({
+    search: filters.search,
+    brand: filters.brand,
+    category: filters.category,
+  });
 
-  const flattenCategories = (categories, flattened = []) => {
-    categories.forEach((category) => {
-      flattened.push(category);
-      if (category.children && category.children.length > 0) {
-        flattenCategories(category.children, flattened);
-      }
-    });
-    return flattened;
-  };
+  const { data: brands = [] } = useGetBrandsQuery();
+  const { data: categories = [] } = useGetCategoriesQuery();
+  
+  const [deleteProduct, { isLoading: deleteLoading }] = useDeleteProductMutation();
 
-  const renderCategoryOptions = (categories, level = 0) => {
-    let options = [];
-    categories.forEach((category) => {
-      const prefix = '  '.repeat(level);
-      options.push(
-        <option key={category.category_uuid} value={category.category_uuid}>
-          {prefix}{category.name}
-        </option>
-      );
-      if (category.children && category.children.length > 0) {
-        options = options.concat(renderCategoryOptions(category.children, level + 1));
-      }
-    });
-    return options;
-  };
-
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const params = {
-        ...(searchTerm && { search: searchTerm }),
-        ...(filters.brand && { brand: filters.brand }),
-        ...(filters.category && { category: filters.category }),
-      };
-      const data = await productService.getProducts(params);
-      setProducts(data);
-    } catch (error) {
-      console.error('Failed to fetch products:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
+  const handleDelete = async (productUuid, productName) => {
+    if (window.confirm(`Are you sure you want to delete "${productName}"?`)) {
       try {
-        await productService.deleteProduct(id);
-        fetchProducts();
+        await deleteProduct(productUuid).unwrap();
+        showSuccess('Product deleted successfully');
       } catch (error) {
+        showError('Failed to delete product');
         console.error('Failed to delete product:', error);
       }
     }
   };
+
+  const handleRowClick = (productUuid, e) => {
+    // Don't navigate if clicking on action buttons
+    if (e.target.closest('.action-buttons')) {
+      return;
+    }
+    navigate(`/products/${productUuid}`);
+  };
+
+  const formatPrice = (price) => {
+    if (typeof price === 'string' && price.startsWith('₹')) {
+      return price;
+    }
+    return `₹${parseFloat(price || 0).toFixed(2)}`;
+  };
+
+  if (productsError) {
+    try {
+      return (
+        <div className="text-center py-8 text-red-500">
+          Failed to load products. Please try again.
+        </div>
+      );
+    } catch (error) {
+      console.error('Products error:', error);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -106,7 +107,7 @@ const ProductList = () => {
 
       {/* Search and Filters */}
       <div className="card">
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -119,11 +120,11 @@ const ProductList = () => {
               />
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <select
-              value={filters.brand}
-              onChange={(e) => setFilters({ ...filters, brand: e.target.value })}
-              className="input-field"
+              value={localFilters.brand}
+              onChange={(e) => setLocalFilters({ ...localFilters, brand: e.target.value })}
+              className="input-field min-w-[150px]"
             >
               <option value="">All Brands</option>
               {brands.map((brand) => (
@@ -132,124 +133,158 @@ const ProductList = () => {
                 </option>
               ))}
             </select>
-            <select
-              value={filters.category}
-              onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-              className="input-field"
-            >
-              <option value="">All Categories</option>
-              {renderCategoryOptions(categories)}
-            </select>
+            <NestedDropdown
+              categories={categories}
+              value={localFilters.category}
+              onChange={(value) => setLocalFilters({ ...localFilters, category: value })}
+              placeholder="All Categories"
+              className="min-w-[200px]"
+            />
           </div>
         </div>
       </div>
 
       {/* Products Table */}
       <div className="card">
-        {loading ? (
+        {productsLoading ? (
           <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+            <LoadingSpinner size="lg" />
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            No products found. Create your first product to get started.
+            {filters.search || filters.brand || filters.category 
+              ? 'No products match your filters.' 
+              : 'No products found. Create your first product to get started.'
+            }
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+          <div className="overflow-x-auto rounded-lg border border-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 bg-white">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Product
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Brand
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Category
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Price
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {products.map((product) => (
-                  <tr key={product.id} className="hover:bg-gray-50">
+                  <tr 
+                    key={product.product_uuid} 
+                    className="hover:bg-gray-50 cursor-pointer transition-colors duration-150"
+                    onClick={(e) => handleRowClick(product.product_uuid, e)}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        {product.thumbnail ? (
+                        {product.img ? (
                           <img
-                            src={product.thumbnail}
-                            alt={product.name}
-                            className="h-10 w-10 object-cover rounded-lg mr-4"
+                            src={product.img}
+                            alt={product.title}
+                            className="h-12 w-12 object-cover rounded-lg mr-4 shadow-sm"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div 
+                          className="h-12 w-12 bg-gray-200 rounded-lg mr-4 flex items-center justify-center text-gray-400 text-xs shadow-sm"
+                          style={{ display: product.img ? 'none' : 'flex' }}
+                        >
+                            No Img
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {product.title || product.name}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            ID: {product.product_uuid.slice(-8)}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        {product.brand?.logo && (
+                          <img
+                            src={product.brand.logo}
+                            alt={product.brand.name}
+                            className="h-6 w-6 object-contain mr-2 rounded"
                             onError={(e) => {
                               e.target.style.display = 'none';
                             }}
                           />
-                        ) : (
-                          <div className="h-10 w-10 bg-gray-200 rounded-lg mr-4 flex items-center justify-center text-gray-400 text-xs">
-                            No Img
-                          </div>
                         )}
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">
-                            {product.name}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {product.product_uuid}
-                          </div>
-                        </div>
+                        <span className="text-sm text-gray-900">
+                          {product.brand?.name || product.brand}
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {typeof product.brand === 'object' ? product.brand.name : product.brand}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {typeof product.category === 'object' ? product.category.name : product.category}
+                      {product.category?.name || product.category}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        ${product.net?.toFixed(2)}
+                        {formatPrice(product.net || product.price)}
                       </div>
-                      {product.disc > 0 && (
+                      {product.discount && (
                         <div className="text-xs text-gray-500 line-through">
-                          ${product.price?.toFixed(2)}
+                          {formatPrice(product.original)}
+                        </div>
+                      )}
+                      {product.discount && (
+                        <div className="text-xs text-green-600 font-medium">
+                          {product.discount}
                         </div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        product.is_active
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {product.is_active ? 'Active' : 'Inactive'}
-                      </span>
+                      <div className="flex flex-col space-y-1">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          product.is_active !== false
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {product.is_active !== false ? 'Active' : 'Inactive'}
+                        </span>
+                        {product.is_featured && (
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                            Featured
+                          </span>
+                        )}
+                      </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-2">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium action-buttons">
+                      <div className="flex space-x-3">
                         <Link
-                          to={`/products/${product.id}`}
-                          className="text-primary-600 hover:text-primary-900"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Link>
-                        <Link
-                          to={`/products/${product.id}/edit`}
-                          className="text-yellow-600 hover:text-yellow-900"
+                          to={`/products/${product.product_uuid}/edit`}
+                          className="text-blue-600 hover:text-blue-900 transition-colors duration-150"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <Edit className="h-4 w-4" />
                         </Link>
                         <button
-                          onClick={() => handleDelete(product.id)}
-                          className="text-red-600 hover:text-red-900"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(product.product_uuid, product.title || product.name);
+                          }}
+                          disabled={deleteLoading}
+                          className="text-red-600 hover:text-red-900 transition-colors duration-150 disabled:opacity-50"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>

@@ -106,7 +106,6 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         return rep
 
 class ProductVariantAttributeMediaUploadSerializer(serializers.ModelSerializer):
-    """Serializer for direct image upload for (variant, attribute_value) pair."""
     images = serializers.ListField(
         child=serializers.ImageField(), write_only=True
     )
@@ -119,22 +118,18 @@ class ProductVariantAttributeMediaUploadSerializer(serializers.ModelSerializer):
         images = validated_data.pop("images", [])
         instance, _ = ProductVariantAttributeMedia.objects.get_or_create(**validated_data)
 
-        # create ProductImage objects for each uploaded file
         from assets.models import ProductImage
-        uploaded = []
-        for img in images:
-            pic = ProductImage.objects.create(image=img)
-            uploaded.append(pic)
+        uploaded = [ProductImage.objects.create(image=img) for img in images]
 
         instance.images.set(uploaded)
-        instance.save()
         return instance
 
     def to_representation(self, instance):
         request = self.context.get("request")
         return {
+            "id": instance.id,
             "variant": instance.variant.id,
-            "attribute_value": instance.attribute_value.id,
+            "attribute_value": instance.attribute_value.value,
             "images": [
                 request.build_absolute_uri(img.image.url)
                 for img in instance.images.all()

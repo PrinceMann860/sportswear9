@@ -13,7 +13,7 @@ urlpatterns = [
     path('admin/create/', admin_views.ProductCreateAPIView.as_view(), name='product-create'),
     
     # Product Update
-    path('admin/<str:product_uuid>/update/', admin_views.ProductUpdateAPIView.as_view(), name='product-update'),
+    path('admin/<str:product_uuid>/', admin_views.ProductUpdateAPIView.as_view(), name='product-update'),
 
     # Product Variants (nested under product)
     path('admin/<str:product_uuid>/variants/', admin_views.AddVariantAPIView.as_view(), name='product-add-variant'),
