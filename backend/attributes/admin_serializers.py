@@ -3,6 +3,7 @@ from .models import (
     Attribute, AttributeValue, ProductAttribute, ProductVariant, ProductVariantAttributeMedia
 )
 from assets.models import ProductImage
+from products.models import Product
 
 
 # ─────────────────────────────
@@ -32,8 +33,11 @@ class ProductAttributeSerializer(serializers.ModelSerializer):
     attribute_id = serializers.PrimaryKeyRelatedField(
         queryset=Attribute.objects.all(), source="attribute", write_only=True
     )
-    product_uuid = serializers.SerializerMethodField()
-
+    product_uuid = serializers.SlugRelatedField(
+        slug_field="product_uuid",
+        queryset=Product.objects.all(),
+        source="product"  # maps to FK
+    )
     class Meta:
         model = ProductAttribute
         fields = ['id', 'product_uuid', 'attribute', 'attribute_id']
@@ -70,18 +74,23 @@ class AttributeValueNestedSerializer(serializers.ModelSerializer):
 
 
 class ProductVariantSerializer(serializers.ModelSerializer):
+    product_uuid = serializers.SlugRelatedField(
+        slug_field="product_uuid",
+        queryset=Product.objects.all(),
+        source="product"  # maps product_uuid → product FK internally
+    )
     attributes = AttributeValueNestedSerializer(many=True, read_only=True)
     attribute_ids = serializers.PrimaryKeyRelatedField(
-        many=True, source="attributes", queryset=AttributeValue.objects.all(), write_only=True
+        many=True,
+        source="attributes",
+        queryset=AttributeValue.objects.all(),
+        write_only=True
     )
-    product_uuid = serializers.SerializerMethodField()
-    # images = serializers.SerializerMethodField()
-
     class Meta:
         model = ProductVariant
         fields = [
             "id", "product_uuid", "sku", "price", "net", "is_default",
-            "attributes", "attribute_ids" #, "images"
+            "attributes", "attribute_ids"
         ]
 
     def get_product_uuid(self, obj):

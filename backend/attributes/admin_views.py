@@ -40,11 +40,26 @@ class ProductAttributeAdminView(generics.ListCreateAPIView):
     serializer_class = ProductAttributeSerializer
     permission_classes = [permissions.IsAdminUser]
 
+    def get_queryset(self):
+        product_uuid = self.request.query_params.get("product_uuid")
+        qs = super().get_queryset()
+        if product_uuid:
+            qs = qs.filter(product__product_uuid=product_uuid)
+        return qs
+
+
 
 class ProductVariantAdminView(generics.ListCreateAPIView):
     queryset = ProductVariant.objects.all()
     serializer_class = ProductVariantSerializer
     permission_classes = [permissions.IsAdminUser]
+
+    def get_queryset(self):
+        product_uuid = self.request.query_params.get("product_uuid")
+        qs = super().get_queryset()
+        if product_uuid:
+            qs = qs.filter(product__product_uuid=product_uuid)
+        return qs
 
 class ProductVariantAttributeMediaViewSet(viewsets.ModelViewSet):
     """

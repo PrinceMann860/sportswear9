@@ -188,10 +188,10 @@ const CategoryList = () => {
             </div>
           </td>
           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            {hasChildren ? `${category.children.length} subcategories` : 'No subcategories'}
+            {hasChildren ? `${category.children.length} subcategories` : '0'}
           </td>
           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            {category.created_at ? new Date(category.created_at).toLocaleDateString() : 'N/A'}
+            {category.category_uuid || 'N/A'}
           </td>
           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
             <div className="flex space-x-3">
@@ -237,7 +237,7 @@ const CategoryList = () => {
 
       {/* Category Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-lg font-semibold mb-4">
               {editingCategory ? 'Edit Category' : 'Add New Category'}
@@ -334,7 +334,7 @@ const CategoryList = () => {
                     Subcategories
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created
+                    Category uuid
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions

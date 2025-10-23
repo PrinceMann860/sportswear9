@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Package, Tag, Layers, ChartBar as BarChart3, Settings, LogOut, Hop as Home } from 'lucide-react';
+import { LayoutDashboard, Package, Tag, Layers, ChartBar as BarChart3, Settings, LogOut, Hop as Home, Palette } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const Sidebar = () => {
@@ -9,6 +9,7 @@ const Sidebar = () => {
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
     { name: 'Homepage', href: '/homepage', icon: Home },
     { name: 'Products', href: '/products', icon: Package },
+    { name: 'Attributes', href: '/attributes', icon: Palette },
     { name: 'Brands', href: '/brands', icon: Tag },
     { name: 'Categories', href: '/categories', icon: Layers },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },

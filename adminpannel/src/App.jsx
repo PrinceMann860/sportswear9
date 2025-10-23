@@ -11,6 +11,7 @@ import ProductForm from './pages/Products/ProductForm';
 import ProductDetails from './pages/Products/ProductDetails';
 import BrandList from './pages/Brands/BrandList';
 import CategoryList from './pages/Categories/CategoryList';
+import AttributeList from './pages/Attributes/AttributeList.jsx';
 import HomepageManager from './pages/Homepage/HomepageManager';
 import ToastContainer from './components/ui/ToastContainer';
 
@@ -35,6 +36,7 @@ function App() {
               <Route path="products/new" element={<ProductForm />} />
               <Route path="products/:id/edit" element={<ProductForm />} />
               <Route path="products/:id" element={<ProductDetails />} />
+              <Route path="attributes" element={<AttributeList />} />
               <Route path="brands" element={<BrandList />} />
               <Route path="categories" element={<CategoryList />} />
               <Route path="analytics" element={<div className="p-6">Analytics coming soon...</div>} />
