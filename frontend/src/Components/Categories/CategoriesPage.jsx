@@ -1,9 +1,60 @@
-// /src/pages/ExplorePage.jsx
-import React, { useMemo, useState } from "react";
-import CategoryCarousel from "../Home/CategoryCarousel";
+// ✅ CategoriesPage.jsx — upgraded with Product.jsx-style filtering logic (tags + rating preserved)
+
+import React, { useMemo, useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import {
+  fetchProducts,
+  selectAllProducts,
+  selectProductsLoading,
+  selectProductsError,
+} from "../Product/productslice";
 import { ProductCard } from "../Product/Product";
+import SkeletonLoader from "../Home/SkeletonLoader";
 
 function CategoriesPage() {
+  const dispatch = useDispatch();
+  const apiProducts = useSelector(selectAllProducts);
+  const loading = useSelector(selectProductsLoading);
+  const error = useSelector(selectProductsError);
+
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
+  // ✅ Unified transform — consistent with Product.jsx
+  const transformProductData = (p) => ({
+    id: p.product_uuid,
+    title: p.name,
+    brand: p.brand?.name || "Unbranded",
+    category: p.category?.name || "Uncategorized",
+    priceValue: parseFloat(p.net || p.price) || 0,
+    price: `₹${parseFloat(p.net || p.price).toFixed(2)}`,
+    discount: p.disc && p.disc !== "0.00" ? `${p.disc}% OFF` : "",
+    original:
+      p.disc && p.disc !== "0.00"
+        ? `₹${(
+            parseFloat(p.net || p.price) /
+            (1 - parseFloat(p.disc) / 100)
+          ).toFixed(2)}`
+        : "",
+    tags: Array.isArray(p.tags)
+      ? p.tags
+      : typeof p.tags === "string"
+      ? p.tags.split(",").map((t) => t.trim())
+      : [],
+    rating: parseFloat(p.rating) || parseFloat(p.average_rating) || 4.2,
+    img:
+      p.thumbnail ||
+      "https://static.nike.com/a/images/t_PDP_936_v1/f_auto,q_auto:eco/022814da-3098-4c8e-b6f9-3692dc1b4207/W+FLEX+EXPERIENCE+RN+12.png",
+    img2:
+      p.thumbnail ||
+      "https://acrossports.s3.amazonaws.com/productPhotos/NIKE/DV0746004/DV0746004_6.jpg",
+  });
+
+  const products = apiProducts.map(transformProductData);
+
+  // ✅ Sidebar data
   const categories = [
     {
       id: "all",
@@ -37,153 +88,91 @@ function CategoriesPage() {
     },
   ];
 
-  // Final 9-item sportswear product list (realistic product images)
-  const products = [
-    {
-      id: 1,
-      title: "Black Performance Hoodie",
-      price: 2499,
-      category: "men",
-      rating: 4.7,
-      tags: ["hoodie", "training"],
-      img: "https://gymtier.com/cdn/shop/files/feralfitnessfront-black-front-hoodie-2_5f06c2be-8172-4809-8aa9-359f68b83427.jpg?v=1709201936",
-    },
-    {
-      id: 2,
-      title: "Grey Tech-Fit Joggers",
-      price: 1999,
-      category: "men",
-      rating: 4.5,
-      tags: ["joggers", "running"],
-      img: "https://1565619539.rsc.cdn77.org/temp/1756134447_369089d95fcb0bf6ed8a9bb009ae48ea.jpg",
-    },
-    {
-      id: 3,
-      title: "Red Mesh Training Tee",
-      price: 1499,
-      category: "women",
-      rating: 4.6,
-      tags: ["tee", "workout"],
-      img: "https://bullshakefit.com/cdn/shop/files/mesh-panel-oversized-training-tee-red-oversized-tee-bullshake-117191.jpg?v=1727876645&width=480",
-    },
-    {
-      id: 4,
-      title: "Oversized Gym Crop Top",
-      price: 1799,
-      category: "women",
-      rating: 4.4,
-      tags: ["crop", "yoga"],
-      img: "https://i.pinimg.com/736x/20/c4/30/20c430b6f3718ce3c23aeecc085bb4a2.jpg",
-    },
-    {
-      id: 5,
-      title: "Kids Soccer Jersey Set",
-      price: 1299,
-      category: "kids",
-      rating: 4.3,
-      tags: ["jersey", "team"],
-      img: "https://img.kwcdn.com/product/fancy/da06e076-439b-4681-8f1e-ebc2bc35fa4b.jpg?imageView2/2/w/500/q/60/format/webp",
-    },
-    {
-      id: 6,
-      title: "Kids Running Tracksuit",
-      price: 1599,
-      category: "kids",
-      rating: 4.2,
-      tags: ["tracksuit", "running"],
-      img: "https://xcdn.next.co.uk/common/items/default/default/itemimages/3_4Ratio/product/lge/F14329s.jpg?im=Resize,width=750",
-    },
-    {
-      id: 7,
-      title: "Unisex Adjustable Cap",
-      price: 799,
-      category: "sports",
-      rating: 4.1,
-      tags: ["cap", "accessory"],
-      img: "https://m.media-amazon.com/images/I/61QVQ2nqeFL._AC_UY1100_.jpg",
-    },
-    {
-      id: 8,
-      title: "Lightweight Gym Duffel",
-      price: 2299,
-      category: "sports",
-      rating: 4.6,
-      tags: ["duffel", "bag"],
-      img: "https://dynamic.zacdn.com/FSOwLQCbTIehL_lLxxCuaTUnqzE=/filters:quality(70):format(webp)/https://static-ph.zacdn.com/p/nike-3785-4204442-6.jpg",
-    },
-    {
-      id: 9,
-      title: "Performance Wrist Wraps",
-      price: 699,
-      category: "sports",
-      rating: 4.0,
-      tags: ["wraps", "accessory"],
-      img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmoYe8hGDuThNA5B1_yEZoBGyjNDE8uH3K2Q&s",
-    },
-  ];
-
-  // filter state
+  // ✅ States (unchanged UI)
   const [activeCategory, setActiveCategory] = useState("all");
   const [priceMax, setPriceMax] = useState(5000);
   const [minRating, setMinRating] = useState(0);
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState("latest");
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
 
+  const location = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const q = params.get("q") || "";
+    setQuery(q);
+  }, [location.search]);
+
+  // ✅ Extract unique tags
   const allTags = useMemo(() => {
-    const s = new Set();
-    products.forEach((p) => p.tags.forEach((t) => s.add(t)));
-    return Array.from(s);
+    const setTags = new Set();
+    products.forEach((p) => {
+      if (Array.isArray(p.tags)) p.tags.forEach((t) => setTags.add(t));
+    });
+    return Array.from(setTags);
   }, [products]);
 
-  function toggleTag(tag) {
+  const toggleTag = (tag) => {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
-  }
+  };
 
-  // filtering + sorting
+  // ✅ Modernized filtering (Product.jsx logic + your tags/rating)
   const filtered = useMemo(() => {
-    let list = products.slice();
+    let list = products.filter((p) => {
+      const categoryKey = activeCategory.toLowerCase();
 
-    if (activeCategory !== "all")
-      list = list.filter((p) => p.category === activeCategory);
-    list = list.filter((p) => p.price <= priceMax);
-    list = list.filter((p) => p.rating >= minRating);
-    if (selectedTags.length)
-      list = list.filter((p) => selectedTags.every((t) => p.tags.includes(t)));
-    if (query.trim()) {
-      const q = query.toLowerCase();
-      list = list.filter(
-        (p) =>
-          p.title.toLowerCase().includes(q) ||
-          p.tags.join(" ").toLowerCase().includes(q)
+      const matchesCategory =
+        activeCategory === "all" ||
+        p.category?.toLowerCase().includes(categoryKey) ||
+        p.title?.toLowerCase().includes(categoryKey) ||
+        p.brand?.toLowerCase().includes(categoryKey);
+
+      const matchesTags =
+        selectedTags.length === 0 ||
+        (Array.isArray(p.tags) &&
+          selectedTags.every((tag) => p.tags.includes(tag)));
+
+      const matchesPrice = p.priceValue <= priceMax;
+      const matchesRating = p.rating >= minRating;
+
+      const q = query.trim().toLowerCase();
+      const matchesQuery =
+        q.length === 0 ||
+        p.title.toLowerCase().includes(q) ||
+        p.brand.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q) ||
+        (Array.isArray(p.tags) && p.tags.join(" ").toLowerCase().includes(q));
+
+      return (
+        matchesCategory &&
+        matchesTags &&
+        matchesPrice &&
+        matchesRating &&
+        matchesQuery
       );
-    }
+    });
 
-    if (sortBy === "price-asc") list.sort((a, b) => a.price - b.price);
-    else if (sortBy === "price-desc") list.sort((a, b) => b.price - a.price);
-    else if (sortBy === "rating") list.sort((a, b) => b.rating - a.rating);
-    else if (sortBy === "latest") list.sort((a, b) => b.id - a.id);
+    // ✅ Sorting (same pattern as Product.jsx)
+    list.sort((a, b) => {
+      if (sortBy === "price-asc") return a.priceValue - b.priceValue;
+      if (sortBy === "price-desc") return b.priceValue - a.priceValue;
+      if (sortBy === "rating") return b.rating - a.rating;
+      return b.id.localeCompare(a.id); // latest by UUID
+    });
 
     return list;
   }, [
+    products,
     activeCategory,
+    selectedTags,
     priceMax,
     minRating,
-    selectedTags,
     query,
     sortBy,
-    products,
   ]);
 
-  // Close mobile filters
-  const closeMobileFilters = () => {
-    setShowMobileFilters(false);
-  };
-
-  // Reset all filters
   const resetAllFilters = () => {
     setActiveCategory("all");
     setSelectedTags([]);
@@ -191,31 +180,38 @@ function CategoriesPage() {
     setMinRating(0);
     setQuery("");
     setSortBy("latest");
-    setShowMobileFilters(false);
   };
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 mt-10">
-      {/* HERO / TOP */}
+      {/* HEADER */}
       <div className="max-w-7xl mx-auto px-4 pt-16 pb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-              Explore — Performance & Training
+              {query
+                ? `Search results for "${query}"`
+                : activeCategory === "all"
+                ? "All Products"
+                : `${
+                    activeCategory.charAt(0).toUpperCase() +
+                    activeCategory.slice(1)
+                  } Collection`}
             </h1>
             <p className="mt-2 text-gray-600 max-w-xl">
-              High-performance sportswear and gear. Filter by category, tags or
+              High-performance sportswear and gear. Filter by category, tags, or
               sort by price and rating.
             </p>
           </div>
 
+          {/* Search + Sort */}
           <div className="flex items-center gap-3 w-full md:w-auto">
             <div className="relative flex-1 md:flex-none">
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search products, tags or models"
-                className="w-full md:w-80 border border-gray-200 rounded-full py-2 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-red-400"
+                className="w-full md:w-80 border border-gray-200 rounded-full py-2 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               <svg
                 className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -249,11 +245,12 @@ function CategoriesPage() {
         </div>
       </div>
 
-      {/* MAIN: sidebar (filters) + products */}
+      {/* MAIN GRID */}
       <div className="max-w-7xl mx-auto px-4 pb-20 grid grid-cols-1 md:grid-cols-12 gap-6">
-        {/* LEFT: Filters & categories */}
+        {/* LEFT SIDEBAR */}
         <aside className="md:col-span-4 lg:col-span-3 space-y-6 hidden md:block">
           <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+            {/* Categories */}
             <h3 className="font-semibold text-lg">Categories</h3>
             <div className="mt-4 grid grid-cols-2 gap-3">
               {categories.map((c) => (
@@ -261,7 +258,7 @@ function CategoriesPage() {
                   key={c.id}
                   onClick={() => setActiveCategory(c.id)}
                   className={`relative h-28 rounded-lg overflow-hidden shadow-sm transform transition hover:scale-[1.02] ${
-                    activeCategory === c.id ? "ring-2 ring-red-300" : ""
+                    activeCategory === c.id ? "ring-2 ring-blue-300" : ""
                   }`}
                 >
                   <img
@@ -277,6 +274,7 @@ function CategoriesPage() {
               ))}
             </div>
 
+            {/* TAGS */}
             <div className="mt-5">
               <h4 className="text-sm text-gray-600">Tags</h4>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -286,7 +284,7 @@ function CategoriesPage() {
                     onClick={() => toggleTag(t)}
                     className={`px-3 py-1 rounded-full border text-sm ${
                       selectedTags.includes(t)
-                        ? "bg-red-50 border-red-200 text-red-700"
+                        ? "bg-blue-50 border-blue-200 text-blue-700"
                         : "bg-white border-gray-200 text-gray-700"
                     }`}
                   >
@@ -296,13 +294,14 @@ function CategoriesPage() {
               </div>
             </div>
 
+            {/* PRICE */}
             <div className="mt-5">
               <h4 className="text-sm text-gray-600">Max Price</h4>
               <div className="mt-3 flex items-center gap-3">
                 <input
                   type="range"
-                  min={500}
-                  max={5000}
+                  min={100}
+                  max={12000}
                   step={100}
                   value={priceMax}
                   onChange={(e) => setPriceMax(Number(e.target.value))}
@@ -314,6 +313,7 @@ function CategoriesPage() {
               </div>
             </div>
 
+            {/* RATING */}
             <div className="mt-5">
               <h4 className="text-sm text-gray-600">Min Rating</h4>
               <div className="mt-2 flex gap-2">
@@ -323,7 +323,7 @@ function CategoriesPage() {
                     onClick={() => setMinRating(r)}
                     className={`px-3 py-1 rounded-lg border ${
                       minRating === r
-                        ? "bg-red-600 text-white border-red-700"
+                        ? "bg-blue-600 text-white border-blue-700"
                         : "bg-white border-gray-200 text-gray-700"
                     }`}
                   >
@@ -333,6 +333,7 @@ function CategoriesPage() {
               </div>
             </div>
 
+            {/* RESET */}
             <div className="mt-5 flex gap-2">
               <button
                 onClick={resetAllFilters}
@@ -340,119 +341,19 @@ function CategoriesPage() {
               >
                 Reset
               </button>
-              <button
-                onClick={() => {}}
-                className="flex-1 py-2 rounded-lg bg-black text-white"
-              >
-                Apply
-              </button>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-            <h3 className="font-semibold text-lg">Featured Picks</h3>
-            <div className="mt-4 space-y-3">
-              {products.slice(0, 3).map((p) => (
-                <div key={p.id} className="flex items-center gap-3">
-                  <img
-                    src={p.img}
-                    alt={p.title}
-                    className="w-16 h-16 object-cover rounded-md"
-                  />
-                  <div>
-                    <div className="font-medium">{p.title}</div>
-                    <div className="text-sm text-gray-500">₹{p.price}</div>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </aside>
 
-        {/* RIGHT: products */}
+        {/* RIGHT: GRID */}
         <div className="md:col-span-8 lg:col-span-9">
-          {/* sticky control bar */}
-          <div className="sticky top-20 z-20 bg-white/60 backdrop-blur-md border border-gray-100 rounded-lg px-4 py-3 mb-4 flex items-center justify-between gap-3 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-600">Showing</div>
-              <div className="font-semibold">{filtered.length} results</div>
-              <div className="h-6 w-px bg-gray-200 mx-3" />
-              <div className="hidden md:flex items-center gap-2">
-                <button
-                  onClick={() => setSortBy("latest")}
-                  className={`px-3 py-1 rounded ${
-                    sortBy === "latest"
-                      ? "bg-black text-white"
-                      : "bg-white border border-gray-200"
-                  }`}
-                >
-                  Latest
-                </button>
-                <button
-                  onClick={() => setSortBy("price-asc")}
-                  className={`px-3 py-1 rounded ${
-                    sortBy === "price-asc"
-                      ? "bg-black text-white"
-                      : "bg-white border border-gray-200"
-                  }`}
-                >
-                  Low Price
-                </button>
-                <button
-                  onClick={() => setSortBy("price-desc")}
-                  className={`px-3 py-1 rounded ${
-                    sortBy === "price-desc"
-                      ? "bg-black text-white"
-                      : "bg-white border border-gray-200"
-                  }`}
-                >
-                  High Price
-                </button>
-                <button
-                  onClick={() => setSortBy("rating")}
-                  className={`px-3 py-1 rounded ${
-                    sortBy === "rating"
-                      ? "bg-black text-white"
-                      : "bg-white border border-gray-200"
-                  }`}
-                >
-                  Top Rated
-                </button>
-              </div>
+          {loading ? (
+            <SkeletonLoader count={8} />
+          ) : error ? (
+            <div className="text-center py-10 text-blue-600 font-medium">
+              Failed to load products. Please try again.
             </div>
-
-            <div className="flex items-center gap-3">
-              <div className="hidden sm:flex items-center gap-2">
-                <select
-                  value={activeCategory}
-                  onChange={(e) => setActiveCategory(e.target.value)}
-                  className="border border-gray-200 rounded-full py-2 px-3 bg-white"
-                >
-                  <option value="all">All</option>
-                  <option value="men">Men</option>
-                  <option value="women">Women</option>
-                  <option value="kids">Kids</option>
-                  <option value="sports">Sports</option>
-                </select>
-              </div>
-              <button
-                onClick={() => setShowMobileFilters(true)}
-                className="md:hidden px-3 py-2 rounded-full border border-gray-200 bg-white"
-              >
-                Filters
-              </button>
-            </div>
-          </div>
-
-          {/* product grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filtered.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-
-          {/* empty state */}
-          {filtered.length === 0 && (
+          ) : filtered.length === 0 ? (
             <div className="mt-8 bg-white p-8 rounded-lg shadow text-center">
               <h3 className="text-lg font-semibold">No results</h3>
               <p className="text-gray-600 mt-2">
@@ -467,162 +368,15 @@ function CategoriesPage() {
                 </button>
               </div>
             </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {filtered.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
           )}
         </div>
       </div>
-
-      {/* MOBILE: slide-up filter sheet */}
-      {showMobileFilters && (
-        <div className="fixed inset-0 z-50">
-          {/* backdrop */}
-          <div
-            onClick={closeMobileFilters}
-            className="absolute inset-0 bg-black/40"
-          />
-
-          {/* sheet */}
-          <div className="absolute left-0 right-0 bottom-0 bg-white rounded-t-2xl shadow-xl transform transition-transform">
-            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-              <h4 className="text-lg font-semibold">Filters</h4>
-              <button
-                onClick={closeMobileFilters}
-                className="text-gray-600 px-2 py-1 rounded"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="p-4 space-y-4 max-h-[60vh] overflow-auto">
-              <div>
-                <h5 className="text-sm font-medium">Category</h5>
-                <div className="mt-2 flex gap-2 flex-wrap">
-                  <button
-                    onClick={() => setActiveCategory("all")}
-                    className={`px-3 py-1 rounded-full border ${
-                      activeCategory === "all"
-                        ? "bg-red-50 border-red-200 text-red-700"
-                        : "bg-white border-gray-200"
-                    }`}
-                  >
-                    All
-                  </button>
-                  <button
-                    onClick={() => setActiveCategory("men")}
-                    className={`px-3 py-1 rounded-full border ${
-                      activeCategory === "men"
-                        ? "bg-red-50 border-red-200 text-red-700"
-                        : "bg-white border-gray-200"
-                    }`}
-                  >
-                    Men
-                  </button>
-                  <button
-                    onClick={() => setActiveCategory("women")}
-                    className={`px-3 py-1 rounded-full border ${
-                      activeCategory === "women"
-                        ? "bg-red-50 border-red-200 text-red-700"
-                        : "bg-white border-gray-200"
-                    }`}
-                  >
-                    Women
-                  </button>
-                  <button
-                    onClick={() => setActiveCategory("kids")}
-                    className={`px-3 py-1 rounded-full border ${
-                      activeCategory === "kids"
-                        ? "bg-red-50 border-red-200 text-red-700"
-                        : "bg-white border-gray-200"
-                    }`}
-                  >
-                    Kids
-                  </button>
-                  <button
-                    onClick={() => setActiveCategory("sports")}
-                    className={`px-3 py-1 rounded-full border ${
-                      activeCategory === "sports"
-                        ? "bg-red-50 border-red-200 text-red-700"
-                        : "bg-white border-gray-200"
-                    }`}
-                  >
-                    Sports
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <h5 className="text-sm font-medium">Tags</h5>
-                <div className="mt-2 flex gap-2 flex-wrap">
-                  {allTags.map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => toggleTag(t)}
-                      className={`px-3 py-1 rounded-full border ${
-                        selectedTags.includes(t)
-                          ? "bg-red-50 border-red-200 text-red-700"
-                          : "bg-white border-gray-200 text-gray-700"
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h5 className="text-sm font-medium">Max Price</h5>
-                <div className="mt-2">
-                  <input
-                    type="range"
-                    min={500}
-                    max={5000}
-                    step={100}
-                    value={priceMax}
-                    onChange={(e) => setPriceMax(Number(e.target.value))}
-                    className="w-full"
-                  />
-                  <div className="mt-2 text-sm font-semibold">
-                    Up to ₹{priceMax}
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h5 className="text-sm font-medium">Minimum rating</h5>
-                <div className="mt-2 flex gap-2">
-                  {[0, 3, 4, 4.5].map((r) => (
-                    <button
-                      key={r}
-                      onClick={() => setMinRating(r)}
-                      className={`px-3 py-1 rounded-lg border ${
-                        minRating === r
-                          ? "bg-red-600 text-white border-red-700"
-                          : "bg-white border-gray-200 text-gray-700"
-                      }`}
-                    >
-                      {r === 0 ? "Any" : `${r}+`}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="p-4 border-t border-gray-100 flex gap-3">
-              <button
-                onClick={resetAllFilters}
-                className="flex-1 py-3 rounded-lg border"
-              >
-                Reset
-              </button>
-              <button
-                onClick={closeMobileFilters}
-                className="flex-1 py-3 rounded-lg bg-black text-white"
-              >
-                Apply
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

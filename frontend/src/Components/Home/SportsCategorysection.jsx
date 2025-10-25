@@ -19,7 +19,7 @@ const SportsCategorySection = () => {
         EQUIPPING CHAMPIONS
       </h2>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 lg:gap-12 xl:gap-20 2xl:gap-40">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 lg:gap-12 xl:gap-15 2xl:gap-30">
         {categories.map((item, index) => (
           <div
             key={index}

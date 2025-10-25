@@ -138,16 +138,16 @@ const Footer = () => {
             {/* SOCIAL ICONS */}
             <h3 className="font-bold mb-2">FOLLOW US</h3>
             <div className="flex gap-4 mb-4 w-full justify-evenly">
-              <a href="#" className="bg-gray-700 p-1">
+              <a href="#" className="bg-gray-700 p-1 rounded-sm">
                 <FaFacebook size={30} className="text-white" />
               </a>
-              <a href="#" className="bg-gray-700 p-1">
+              <a href="#" className="bg-gray-700 p-1 rounded-sm">
                 <FaInstagram size={30} className="text-white" />
               </a>
-              <a href="#" className="bg-gray-700 p-1">
+              <a href="#" className="bg-gray-700 p-1 rounded-sm">
                 <FaTwitter size={30} className="text-white" />
               </a>
-              <a href="#" className="bg-gray-700 p-1">
+              <a href="#" className="bg-gray-700 p-1 rounded-sm">
                 <FaYoutube size={30} className="text-white" />
               </a>
             </div>

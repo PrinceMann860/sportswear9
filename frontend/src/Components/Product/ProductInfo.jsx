@@ -16,7 +16,12 @@ import {
   Ruler,
   Plus,
   Minus,
-  ShoppingCart
+  ShoppingCart,
+  Clock,
+  Award,
+  Leaf,
+  Users,
+  ArrowRight
 } from "lucide-react";
 import { fetchProductDetail, clearProductDetail } from "./Productdetailslice";
 import RecommendedProducts from "../Home/RecommendedProducts";
@@ -190,7 +195,7 @@ const ProductInfo = () => {
   }, [product, selectedColorObj]);
 
   const handleAddToCart = () => {
-    alert("Added to cart - Decathlon style!");
+    alert("Added to cart - SportsWear9 style!");
   };
 
   if (loading) {
@@ -207,8 +212,8 @@ const ProductInfo = () => {
     return null;
   }
 
-  // Decathlon-style product data
-  const decathlonProduct = {
+  // Enhanced SportsWear9-style product data
+  const SportsWear9Product = {
     title: product.title,
     price: product.price,
     original: product.original,
@@ -219,8 +224,19 @@ const ProductInfo = () => {
     inStock: product.inStock,
     rating: 4.2,
     reviewCount: 128,
-    deliveryDate: "2-3 days",
-    brand: product.brand?.name || "Decathlon"
+    deliveryDate: "10-15 days",
+    brand: product.brand?.name || "SportsWear9",
+    // Additional data
+    madeIn: "India",
+    warranty: "2 Years",
+    sustainability: "Top Quality materials",
+    usage: "Professional & Casual",
+    skillLevel: "Beginner to Advanced",
+    material: "100% Recycled Polyester",
+    weight: "450g",
+    care: "Machine Washable",
+    activityType: "Running, Training, Outdoor",
+    bestFor: "All weather conditions"
   };
 
   const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
@@ -231,16 +247,44 @@ const ProductInfo = () => {
     "Breathable fabric"
   ];
 
+  // Trust badges data
+  const trustBadges = [
+    { icon: <Shield className="w-5 h-5" />, text: "2 Year Warranty" },
+    { icon: <RefreshCw className="w-5 h-5" />, text: "Easy Returns" },
+    { icon: <Award className="w-5 h-5" />, text: "Quality Certified" },
+    { icon: <Leaf className="w-5 h-5" />, text: "Top Quality" }
+  ];
+
+  // Product highlights
+  const productHighlights = [
+    "Designed and tested by sports experts",
+    "Suitable for multiple sports activities",
+    "Durable construction for long-lasting use",
+    "Comfort fit for extended wear",
+    "Moisture-wicking technology",
+    "Anti-odor treatment"
+  ];
+
   return (
     <div className="pt-20 bg-white">
 
-      {/* Main Product Section - Decathlon Layout */}
+      {/* Main Product Section - SportsWear9 Layout */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid lg:grid-cols-2 gap-12">
           
           {/* Left Column - Product Gallery */}
           <div className="space-y-4">
             <ProductGallery images={galleryImages}/>
+            
+            {/* Trust Badges */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6">
+              {trustBadges.map((badge, index) => (
+                <div key={index} className="flex flex-col items-center text-center p-3 bg-gray-50 rounded-lg">
+                  <div className="text-blue-600 mb-2">{badge.icon}</div>
+                  <span className="text-xs font-medium text-gray-700">{badge.text}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Right Column - Product Info */}
@@ -248,10 +292,10 @@ const ProductInfo = () => {
             {/* Brand and Title */}
             <div>
               <span className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
-                {decathlonProduct.brand}
+                {SportsWear9Product.brand}
               </span>
               <h1 className="text-2xl font-bold text-gray-900 mt-1">
-                {decathlonProduct.title}
+                {SportsWear9Product.title}
               </h1>
             </div>
 
@@ -264,7 +308,7 @@ const ProductInfo = () => {
                       key={star}
                       size={16}
                       className={`${
-                        star <= Math.floor(decathlonProduct.rating)
+                        star <= Math.floor(SportsWear9Product.rating)
                           ? "text-yellow-400 fill-yellow-400"
                           : "text-gray-300"
                       }`}
@@ -272,35 +316,57 @@ const ProductInfo = () => {
                   ))}
                 </div>
                 <span className="text-sm font-medium text-gray-700">
-                  {decathlonProduct.rating}
+                  {SportsWear9Product.rating}
                 </span>
               </div>
               <span className="text-sm text-gray-500">
-                ({decathlonProduct.reviewCount} reviews)
+                ({SportsWear9Product.reviewCount} reviews)
               </span>
-              <button className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm">
-                <Share2 size={14} />
-                Share
-              </button>
+              
+            </div>
+
+            {/* Made in India Badge */}
+            <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1 rounded-full">
+              <span className="text-sm font-medium">🇮🇳 Made in India</span>
             </div>
 
             {/* Price */}
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <span className="text-3xl font-bold text-gray-900">
-                  {decathlonProduct.price}
+                  {SportsWear9Product.price}
                 </span>
-                {decathlonProduct.original && (
+                {SportsWear9Product.original && (
                   <span className="text-xl text-gray-500 line-through">
-                    {decathlonProduct.original}
+                    {SportsWear9Product.original}
                   </span>
                 )}
               </div>
-              {decathlonProduct.discount && (
+              {SportsWear9Product.discount && (
                 <span className="inline-block bg-red-100 text-red-600 px-2 py-1 rounded text-sm font-semibold">
-                  Save {decathlonProduct.discount}
+                  Save {SportsWear9Product.discount}
                 </span>
               )}
+            </div>
+
+            {/* Quick Info Grid */}
+            <div className="grid grid-cols-2 gap-4 py-4">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-600">Delivery in {SportsWear9Product.deliveryDate}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-600">{SportsWear9Product.skillLevel}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Award className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-600">{SportsWear9Product.warranty} Warranty</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Leaf className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-600">{SportsWear9Product.sustainability}</span>
+              </div>
             </div>
 
             {/* Color Selection */}
@@ -355,6 +421,19 @@ const ProductInfo = () => {
               </div>
             </div>
 
+            {/* Product Highlights */}
+            <div className="bg-blue-50 rounded-lg p-4">
+              <h4 className="font-semibold text-gray-900 mb-3">Product Highlights</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {productHighlights.map((highlight, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">{highlight}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Add to Cart Section */}
             <div className="bg-gray-50 rounded-lg p-6 space-y-4">
               <div className="flex items-center justify-between">
@@ -394,10 +473,10 @@ const ProductInfo = () => {
               {/* Stock Status */}
               <div className="flex items-center gap-2 text-sm">
                 <div className={`w-2 h-2 rounded-full ${
-                  decathlonProduct.inStock ? 'bg-green-500' : 'bg-red-500'
+                  SportsWear9Product.inStock ? 'bg-green-500' : 'bg-red-500'
                 }`}></div>
-                <span className={decathlonProduct.inStock ? 'text-green-600' : 'text-red-600'}>
-                  {decathlonProduct.inStock ? 'In stock' : 'Out of stock'}
+                <span className={SportsWear9Product.inStock ? 'text-green-600' : 'text-red-600'}>
+                  {SportsWear9Product.inStock ? 'In stock' : 'Out of stock'}
                 </span>
                 <span className="text-gray-500">- Ready to ship</span>
               </div>
@@ -410,7 +489,17 @@ const ProductInfo = () => {
                 <div>
                   <p className="font-medium text-gray-900">Free delivery</p>
                   <p className="text-sm text-gray-600">
-                    Get it by {decathlonProduct.deliveryDate}
+                    Get it by {SportsWear9Product.deliveryDate}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg">
+                <MapPin className="w-5 h-5 text-blue-600" />
+                <div>
+                  <p className="font-medium text-gray-900">Store pickup available</p>
+                  <p className="text-sm text-gray-600">
+                    Check availability in stores near you
                   </p>
                 </div>
               </div>
@@ -424,8 +513,9 @@ const ProductInfo = () => {
             {[
               { id: 'description', label: 'Description' },
               { id: 'specifications', label: 'Specifications' },
-              { id: 'reviews', label: `Reviews (${decathlonProduct.reviewCount})` },
-              { id: 'shipping', label: 'Shipping & Returns' }
+              { id: 'reviews', label: `Reviews (${SportsWear9Product.reviewCount})` },
+              { id: 'shipping', label: 'Shipping & Returns' },
+              { id: 'features', label: 'Key Features' }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -447,10 +537,23 @@ const ProductInfo = () => {
               <div className="max-w-3xl">
                 <h3 className="text-lg font-semibold mb-4">Product Description</h3>
                 <p className="text-gray-700 leading-relaxed mb-6">
-                  {decathlonProduct.description}
+                  {SportsWear9Product.description}
                 </p>
+                
+                {/* Usage Section */}
+                <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                  <h4 className="font-semibold text-gray-900 mb-3">Recommended Usage</h4>
+                  <p className="text-gray-700 mb-4">
+                    Perfect for {SportsWear9Product.activityType}. Designed for {SportsWear9Product.skillLevel} level users and ideal for {SportsWear9Product.bestFor}.
+                  </p>
+                  <div className="flex items-center gap-2 text-blue-600 font-medium">
+                    <span>View usage guide</span>
+                    <ArrowRight size={16} />
+                  </div>
+                </div>
+
                 <div className="grid md:grid-cols-2 gap-6">
-                  {decathlonProduct.features.map((feature, index) => (
+                  {SportsWear9Product.features.map((feature, index) => (
                     <div key={index} className="flex items-start gap-3">
                       <Check className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
                       <div>
@@ -467,10 +570,38 @@ const ProductInfo = () => {
               <div className="max-w-2xl">
                 <h3 className="text-lg font-semibold mb-6">Technical Specifications</h3>
                 <div className="bg-gray-50 rounded-lg overflow-hidden">
-                  {Object.entries(decathlonProduct.specifications).map(([key, value]) => (
+                  {Object.entries({
+                    'Material': SportsWear9Product.material,
+                    'Weight': SportsWear9Product.weight,
+                    'Care Instructions': SportsWear9Product.care,
+                    'Made In': SportsWear9Product.madeIn,
+                    'Warranty': SportsWear9Product.warranty,
+                    'Activity Type': SportsWear9Product.activityType,
+                    'Skill Level': SportsWear9Product.skillLevel,
+                    ...SportsWear9Product.specifications
+                  }).map(([key, value]) => (
                     <div key={key} className="flex justify-between items-center py-4 px-6 border-b border-gray-200 last:border-b-0">
                       <span className="text-gray-600 font-medium">{key}</span>
                       <span className="text-gray-900 font-semibold">{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'features' && (
+              <div className="max-w-4xl">
+                <h3 className="text-lg font-semibold mb-6">Key Features & Benefits</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {productHighlights.map((highlight, index) => (
+                    <div key={index} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-white text-sm font-bold">{index + 1}</span>
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-1">Enhanced Performance</h4>
+                        <p className="text-sm text-gray-600">{highlight}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -499,6 +630,7 @@ const ProductInfo = () => {
                       <li>• Free standard delivery on orders over ₹999</li>
                       <li>• Express delivery available</li>
                       <li>• Store pickup within 2 hours</li>
+                      <li>• Same day delivery in select cities</li>
                     </ul>
                   </div>
                   <div>
@@ -507,6 +639,7 @@ const ProductInfo = () => {
                       <li>• 30-day return policy</li>
                       <li>• Free returns for quality issues</li>
                       <li>• Easy online return process</li>
+                      <li>• No questions asked returns</li>
                     </ul>
                   </div>
                 </div>

@@ -79,7 +79,7 @@ function Navbar() {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      navigate(`/categories?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
       setShowSearch(false);
     }
@@ -158,14 +158,16 @@ function Navbar() {
             </Link>
 
             {/* Desktop Links */}
-            <div className="hidden lg:flex xl:space-x-8 lg:space-x-6 relative">
+            <div className="hidden lg:flex xl:space-x-6 lg:space-x-4 relative">
               {[
-                { name: "Home", to: "/" },
                 { name: "Men", to: "/product/men" },
                 { name: "Women", to: "/product/women" },
                 { name: "Kids", to: "/product/kids" },
-                { name: "Sports&Lifestyle", to: "/sports" },
-                { name: "Outlet", to: "/Categories" },
+                // { name: "SwimWear", to: "/product/swimwear"},
+                // { name: "Flash Clearance Sale", to: "/product/clearance"},
+                // { name: "New Arrivals", to: "/product/new-arrivals"},
+                { name: "Accessories", to: "/product/accessories" },
+                { name: "Contact", to: "/contact" },
               ].map((link) => (
                 <div
                   key={link.name}
@@ -684,13 +686,14 @@ function Navbar() {
 
           {/* Mobile Icons */}
           <div className="lg:hidden flex items-center space-x-3">
+            <Link to={'/categories'}>
             <button
-              onClick={() => setShowSearch(true)}
               className="p-2 rounded-full hover:bg-gray-200 transition-colors"
               aria-label="Search"
-            >
+              >
               <FiSearch size={20} className="cursor-pointer" />
             </button>
+              </Link>
             <Link
               to="/cart"
               className="p-2 rounded-full hover:bg-gray-200 transition-colors"
@@ -705,55 +708,7 @@ function Navbar() {
         <MobileSidebar isOpen={open} onClose={() => setOpen(false)} />
 
         {/* Mobile Search */}
-        {showSearch && (
-          <div className="fixed inset-0 bg-white z-[80] flex flex-col p-4 md:p-6 animate-slideDown overflow-scroll">
-            <div className="flex items-center mb-6 gap-3">
-              <form onSubmit={handleSearch} className="flex-1">
-                <input
-                  type="text"
-                  placeholder={placeholders[currentPlaceholder]}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  autoFocus
-                />
-              </form>
-              <button
-                onClick={() => setShowSearch(false)}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                aria-label="Close search"
-              >
-                <FiX size={24} className="cursor-pointer" />
-              </button>
-            </div>
-            <div className="mt-4">
-              <PortraitCarousel />
-            </div>
-            <div className="space-y-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 px-2">
-                Popular Searches
-              </p>
-              {suggestions
-                .filter((s) =>
-                  s.toLowerCase().includes(searchQuery.toLowerCase())
-                )
-                .map((s, i) => (
-                  <div
-                    key={i}
-                    className="p-3 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-gray-100 last:border-0"
-                    onClick={() => {
-                      setSearchQuery(s);
-                      navigate(`/search?q=${encodeURIComponent(s)}`);
-                      setShowSearch(false);
-                    }}
-                  >
-                    <FiSearch size={16} className="text-gray-400" />
-                    <span className="text-gray-700">{s}</span>
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
+        
       </nav>
 
       {/* Auth Modal */}
