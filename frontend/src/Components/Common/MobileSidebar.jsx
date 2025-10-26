@@ -28,7 +28,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
   const categories = [
     {
       id: 'men',
-      name: 'Men',
+      name: 'Men Collection',
       subcategories: [
         'T-Shirts',
         'Casual Shirts',
@@ -41,7 +41,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
     },
     {
       id: 'women',
-      name: 'Women',
+      name: 'Women Collection',
       subcategories: [
         'Kurtas & Suits',
         'Tops',
@@ -54,12 +54,45 @@ const MobileSidebar = ({ isOpen, onClose }) => {
     },
     {
       id: 'kids',
-      name: 'Kids',
+      name: 'Kids Collection',
       subcategories: ['T-Shirts', 'Shirts', 'Jeans', 'Dresses', 'Tops', 'Toys'],
     },
     {
-      id: 'sports',
-      name: 'Sports',
+      id: 'Swimwear',
+      name: 'SwimWear',
+      subcategories: [
+        'swimming goggles',
+        'pool Wear',
+        'Swimming Equipment',
+        'shorts',
+        'Swimwear Accessories',
+      ],
+    },
+    {
+      id: 'clearance',
+      name: 'Flash clearance Sale',
+      subcategories: [
+        'Running Shoes',
+        'Gym Wear',
+        'Sports Equipment',
+        'Tracksuits',
+        'Swimwear',
+      ],
+    },
+    {
+      id: 'new arrivals',
+      name: 'New Arrivals',
+      subcategories: [
+        'Running Shoes',
+        'Gym Wear',
+        'Sports Equipment',
+        'Tracksuits',
+        'Swimwear',
+      ],
+    },
+    {
+      id: 'Accessories',
+      name: 'Accessories',
       subcategories: [
         'Running Shoes',
         'Gym Wear',
@@ -84,14 +117,14 @@ const MobileSidebar = ({ isOpen, onClose }) => {
   return (
     <>
       <div
-        className={`fixed inset-0 bg-black transition-opacity duration-300 z-[60] md:hidden ${
+        className={`fixed inset-0 bg-black transition-opacity duration-300 z-[60] xl:hidden ${
           isOpen ? 'opacity-50 visible' : 'opacity-0 invisible'
         }`}
         onClick={onClose}
       />
 
       <div
-        className={`fixed top-0 left-0 h-full w-80 bg-white shadow-2xl z-[70] transform transition-transform duration-300 ease-out md:hidden overflow-y-auto ${
+        className={`fixed top-0 left-0 h-full w-80 bg-white shadow-2xl z-[70] transform transition-transform duration-300 ease-out xl:hidden overflow-y-auto ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >

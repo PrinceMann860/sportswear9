@@ -6,6 +6,7 @@ import { logout } from "../../store/slices/auth/authSlice";
 import logo from "../../assets/blacklogo.png";
 import AuthModal from "../Auth/AuthModal";
 import MobileSidebar from "./MobileSidebar";
+import { User, Package } from "lucide-react";
 import {
   FiSearch,
   FiUser,
@@ -16,7 +17,6 @@ import {
   FiLogOut,
 } from "react-icons/fi";
 import { ShoppingBag } from "lucide-react";
-import PortraitCarousel from "../Banner&Carousels/PortraitCarousel";
 
 function Navbar() {
   const dispatch = useDispatch();
@@ -46,7 +46,7 @@ function Navbar() {
     "your perfect sportswear...",
     "trending styles...",
     "athletic wear...",
-    "atest collections...",
+    "latest collections...",
   ];
 
   useEffect(() => {
@@ -78,6 +78,14 @@ function Navbar() {
 
   const handleSearch = (e) => {
     e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/categories?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+      setShowSearch(false);
+    }
+  };
+
+  const handleMobileSearch = () => {
     if (searchQuery.trim()) {
       navigate(`/categories?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
@@ -141,7 +149,7 @@ function Navbar() {
           <div className="flex items-center gap-8">
             <button
               onClick={() => setOpen(true)}
-              className="lg:hidden hover:bg-gray-200 p-2 rounded-md transition-colors"
+              className="xl:hidden hover:bg-gray-200 p-2 rounded-md transition-colors"
               aria-label="Open menu"
             >
               <FiMenu size={22} />
@@ -158,14 +166,14 @@ function Navbar() {
             </Link>
 
             {/* Desktop Links */}
-            <div className="hidden lg:flex xl:space-x-6 lg:space-x-4 relative">
+            <div className="hidden xl:flex space-x-4 relative">
               {[
-                { name: "Men", to: "/product/men" },
-                { name: "Women", to: "/product/women" },
-                { name: "Kids", to: "/product/kids" },
-                // { name: "SwimWear", to: "/product/swimwear"},
-                // { name: "Flash Clearance Sale", to: "/product/clearance"},
-                // { name: "New Arrivals", to: "/product/new-arrivals"},
+                { name: "Men Collection", to: "/product/men" },
+                { name: "Women Collection", to: "/product/women" },
+                { name: "Kids Collection", to: "/product/kids" },
+                { name: "SwimWear", to: "/product/swimwear" },
+                { name: "Flash Clearance Sale", to: "/product/clearance" },
+                { name: "New Arrivals", to: "/product/new-arrivals" },
                 { name: "Accessories", to: "/product/accessories" },
                 { name: "Contact", to: "/contact" },
               ].map((link) => (
@@ -177,7 +185,7 @@ function Navbar() {
                   <NavLink
                     to={link.to}
                     className={({ isActive }) =>
-                      `text-sm xl:text-base transition-all duration-200 hover:text-blue-600 relative pb-1 ${
+                      `text-sm 2xl:text-base transition-all duration-200 hover:text-blue-600 relative pb-1 ${
                         isActive
                           ? "text-blue-600 font-semibold"
                           : "text-gray-900"
@@ -186,16 +194,16 @@ function Navbar() {
                   >
                     {link.name}
                     <span
-                      className={`absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full`}
+                      className={`absolute bottom-[-25px] left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full`}
                     ></span>
                   </NavLink>
 
                   {/* MEN */}
-                  {link.name === "Men" && (
+                  {link.name === "Men Collection" && (
                     <div
-                      onMouseEnter={() => setHoveredLink("Men")}
+                      onMouseEnter={() => setHoveredLink("Men Collection")}
                       className={`transition-all duration-300 ease-out fixed left-0 right-0 top-[60px] lg:top-[80px] z-40 bg-white border-t border-gray-200 shadow-2xl ${
-                        hoveredLink === "Men"
+                        hoveredLink === "Men Collection"
                           ? "visible opacity-100 translate-y-0 pointer-events-auto"
                           : "invisible opacity-0 -translate-y-4 pointer-events-none"
                       }`}
@@ -334,11 +342,11 @@ function Navbar() {
                   )}
 
                   {/* WOMEN */}
-                  {link.name === "Women" && (
+                  {link.name === "Women Collection" && (
                     <div
-                      onMouseEnter={() => setHoveredLink("Women")}
+                      onMouseEnter={() => setHoveredLink("Women Collection")}
                       className={`transition-all duration-300 ease-out fixed left-0 right-0 top-[60px] lg:top-[80px] z-40 bg-white border-t border-gray-200 shadow-2xl ${
-                        hoveredLink === "Women"
+                        hoveredLink === "Women Collection"
                           ? "visible opacity-100 translate-y-0 pointer-events-auto"
                           : "invisible opacity-0 -translate-y-4 pointer-events-none"
                       }`}
@@ -477,11 +485,11 @@ function Navbar() {
                   )}
 
                   {/* KIDS */}
-                  {link.name === "Kids" && (
+                  {link.name === "Kids Collection" && (
                     <div
-                      onMouseEnter={() => setHoveredLink("Kids")}
+                      onMouseEnter={() => setHoveredLink("Kids Collection")}
                       className={`transition-all duration-300 ease-out fixed left-0 right-0 top-[60px] lg:top-[80px] z-40 bg-white border-t border-gray-200 shadow-2xl ${
-                        hoveredLink === "Kids"
+                        hoveredLink === "Kids Collection"
                           ? "visible opacity-100 translate-y-0 pointer-events-auto"
                           : "invisible opacity-0 -translate-y-4 pointer-events-none"
                       }`}
@@ -609,24 +617,16 @@ function Navbar() {
           </div>
 
           {/* Desktop Search + Icons */}
-          <div className="hidden lg:flex items-center lg:space-x-3 xl:space-x-5">
-            <form className="relative group" onSubmit={handleSearch}>
-              <input
-                type="text"
-                placeholder={`Search for ${placeholders[currentPlaceholder]}`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-[280px] xl:w-[350px] pl-4 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-300 placeholder:text-gray-400 bg-white/80 backdrop-blur-sm hover:bg-white placeholder-animate"
-              />
-
+          <div className="hidden lg:flex items-center lg:space-x-3">
+            {/* Search Icon Only */}
+            <Link to={"/categories"}>
               <button
-                type="submit"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors p-1 rounded-full hover:bg-blue-50"
-                aria-label="Search for "
+                className="p-2 rounded-full hover:bg-blue-50 transition-colors"
+                aria-label="Search"
               >
-                <FiSearch size={18} />
+                <FiSearch className="text-lg cursor-pointer hover:text-blue-600 transition-colors" />
               </button>
-            </form>
+            </Link>
 
             {isAuthenticated ? (
               <div className="relative" ref={userMenuRef}>
@@ -641,17 +641,55 @@ function Navbar() {
                 </button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-xl py-2 animate-slideIn">
-                    <button
-                      onClick={() => {
-                        dispatch(logout());
-                        setShowUserMenu(false);
-                      }}
-                      className="w-full px-4 py-2.5 text-left hover:bg-blue-50 flex items-center gap-3 text-gray-700 hover:text-blue-600 transition-colors rounded-lg mx-1"
+                  <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-2xl shadow-2xl py-3 animate-slideIn">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-semibold text-gray-900 truncate">
+                        {profile?.full_name}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {profile?.email}
+                      </p>
+                    </div>
+
+                    <Link
+                      to="/profile"
+                      onClick={() => setShowUserMenu(false)}
+                      className="w-full px-4 py-3 text-left hover:bg-blue-50 flex items-center gap-3 text-gray-700 hover:text-blue-600 transition-colors rounded-lg mx-1"
                     >
-                      <FiLogOut size={18} />
-                      <span className="font-medium">Logout</span>
-                    </button>
+                      <User size={18} className="text-blue-500" />
+                      <span className="font-medium">My Profile</span>
+                    </Link>
+
+                    <Link
+                      to="/wishlist"
+                      onClick={() => setShowUserMenu(false)}
+                      className="w-full px-4 py-3 text-left hover:bg-blue-50 flex items-center gap-3 text-gray-700 hover:text-blue-600 transition-colors rounded-lg mx-1"
+                    >
+                      <FiHeart size={18} className="text-pink-500" />
+                      <span className="font-medium">Wishlist</span>
+                    </Link>
+
+                    <Link
+                      to="/orders"
+                      onClick={() => setShowUserMenu(false)}
+                      className="w-full px-4 py-3 text-left hover:bg-blue-50 flex items-center gap-3 text-gray-700 hover:text-blue-600 transition-colors rounded-lg mx-1"
+                    >
+                      <Package size={18} className="text-green-500" />
+                      <span className="font-medium">My Orders</span>
+                    </Link>
+
+                    <div className="border-t border-gray-100 mt-2 pt-2">
+                      <button
+                        onClick={() => {
+                          dispatch(logout());
+                          setShowUserMenu(false);
+                        }}
+                        className="w-full px-4 py-3 text-left hover:bg-red-50 flex items-center gap-3 text-red-600 hover:text-red-700 transition-colors rounded-lg mx-1"
+                      >
+                        <FiLogOut size={18} />
+                        <span className="font-medium">Logout</span>
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -686,14 +724,14 @@ function Navbar() {
 
           {/* Mobile Icons */}
           <div className="lg:hidden flex items-center space-x-3">
-            <Link to={'/categories'}>
-            <button
-              className="p-2 rounded-full hover:bg-gray-200 transition-colors"
-              aria-label="Search"
+            <Link to={"/categories"}>
+              <button
+                className="p-2 rounded-full hover:bg-gray-200 transition-colors"
+                aria-label="Search"
               >
-              <FiSearch size={20} className="cursor-pointer" />
-            </button>
-              </Link>
+                <FiSearch size={20} className="cursor-pointer" />
+              </button>
+            </Link>
             <Link
               to="/cart"
               className="p-2 rounded-full hover:bg-gray-200 transition-colors"
@@ -706,9 +744,6 @@ function Navbar() {
 
         {/* Mobile Sidebar */}
         <MobileSidebar isOpen={open} onClose={() => setOpen(false)} />
-
-        {/* Mobile Search */}
-        
       </nav>
 
       {/* Auth Modal */}
