@@ -39,7 +39,7 @@ const CategoryGrid = ({
                 <img
                   src={category.image}
                   alt={category.name}
-                  className="w-full h-full object-fill transition-all duration-500"
+                  className="w-full h-full object-cover transition-all duration-500"
                   loading="lazy"
                 />
                 

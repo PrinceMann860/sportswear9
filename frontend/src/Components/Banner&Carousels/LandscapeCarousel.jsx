@@ -132,7 +132,7 @@ const LandscapeCarousel = ({ items = [] }) => {
                 <img
                   src={item.image}
                   alt={item.alt || item.title || `Banner ${index + 1}`}
-                  className="w-full h-full object-fill"
+                  className="w-full h-full object-fill rounded-xl md:rounded-2xl lg:rounded-4xl border-2 border-gray-200"
                   draggable="false"
                   loading="lazy"
                 />

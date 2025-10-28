@@ -1,28 +1,101 @@
-import React, { useState } from 'react';
-import { User, CreditCard as Edit3, MapPin, Phone, Mail, Calendar, Package, Heart, CreditCard, Settings, LogOut } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { useDispatch } from 'react-redux';
-import { logout } from '../../store/slices/auth/authSlice';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  User,
+  Edit3,
+  MapPin,
+  Heart,
+  CreditCard,
+  Settings,
+  LogOut,
+  Package,
+  Star,
+  Import,
+} from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { useDispatch } from "react-redux";
+import { logout } from "../../store/slices/auth/authSlice";
+import { Link } from "react-router-dom";
+
+// Helper function to calculate profile completion percentage
+const calculateProfileCompletion = (profileData) => {
+  const fields = [
+    profileData.fullName,
+    profileData.email,
+    profileData.phone,
+    profileData.dateOfBirth,
+    profileData.gender,
+    profileData.address.street,
+    profileData.address.city,
+    profileData.address.state,
+    profileData.address.pincode,
+  ];
+
+  const filledFields = fields.filter(
+    (field) => field && field.trim() !== ""
+  ).length;
+  return Math.round((filledFields / fields.length) * 100);
+};
 
 const ProfilePage = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
   const dispatch = useDispatch();
-  const [activeTab, setActiveTab] = useState('profile');
+
+  const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
-  const [profileData, setProfileData] = useState({
-    fullName: user?.full_name || 'John Doe',
-    email: user?.email || 'john.doe@example.com',
-    phone: '+91 9876543210',
-    dateOfBirth: '1990-01-15',
-    gender: 'Male',
-    address: {
-      street: '123 Main Street',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      pincode: '400001',
-      country: 'India'
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (window.google && document.getElementById("googleSignInDiv")) {
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        callback: (response) => {
+          // handle login success from Google
+          console.log("Google Login Success:", response);
+          navigate("/profile");
+        },
+      });
+
+      window.google.accounts.id.renderButton(
+        document.getElementById("googleSignInDiv"),
+        { theme: "outline", size: "large", width: "250" }
+      );
     }
+  }, []);
+  const [profileData, setProfileData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    dateOfBirth: "",
+    gender: "",
+    address: {
+      street: "",
+      city: "",
+      state: "",
+      pincode: "",
+      country: "India",
+    },
   });
+
+  // Initialize profile data when user data is available
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        fullName: user.full_name || "",
+        email: user.email || "",
+        phone: user.phone || "+91 9876543210",
+        dateOfBirth: user.date_of_birth || "1990-01-15",
+        gender: user.gender || "Male",
+        address: {
+          street: user.address?.street || "123 Main Street",
+          city: user.address?.city || "Mumbai",
+          state: user.address?.state || "Maharashtra",
+          pincode: user.address?.pincode || "400001",
+          country: user.address?.country || "India",
+        },
+      });
+    }
+  }, [user]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -30,298 +103,328 @@ const ProfilePage = () => {
 
   const handleSave = () => {
     setIsEditing(false);
-    // Here you would typically save to backend
-    console.log('Saving profile data:', profileData);
+    console.log("Saving profile data:", profileData);
+    // You can add an API call here to update user profile
   };
 
   const menuItems = [
-    { id: 'profile', label: 'Profile Info', icon: User },
-    { id: 'orders', label: 'My Orders', icon: Package },
-    { id: 'wishlist', label: 'Wishlist', icon: Heart },
-    { id: 'addresses', label: 'Addresses', icon: MapPin },
-    { id: 'payments', label: 'Payment Methods', icon: CreditCard },
-    { id: 'settings', label: 'Settings', icon: Settings },
+    {
+      id: "profile",
+      label: "Profile Info",
+      icon: User,
+      color: "text-blue-500",
+    },
+    {
+      id: "orders",
+      label: "My Orders",
+      icon: Package,
+      color: "text-green-500",
+    },
+    { id: "wishlist", label: "Wishlist", icon: Heart, color: "text-pink-500" },
+    {
+      id: "addresses",
+      label: "Addresses",
+      icon: MapPin,
+      color: "text-purple-500",
+    },
+    {
+      id: "payments",
+      label: "Payment Methods",
+      icon: CreditCard,
+      color: "text-orange-500",
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: Settings,
+      color: "text-gray-500",
+    },
   ];
 
-  if (!isAuthenticated) {
+  // ✅ NEW: handle global loading state safely
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-16 md:pt-20 pb-16 md:pb-0 flex items-center justify-center">
-        <div className="text-center p-6">
-          <User size={48} className="mx-auto text-gray-400 mb-4" />
-          <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Please Login</h2>
-          <p className="text-sm md:text-base text-gray-600 mb-4">You need to login to access your profile</p>
-          <button className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition font-semibold text-sm md:text-base">
-            Login Now
-          </button>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center">
+        <div className="text-center animate-pulse">
+          <div className="w-20 h-20 bg-blue-200 rounded-full mx-auto mb-6"></div>
+          <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+          <p className="text-gray-500 mt-6">Loading your profile...</p>
         </div>
       </div>
     );
   }
 
+  // When user not logged in
+if (!isAuthenticated) {
   return (
-    <div className="min-h-screen bg-gray-50 pt-16 md:pt-20 pb-16 md:pb-0">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center pt-16 md:pt-20 pb-16 md:pb-0">
+      <div className="text-center p-8 bg-white rounded-2xl shadow-lg max-w-md mx-4">
+        <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <User size={40} className="text-blue-500" />
+        </div>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">Please Login</h2>
+        <p className="text-gray-600 mb-6">You need to login to access your profile</p>
+        {/* 👇 same login button as Navbar */}
+        <div id="googleSignInDiv" className="flex justify-center"></div>
+      </div>
+    </div>
+  );
+}
+
+
+  // ✅ if user data still null but authenticated
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center">
+        <div className="text-center animate-pulse">
+          <div className="w-20 h-20 bg-blue-200 rounded-full mx-auto mb-6"></div>
+          <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+          <p className="text-gray-500 mt-6">Fetching your details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ✅ main UI after everything is ready
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 pt-16 md:pt-20 pb-16 md:pb-0">
       <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
-        <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
+        <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
           {/* Sidebar */}
-          <div className="w-full lg:w-80 bg-white rounded-lg shadow-sm p-4 md:p-6 h-fit">
-            {/* Profile Header */}
-            <div className="flex items-center gap-3 md:gap-4 mb-6 pb-6 border-b border-gray-200">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                <User className="w-6 h-6 md:w-8 md:h-8 text-blue-500" />
+          <div className="w-full lg:w-80 bg-white rounded-2xl shadow-xl p-6 h-fit border border-blue-100">
+            <div className="flex items-center gap-4 mb-8 pb-6 border-b border-blue-100">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                {user.profile_picture ? (
+                  <img
+                    src={user.profile_picture}
+                    alt="Profile"
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                ) : (
+                  <User className="w-8 h-8 text-white" />
+                )}
               </div>
-              <div>
-                <h3 className="font-semibold text-base md:text-lg text-gray-900">{profileData.fullName}</h3>
-                <p className="text-xs md:text-sm text-gray-600">{profileData.email}</p>
+              <div className="flex-1">
+                <h3 className="font-bold text-lg text-gray-900 truncate">
+                  {profileData.fullName || user.full_name || "User"}
+                </h3>
+                <p className="text-sm text-gray-600 truncate">
+                  {profileData.email || user.email}
+                </p>
+                <div className="flex items-center gap-1 mt-1">
+                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                  <span className="text-xs text-gray-500">
+                    {user.membership_type || "Premium Member"}
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* Menu Items */}
-            <nav className="space-y-1">
+            {/* Menu */}
+            <nav className="space-y-2">
               {menuItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 md:py-3 rounded-lg text-left transition-colors text-sm md:text-base ${
+                  className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl text-left transition-all duration-300 group ${
                     activeTab === item.id
-                      ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                      : 'text-gray-700 hover:bg-gray-50'
+                      ? "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-600 border border-blue-200 shadow-md"
+                      : "text-gray-700 hover:bg-blue-50 hover:text-blue-600 hover:shadow-sm"
                   }`}
                 >
-                  <item.icon className="w-4 h-4 md:w-5 md:h-5" />
-                  {item.label}
+                  <div
+                    className={`p-2 rounded-lg ${
+                      activeTab === item.id
+                        ? "bg-blue-100"
+                        : "bg-gray-100 group-hover:bg-blue-100"
+                    }`}
+                  >
+                    <item.icon className={`w-5 h-5 ${item.color}`} />
+                  </div>
+                  <span className="font-medium">{item.label}</span>
                 </button>
               ))}
-              
+
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-3 py-2.5 md:py-3 rounded-lg text-left transition-colors text-blue-600 hover:bg-blue-50 text-sm md:text-base"
+                className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-left transition-all duration-300 text-red-600 hover:bg-red-50 hover:shadow-sm group"
               >
-                <LogOut className="w-4 h-4 md:w-5 md:h-5" />
-                Logout
+                <div className="p-2 rounded-lg bg-red-100 group-hover:bg-red-200">
+                  <LogOut className="w-5 h-5" />
+                </div>
+                <span className="font-medium">Logout</span>
               </button>
             </nav>
+
+            {/* Profile Completion */}
+            <div className="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-200">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-blue-900">
+                  Profile Completion
+                </span>
+                <span className="text-sm font-bold text-blue-600">
+                  {calculateProfileCompletion(profileData)}%
+                </span>
+              </div>
+              <div className="w-full bg-blue-200 rounded-full h-2">
+                <div
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                  style={{
+                    width: `${calculateProfileCompletion(profileData)}%`,
+                  }}
+                ></div>
+              </div>
+            </div>
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 bg-white rounded-lg shadow-sm p-4 md:p-6">
-            {activeTab === 'profile' && (
+          <div className="flex-1 bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-blue-100">
+            {/* Profile Tab */}
+            {activeTab === "profile" && (
               <div>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
-                  <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2 sm:mb-0">Profile Information</h2>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                      Profile Information
+                    </h2>
+                    <p className="text-gray-600 mt-2">
+                      Manage your personal information and preferences
+                    </p>
+                  </div>
                   <button
-                    onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm md:text-base"
+                    onClick={() =>
+                      isEditing ? handleSave() : setIsEditing(true)
+                    }
+                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 mt-4 sm:mt-0"
                   >
                     <Edit3 className="w-4 h-4" />
-                    {isEditing ? 'Save Changes' : 'Edit Profile'}
+                    {isEditing ? "Save Changes" : "Edit Profile"}
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                    <input
-                      type="text"
-                      value={profileData.fullName}
-                      onChange={(e) => setProfileData({...profileData, fullName: e.target.value})}
-                      disabled={!isEditing}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 text-sm md:text-base"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                    <input
-                      type="email"
-                      value={profileData.email}
-                      disabled
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm md:text-base"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                    <input
-                      type="tel"
-                      value={profileData.phone}
-                      onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
-                      disabled={!isEditing}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 text-sm md:text-base"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
-                    <input
-                      type="date"
-                      value={profileData.dateOfBirth}
-                      onChange={(e) => setProfileData({...profileData, dateOfBirth: e.target.value})}
-                      disabled={!isEditing}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 text-sm md:text-base"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                {/* Personal Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                  <InputField
+                    label="Full Name"
+                    value={profileData.fullName}
+                    onChange={(e) =>
+                      setProfileData({
+                        ...profileData,
+                        fullName: e.target.value,
+                      })
+                    }
+                    disabled={!isEditing}
+                    variant="blue"
+                  />
+                  <InputField
+                    label="Email"
+                    value={profileData.email}
+                    disabled
+                    variant="gray"
+                  />
+                  <InputField
+                    label="Phone"
+                    value={profileData.phone}
+                    onChange={(e) =>
+                      setProfileData({ ...profileData, phone: e.target.value })
+                    }
+                    disabled={!isEditing}
+                    variant="blue"
+                  />
+                  <InputField
+                    label="Date of Birth"
+                    type="date"
+                    value={profileData.dateOfBirth}
+                    onChange={(e) =>
+                      setProfileData({
+                        ...profileData,
+                        dateOfBirth: e.target.value,
+                      })
+                    }
+                    disabled={!isEditing}
+                    variant="blue"
+                  />
+                  <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                    <label className="block text-sm font-semibold text-blue-900 mb-3">
+                      Gender
+                    </label>
                     <select
                       value={profileData.gender}
-                      onChange={(e) => setProfileData({...profileData, gender: e.target.value})}
+                      onChange={(e) =>
+                        setProfileData({
+                          ...profileData,
+                          gender: e.target.value,
+                        })
+                      }
                       disabled={!isEditing}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 text-sm md:text-base"
+                      className="w-full px-4 py-3 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-blue-100 text-gray-900 transition-all duration-300"
                     >
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
                       <option value="Other">Other</option>
-                      <option value="Prefer not to say">Prefer not to say</option>
+                      <option value="Prefer not to say">
+                        Prefer not to say
+                      </option>
                     </select>
                   </div>
                 </div>
 
                 {/* Address Section */}
-                <div className="mt-8">
-                  <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">Address</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
-                      <input
-                        type="text"
-                        value={profileData.address.street}
-                        onChange={(e) => setProfileData({
-                          ...profileData, 
-                          address: {...profileData.address, street: e.target.value}
-                        })}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 text-sm md:text-base"
-                      />
-                    </div>
+                <div className="mt-12">
+                  <div className="flex items-center gap-3 mb-6">
+                    <MapPin className="w-6 h-6 text-blue-500" />
+                    <h3 className="text-xl md:text-2xl font-bold text-gray-900">
+                      Address Information
+                    </h3>
+                  </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
-                      <input
-                        type="text"
-                        value={profileData.address.city}
-                        onChange={(e) => setProfileData({
-                          ...profileData, 
-                          address: {...profileData.address, city: e.target.value}
-                        })}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 text-sm md:text-base"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
-                      <input
-                        type="text"
-                        value={profileData.address.state}
-                        onChange={(e) => setProfileData({
-                          ...profileData, 
-                          address: {...profileData.address, state: e.target.value}
-                        })}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 text-sm md:text-base"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">PIN Code</label>
-                      <input
-                        type="text"
-                        value={profileData.address.pincode}
-                        onChange={(e) => setProfileData({
-                          ...profileData, 
-                          address: {...profileData.address, pincode: e.target.value}
-                        })}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 text-sm md:text-base"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
-                      <input
-                        type="text"
-                        value={profileData.address.country}
-                        onChange={(e) => setProfileData({
-                          ...profileData, 
-                          address: {...profileData.address, country: e.target.value}
-                        })}
-                        disabled={!isEditing}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 text-sm md:text-base"
-                      />
-                    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                    {["street", "city", "state", "pincode", "country"].map(
+                      (field) => (
+                        <InputField
+                          key={field}
+                          label={field.charAt(0).toUpperCase() + field.slice(1)}
+                          value={profileData.address[field]}
+                          onChange={(e) =>
+                            setProfileData({
+                              ...profileData,
+                              address: {
+                                ...profileData.address,
+                                [field]: e.target.value,
+                              },
+                            })
+                          }
+                          disabled={!isEditing}
+                          variant="blue"
+                          full={field === "street"}
+                        />
+                      )
+                    )}
                   </div>
                 </div>
               </div>
             )}
 
-            {activeTab === 'orders' && (
-              <div>
-                <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-6">My Orders</h2>
-                <div className="text-center py-12">
-                  <Package size={48} className="mx-auto text-gray-400 mb-4" />
-                  <p className="text-sm md:text-base text-gray-600">No orders found. Start shopping to see your orders here.</p>
-                </div>
-              </div>
+            {/* Orders */}
+            {activeTab === "orders" && (
+              <EmptyTab
+                icon={Package}
+                color="text-blue-400"
+                title="No orders found"
+                subtitle="Start shopping to see your orders here"
+              />
             )}
 
-            {activeTab === 'wishlist' && (
-              <div>
-                <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-6">My Wishlist</h2>
-                <div className="text-center py-12">
-                  <Heart size={48} className="mx-auto text-gray-400 mb-4" />
-                  <p className="text-sm md:text-base text-gray-600">Your wishlist is empty. Add items you love!</p>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'addresses' && (
-              <div>
-                <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-6">Saved Addresses</h2>
-                <div className="text-center py-12">
-                  <MapPin size={48} className="mx-auto text-gray-400 mb-4" />
-                  <p className="text-sm md:text-base text-gray-600">No saved addresses. Add an address for faster checkout.</p>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'payments' && (
-              <div>
-                <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-6">Payment Methods</h2>
-                <div className="text-center py-12">
-                  <CreditCard size={48} className="mx-auto text-gray-400 mb-4" />
-                  <p className="text-sm md:text-base text-gray-600">No payment methods saved. Add a payment method for faster checkout.</p>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'settings' && (
-              <div>
-                <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-6">Settings</h2>
-                <div className="space-y-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div>
-                      <h3 className="font-medium text-sm md:text-base">Email Notifications</h3>
-                      <p className="text-xs md:text-sm text-gray-600">Receive updates about your orders and offers</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer mt-2 sm:mt-0">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div>
-                      <h3 className="font-medium text-sm md:text-base">SMS Notifications</h3>
-                      <p className="text-xs md:text-sm text-gray-600">Get SMS updates for order status</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer mt-2 sm:mt-0">
-                      <input type="checkbox" className="sr-only peer" />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
-                </div>
-              </div>
+            {/* Wishlist */}
+            {activeTab === "wishlist" && (
+              <EmptyTab
+                icon={Heart}
+                color="text-pink-400"
+                title="Your wishlist is empty"
+                subtitle="Add items you love to see them here"
+              />
             )}
           </div>
         </div>
@@ -331,3 +434,48 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
+
+// ✅ small reusable input component
+const InputField = ({
+  label,
+  value,
+  onChange,
+  disabled,
+  type = "text",
+  variant = "blue",
+  full,
+}) => {
+  const baseColor = variant === "blue" ? "blue" : "gray";
+  const bg = variant === "blue" ? "bg-blue-50" : "bg-gray-50";
+  const border = variant === "blue" ? "border-blue-200" : "border-gray-200";
+
+  return (
+    <div
+      className={`${bg} p-4 rounded-xl border ${border} ${
+        full ? "md:col-span-2" : ""
+      }`}
+    >
+      <label
+        className={`block text-sm font-semibold text-${baseColor}-900 mb-3`}
+      >
+        {label}
+      </label>
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        className={`w-full px-4 py-3 border border-${baseColor}-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-${baseColor}-500 focus:border-transparent disabled:bg-${baseColor}-100 text-gray-900 transition-all duration-300`}
+      />
+    </div>
+  );
+};
+
+// ✅ small reusable empty tab component
+const EmptyTab = ({ icon: Icon, color, title, subtitle }) => (
+  <div className="text-center py-16 bg-blue-50 rounded-2xl border border-blue-200">
+    <Icon size={64} className={`mx-auto ${color} mb-4`} />
+    <p className="text-lg text-gray-600 mb-2">{title}</p>
+    <p className="text-gray-500">{subtitle}</p>
+  </div>
+);
