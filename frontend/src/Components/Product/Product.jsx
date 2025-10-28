@@ -7,12 +7,19 @@ import {
   selectProductsLoading,
   selectProductsError,
 } from "./productslice";
+import {
+  fetchHomepageLevels,
+  selectHomepageLevels,
+  selectHomepageLoading,
+  selectHomepageError,
+} from "../Home/HomePageSlice"; // Import from your slice
 import { Filter, SlidersHorizontal, X } from "lucide-react";
 import banner from "../../assets/productbanner.png";
 import { Heart } from "lucide-react";
 import LandscapeCarousel from "../Banner&Carousels/LandscapeCarousel";
 
-const mainBanners = [
+// ✅ Fallback banner data in case API fails
+const fallbackBanners = [
   {
     id: 1,
     image:
@@ -28,6 +35,47 @@ const mainBanners = [
     image:
       "https://contents.mediadecathlon.com/s1319183/k$49524bae0ca31288ebeece35e8592f5d/defaut.jpg?format=auto&quality=70&f=1920x0",
   },
+];
+
+// ✅ Fallback data for homepage sections (similar to homepage)
+const fallbackHomepageData = [
+  {
+    level_uuid: "LVL-3F3NNHU6RQ",
+    name: "Level 1",
+    order: 1,
+    sections: [
+      {
+        section_uuid: "SEC-JRJ3BTA81YDS",
+        title: "section 1",
+        section_type: "carousel",
+        order: 2,
+        extra_config: {},
+        items: [
+          {
+            item_uuid: "ITM-JH23SY0KK0ZWGJ",
+            image: "http://127.0.0.1:8000/media/homepage/defaut.avif",
+            title: "banner 1",
+            link: "",
+            order: 1
+          },
+          {
+            item_uuid: "ITM-F4AA2NB2JUMOT0",
+            image: "http://127.0.0.1:8000/media/homepage/defaut_1.avif",
+            title: "banner 1",
+            link: "",
+            order: 2
+          },
+          {
+            item_uuid: "ITM-QG9LXY841QZVFP",
+            image: "http://127.0.0.1:8000/media/homepage/defaut_1_SZpsUR6.avif",
+            title: "banner 3",
+            link: "",
+            order: 3
+          }
+        ]
+      }
+    ]
+  }
 ];
 
 // ✅ Product Card (unchanged)
@@ -90,6 +138,34 @@ function ProductCard({ product }) {
   );
 }
 
+function ProductCardSkeleton() {
+  return (
+    <div className="relative max-w-[300px] bg-white overflow-hidden border border-gray-200 flex flex-col rounded-lg animate-pulse">
+      {/* Image Skeleton */}
+      <div className="w-full h-46 md:h-54 lg:h-70 bg-gray-300 flex items-center justify-center"></div>
+
+      {/* Rating and Wishlist Skeleton */}
+      <div className="flex justify-between px-4 pt-3">
+        <div className="h-4 w-20 bg-gray-300 rounded"></div>
+        <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
+      </div>
+
+      {/* Product Info Skeleton */}
+      <div className="px-4 text-start flex flex-col flex-grow min-h-[120px] space-y-2 pt-2">
+        <div className="h-3 w-16 bg-gray-300 rounded"></div>
+        <div className="h-4 w-32 bg-gray-300 rounded"></div>
+        <div className="space-y-1">
+          <div className="h-5 w-20 bg-gray-300 rounded"></div>
+          <div className="h-3 w-24 bg-gray-300 rounded"></div>
+        </div>
+      </div>
+
+      {/* Button Skeleton */}
+      <div className="w-[95%] mx-auto py-2 my-2 bg-gray-300 rounded"></div>
+    </div>
+  );
+}
+
 // ✅ Transform API data for ProductCard
 const transformProductData = (apiProduct) => ({
   id: apiProduct.product_uuid,
@@ -110,10 +186,10 @@ const transformProductData = (apiProduct) => ({
   category: apiProduct.category?.name || "Uncategorized",
   img:
     apiProduct.thumbnail ||
-    "https://via.placeholder.com/300x300?text=No+Image",
+    "https://static.nike.com/a/images/t_PDP_936_v1/f_auto,q_auto:eco/022814da-3098-4c8e-b6f9-3692dc1b4207/W+FLEX+EXPERIENCE+RN+12.png",
   img2:
     apiProduct.thumbnail ||
-    "https://via.placeholder.com/300x300?text=No+Image",
+    "https://acrossports.s3.amazonaws.com/productPhotos/NIKE/DV0746004/DV0746004_6.jpg",
   rating: {
     rate: apiProduct.average_rating || 4.5,
     count: 120,
@@ -129,6 +205,11 @@ function Product() {
   const loading = useSelector(selectProductsLoading);
   const error = useSelector(selectProductsError);
 
+  // ✅ Use Redux for homepage data (same as homepage)
+  const homepageData = useSelector(selectHomepageLevels);
+  const homepageLoading = useSelector(selectHomepageLoading);
+  const homepageError = useSelector(selectHomepageError);
+
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedBrand, setSelectedBrand] = useState("All");
@@ -137,9 +218,38 @@ function Product() {
 
   useEffect(() => {
     dispatch(fetchProducts());
+    dispatch(fetchHomepageLevels()); // Use Redux action to fetch homepage data
   }, [dispatch]);
 
   const products = apiProducts.map(transformProductData);
+
+  // ✅ Extract banners from API data with fallback (same as homepage)
+  const getBannerData = () => {
+    const dataToUse = homepageData && homepageData.length > 0 ? homepageData : fallbackHomepageData;
+    
+    if (!dataToUse || !dataToUse[0]?.sections) return fallbackBanners;
+    
+    const level = dataToUse[0];
+    
+    // Look for carousel sections
+    const carouselSections = level.sections.filter(sec => sec.section_type === "carousel");
+    
+    if (carouselSections.length > 0) {
+      // Use the first carousel section found
+      const carouselSection = carouselSections[0];
+      return carouselSection.items.map(item => ({
+        id: item.item_uuid,
+        image: item.image,
+        title: item.title,
+        link: item.link,
+      }));
+    }
+    
+    // Fallback to predefined banners if no carousel sections found
+    return fallbackBanners;
+  };
+
+  const bannerItems = getBannerData();
 
   const categories = useMemo(() => {
     const unique = [...new Set(products.map((p) => p.category))];
@@ -216,11 +326,88 @@ function Product() {
     return filtered;
   }, [products, selectedCategory, selectedBrand, priceRange, sortOption, activePath]);
 
-  if (loading)
+  if (loading || homepageLoading)
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-600">
-        Loading products...
+      <div className="mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-16 lg:py-20 bg-gray-50 animate-pulse">
+      {/* Hero Carousel Skeleton */}
+      <div className="mb-10">
+        <div className="w-full h-48 md:h-64 lg:h-80 bg-gray-300 rounded-xl"></div>
       </div>
+
+      {/* Page Title Skeleton */}
+      <div className="mb-6">
+        <div className="h-8 w-64 bg-gray-300 rounded mb-2"></div>
+        <div className="h-4 w-32 bg-gray-300 rounded"></div>
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Sidebar Filters Skeleton */}
+        <aside className="hidden md:block md:w-1/4 lg:w-1/5 border border-gray-200 rounded-xl p-4">
+          {/* Filters Title */}
+          <div className="h-6 w-20 bg-gray-300 rounded mb-4"></div>
+
+          {/* Category Filter Skeleton */}
+          <div className="mb-6">
+            <div className="h-5 w-24 bg-gray-300 rounded mb-2"></div>
+            <div className="space-y-2">
+              {[1, 2, 3, 4, 5].map((item) => (
+                <div key={item} className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-gray-300 rounded"></div>
+                  <div className="h-3 w-20 bg-gray-300 rounded"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Brand Filter Skeleton */}
+          <div className="mb-6">
+            <div className="h-5 w-20 bg-gray-300 rounded mb-2"></div>
+            <div className="space-y-2">
+              {[1, 2, 3, 4].map((item) => (
+                <div key={item} className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-gray-300 rounded"></div>
+                  <div className="h-3 w-24 bg-gray-300 rounded"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Price Filter Skeleton */}
+          <div>
+            <div className="h-5 w-28 bg-gray-300 rounded mb-2"></div>
+            <div className="w-full h-2 bg-gray-300 rounded mb-1"></div>
+            <div className="flex justify-between">
+              <div className="h-3 w-8 bg-gray-300 rounded"></div>
+              <div className="h-3 w-12 bg-gray-300 rounded"></div>
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Product Grid Skeleton */}
+        <main className="flex-1">
+          {/* Filter Bar Skeleton */}
+          <div className="flex items-center justify-between mb-4 border-b pb-3">
+            <div className="md:hidden h-8 w-20 bg-gray-300 rounded"></div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-gray-300 rounded"></div>
+              <div className="h-8 w-40 bg-gray-300 rounded"></div>
+            </div>
+          </div>
+
+          {/* Product Grid Skeleton */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item) => (
+              <ProductCardSkeleton key={item} />
+            ))}
+          </div>
+        </main>
+      </div>
+
+      {/* Bottom Banner Skeleton */}
+      <div className="mt-14 rounded-2xl overflow-hidden">
+        <div className="w-full h-32 md:h-48 bg-gray-300"></div>
+      </div>
+    </div>
     );
 
   if (error)
@@ -240,7 +427,7 @@ function Product() {
     <div className="mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-16 lg:py-20 bg-gray-50">
       {/* Hero Carousel */}
       <div className="mb-10">
-        <LandscapeCarousel items={mainBanners} />
+        <LandscapeCarousel items={bannerItems} />
       </div>
 
       {/* Page Title */}

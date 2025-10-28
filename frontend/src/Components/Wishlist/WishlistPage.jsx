@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, ShoppingCart, X } from 'lucide-react';
+import { Heart, ShoppingCart, X, Share2, Trash2 } from 'lucide-react';
 import { ProductCard } from '../Product/Product';
 
 const WishlistPage = () => {
@@ -12,6 +12,7 @@ const WishlistPage = () => {
       discount: '-65%',
       title: 'Duramo 10 Running Shoes',
       category: 'Performance',
+      inStock: true,
     },
     {
       id: 2,
@@ -21,6 +22,7 @@ const WishlistPage = () => {
       discount: '-50%',
       title: 'Compression T-shirt',
       category: 'Training',
+      inStock: true,
     },
     {
       id: 3,
@@ -30,6 +32,7 @@ const WishlistPage = () => {
       discount: '-50%',
       title: 'Training Shorts',
       category: 'Performance',
+      inStock: false,
     }
   ]);
 
@@ -42,61 +45,143 @@ const WishlistPage = () => {
     // Here you would typically dispatch to cart state
   };
 
+  const clearWishlist = () => {
+    if (window.confirm('Are you sure you want to clear your entire wishlist?')) {
+      setWishlistItems([]);
+    }
+  };
+
+  const shareWishlist = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'My Wishlist',
+        text: 'Check out my wishlist!',
+        url: window.location.href,
+      });
+    } else {
+      alert('Share functionality not supported on this browser');
+    }
+  };
+
+  const addAllToCart = () => {
+    const inStockItems = wishlistItems.filter(item => item.inStock);
+    if (inStockItems.length > 0) {
+      inStockItems.forEach(item => addToCart(item));
+      alert(`Added ${inStockItems.length} items to cart!`);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 pt-20 pb-20 md:pb-0">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex items-center gap-3 mb-8">
-          <Heart className="text-blue-500" size={28} />
-          <h1 className="text-3xl font-bold text-gray-900">My Wishlist</h1>
-          <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">
-            {wishlistItems.length} items
-          </span>
+    <div className="min-h-screen bg-white pt-20 pb-20 md:pb-0">
+      <div className="max-w-7xl mx-auto px-4 py-6 md:py-8">
+        {/* Header Section */}
+        <div className="mb-6 md:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                My Wishlist
+              </h1>
+              <p className="text-gray-600 text-sm md:text-base">
+                {wishlistItems.length} {wishlistItems.length === 1 ? 'item' : 'items'} saved
+              </p>
+            </div>
+            
+            {wishlistItems.length > 0 && (
+              <div className="flex gap-3">
+                <button
+                  onClick={shareWishlist}
+                  className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+                >
+                  <Share2 size={16} />
+                  Share
+                </button>
+                <button
+                  onClick={clearWishlist}
+                  className="flex items-center gap-2 px-4 py-2 border border-blue-300 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors text-sm font-medium"
+                >
+                  <Trash2 size={16} />
+                  Clear All
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div className="h-px bg-gray-200"></div>
         </div>
 
         {wishlistItems.length > 0 ? (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {/* Product Grid using ProductCard */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
               {wishlistItems.map((item) => (
                 <div key={item.id} className="relative group">
+                  {/* Use the existing ProductCard component */}
                   <ProductCard product={item} />
-                  <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  
+                  {/* Overlay Actions */}
+                  <div className="absolute top-2 right-2 flex flex-col gap-2 z-10">
+                    {/* Remove from Wishlist Button */}
                     <button
                       onClick={() => removeFromWishlist(item.id)}
-                      className="p-2 bg-white rounded-full shadow-md hover:bg-blue-50 transition-colors"
+                      className="p-2 bg-white rounded-full shadow-md hover:bg-blue-50 transition-all hover:scale-110"
                       title="Remove from wishlist"
                     >
-                      <X size={16} className="text-blue-500" />
+                      <X size={16} className="text-black" />
                     </button>
-                    <button
-                      onClick={() => addToCart(item)}
-                      className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
-                      title="Add to cart"
-                    >
-                      <ShoppingCart size={16} className="text-gray-600" />
-                    </button>
+                    
+                  
                   </div>
+
+                  {/* Out of Stock Overlay */}
+                  {!item.inStock && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
+                      <span className="bg-red-400 text-white px-4 py-2 rounded-lg font-semibold text-sm">
+                        Out of Stock
+                      </span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
 
-            <div className="mt-8 text-center">
-              <button className="px-8 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition font-semibold">
-                Add All to Cart
-              </button>
+            {/* Bottom Action Bar */}
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+                <p className="text-gray-600 text-sm">
+                  Continue shopping to add more items to your wishlist
+                </p>
+                <button
+                  onClick={addAllToCart}
+                  disabled={!wishlistItems.some(item => item.inStock)}
+                  className={`px-8 py-3 rounded-lg transition-all font-semibold text-sm shadow-md hover:shadow-lg whitespace-nowrap ${
+                    wishlistItems.some(item => item.inStock)
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  Add All to Cart ({wishlistItems.filter(item => item.inStock).length})
+                </button>
+              </div>
             </div>
           </>
         ) : (
-          <div className="text-center py-16">
-            <Heart size={64} className="mx-auto text-gray-300 mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Your wishlist is empty</h2>
-            <p className="text-gray-600 mb-6">
-              Save items you love by clicking the heart icon on any product
+          // Empty Wishlist State
+          <div className="text-center py-16 md:py-24">
+            <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+              <Heart size={48} className="text-gray-300" />
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+              Your wishlist is empty
+            </h2>
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              Save your favorite sports gear and equipment by clicking the heart icon on any product
             </p>
             <button
-              onClick={() => window.history.back()}
-              className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition font-semibold"
+              onClick={() => window.location.href = '/'}
+              className="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-semibold shadow-md hover:shadow-lg active:scale-95"
             >
-              Continue Shopping
+              Start Shopping
             </button>
           </div>
         )}

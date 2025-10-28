@@ -200,11 +200,209 @@ const ProductInfo = () => {
 
   if (loading) {
     return (
-      <div className="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-center h-40">
-          <div className="text-sm text-gray-600">Loading product...</div>
+      <div className="pt-20 bg-white animate-pulse">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid lg:grid-cols-2 gap-12">
+          
+          {/* Left Column - Gallery Skeleton */}
+          <div className="space-y-4">
+            {/* Main Image */}
+            <div className="bg-gray-300 rounded-xl w-full h-96"></div>
+            
+            {/* Thumbnails */}
+            <div className="flex gap-3">
+              {[1, 2, 3, 4].map((item) => (
+                <div key={item} className="w-20 h-20 bg-gray-300 rounded-lg"></div>
+              ))}
+            </div>
+            
+            {/* Trust Badges */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6">
+              {[1, 2, 3, 4].map((item) => (
+                <div key={item} className="flex flex-col items-center text-center p-3 bg-gray-200 rounded-lg">
+                  <div className="w-5 h-5 bg-gray-300 rounded-full mb-2"></div>
+                  <div className="h-3 w-16 bg-gray-300 rounded"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Column - Product Info Skeleton */}
+          <div className="space-y-6">
+            {/* Brand and Title */}
+            <div>
+              <div className="h-4 w-20 bg-gray-300 rounded mb-2"></div>
+              <div className="h-8 w-64 bg-gray-300 rounded"></div>
+            </div>
+
+            {/* Rating */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <div key={star} className="w-4 h-4 bg-gray-300 rounded"></div>
+                  ))}
+                </div>
+                <div className="h-4 w-8 bg-gray-300 rounded"></div>
+              </div>
+              <div className="h-4 w-20 bg-gray-300 rounded"></div>
+            </div>
+
+            {/* Made in India Badge */}
+            <div className="h-6 w-32 bg-gray-300 rounded-full"></div>
+
+            {/* Price */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-24 bg-gray-300 rounded"></div>
+                <div className="h-6 w-16 bg-gray-300 rounded"></div>
+              </div>
+              <div className="h-6 w-20 bg-gray-300 rounded"></div>
+            </div>
+
+            {/* Quick Info Grid */}
+            <div className="grid grid-cols-2 gap-4 py-4">
+              {[1, 2, 3, 4].map((item) => (
+                <div key={item} className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-gray-300 rounded"></div>
+                  <div className="h-4 w-32 bg-gray-300 rounded"></div>
+                </div>
+              ))}
+            </div>
+
+            {/* Color Selection */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="h-5 w-16 bg-gray-300 rounded"></div>
+                <div className="h-4 w-24 bg-gray-300 rounded"></div>
+              </div>
+              <div className="flex gap-3">
+                {[1, 2, 3].map((item) => (
+                  <div key={item} className="w-12 h-12 bg-gray-300 rounded-full"></div>
+                ))}
+              </div>
+            </div>
+
+            {/* Size Selection */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="h-5 w-16 bg-gray-300 rounded"></div>
+                <div className="h-4 w-20 bg-gray-300 rounded"></div>
+              </div>
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                {[1, 2, 3, 4, 5, 6].map((item) => (
+                  <div key={item} className="h-12 bg-gray-300 rounded-lg"></div>
+                ))}
+              </div>
+            </div>
+
+            {/* Product Highlights */}
+            <div className="bg-gray-200 rounded-lg p-4">
+              <div className="h-5 w-32 bg-gray-300 rounded mb-3"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {[1, 2, 3, 4].map((item) => (
+                  <div key={item} className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-gray-300 rounded"></div>
+                    <div className="h-4 w-40 bg-gray-300 rounded"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Add to Cart Section */}
+            <div className="bg-gray-200 rounded-lg p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="h-5 w-20 bg-gray-300 rounded"></div>
+                <div className="flex items-center border border-gray-300 rounded-lg bg-white">
+                  <div className="w-8 h-8 bg-gray-300"></div>
+                  <div className="w-12 h-8 bg-gray-200 border-l border-r border-gray-300"></div>
+                  <div className="w-8 h-8 bg-gray-300"></div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <div className="flex-1 h-12 bg-gray-300 rounded-lg"></div>
+                <div className="w-12 h-12 bg-gray-300 rounded-lg"></div>
+              </div>
+
+              {/* Stock Status */}
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                <div className="h-4 w-24 bg-gray-300 rounded"></div>
+                <div className="h-4 w-32 bg-gray-300 rounded"></div>
+              </div>
+            </div>
+
+            {/* Delivery Info */}
+            <div className="space-y-3">
+              {[1, 2].map((item) => (
+                <div key={item} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg">
+                  <div className="w-5 h-5 bg-gray-300 rounded"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 w-32 bg-gray-300 rounded"></div>
+                    <div className="h-3 w-40 bg-gray-300 rounded"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Product Details Tabs Skeleton */}
+        <div className="mt-16 border-t border-gray-200">
+          <div className="flex overflow-x-auto gap-4 py-4">
+            {[1, 2, 3, 4, 5].map((item) => (
+              <div key={item} className="h-8 w-24 bg-gray-300 rounded"></div>
+            ))}
+          </div>
+
+          {/* Tab Content Skeleton */}
+          <div className="py-8">
+            <div className="max-w-3xl space-y-4">
+              <div className="h-6 w-48 bg-gray-300 rounded"></div>
+              <div className="h-4 w-full bg-gray-300 rounded"></div>
+              <div className="h-4 w-3/4 bg-gray-300 rounded"></div>
+              <div className="h-4 w-2/3 bg-gray-300 rounded"></div>
+              
+              <div className="bg-gray-200 rounded-lg p-6 space-y-3">
+                <div className="h-5 w-40 bg-gray-300 rounded"></div>
+                <div className="h-4 w-full bg-gray-300 rounded"></div>
+                <div className="h-4 w-32 bg-gray-300 rounded"></div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {[1, 2, 3, 4].map((item) => (
+                  <div key={item} className="flex items-start gap-3">
+                    <div className="w-5 h-5 bg-gray-300 rounded"></div>
+                    <div className="space-y-2">
+                      <div className="h-4 w-32 bg-gray-300 rounded"></div>
+                      <div className="h-3 w-40 bg-gray-300 rounded"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Recommended Products Skeleton */}
+      <div className="border-t border-gray-200 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="h-8 w-64 bg-gray-300 rounded mb-8"></div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <div key={item} className="space-y-3">
+                <div className="w-full h-48 bg-gray-300 rounded-lg"></div>
+                <div className="h-4 w-3/4 bg-gray-300 rounded"></div>
+                <div className="h-4 w-1/2 bg-gray-300 rounded"></div>
+                <div className="h-4 w-1/3 bg-gray-300 rounded"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
     );
   }
 
