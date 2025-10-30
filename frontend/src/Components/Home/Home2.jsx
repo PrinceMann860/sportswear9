@@ -22,6 +22,7 @@ import CategoryGrid from "../Decath/CategoryGrid";
 import LandscapeCarousel from "../Banner&Carousels/LandscapeCarousel";
 import SportsGearCarousel from "../Decath/SportsGearCarousel";
 import FestiveDealsGrid from "../Decath/FestiveDealsGrid";
+import BMSMBanner from "../../assets/BMSM.jpg"
 import HorizontalScrollCarousel from "../Banner&Carousels/HorizontalScrollCarousel";
 import RecommendedProducts from "./RecommendedProducts";
 import VideoGrid from "./VideoGrid";
@@ -29,6 +30,11 @@ import { DealsOfTheDay } from "../Banner&Carousels/DealsOfTheDay";
 import { fetchBrands } from "../Brands/brandlistslice";
 
 import logo1 from "../../assets/1.svg";
+import logo2 from "../../assets/2.svg";
+import logo3 from "../../assets/3.svg";
+import logo4 from "../../assets/4.svg";
+import logo5 from "../../assets/5.svg";
+import logo6 from "../../assets/6.svg";
 import sportvid from "../../assets/sportvid.mp4";
 import SportsCategorySection from "./SportsCategorysection";
 import SkeletonLoader from "./SkeletonLoader";
@@ -321,35 +327,35 @@ const promoCards = [
       "https://www.powerhousegymproshop.com/cdn/shop/files/powerhouse-gym-pro-shop-premium-oversized-hoodie-charcoal-34264387911851.jpg?v=1687997189&width=1445", // Green background
     deal: "FLAT 30% OFF",
     look: "Seasonal Essentials",
-    logo: "https://placehold.co/100x40/ffffff/10b981?text=Brand+B+Logo",
+    logo: logo2,
   },
   {
     image:
       "https://bullarfitness.com/cdn/shop/files/Accessories.jpg?v=1740035011&width=1100", // Purple background
     deal: "BUY 1 GET 1 FREE",
     look: "Premium Collections",
-    logo: "https://placehold.co/100x40/ffffff/f97316?text=Brand+C+Logo",
+    logo: logo3,
   },
   {
     image:
       "https://www.verywellfit.com/thmb/Eyv2XS6jfnBy9nSnCLHe_9A71TU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/vwt-product-reebok-nano-x2-training-shoes-tstaples-133-e73e0a61fe50493daf72e839cd53dfdf.jpg", // Orange background
     deal: "UP TO 70% OFF",
     look: "Footwear & Accessories",
-    logo: "https://placehold.co/100x40/ffffff/5b21b6?text=Brand+D+Logo",
+    logo: logo4,
   },
   {
     image:
       "https://www.fitlineindia.com/cdn/shop/files/WhatsApp_Image_2022-05-19_at_5.53.38_PM.jpg?v=1653037917&width=1500", // Deep Purple background
     deal: "EXTRA 20% OFF",
     look: "Clearance Event",
-    logo: "https://placehold.co/100x40/ffffff/6d28d9?text=Brand+E+Logo",
+    logo: logo5,
   },
   {
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDU7OcmNBhqYI7DCu3wOmtEOCwyTOzhknEU490QpBwnI4ngrWe1kzpwyy06N33fyeQkRo&usqp=CAU", // Emerald Green background
     deal: "NEW COLORS",
     look: "Comfort Collection",
-    logo: "https://placehold.co/100x40/ffffff/059669?text=Brand+F+Logo",
+    logo: logo6,
   },
 ];
 const malecards = [
@@ -611,7 +617,7 @@ function Home2() {
         <AnimatedSection>
           <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full">
             <ProductCarouselWithTitle
-              title="The perfect cycle is waiting"
+              title="The perfect Shoes is waiting"
               products={featuredProducts}
             />
           </section>
@@ -644,6 +650,8 @@ function Home2() {
           </div>
         </AnimatedSection>
 
+
+
         {/* ✅ Trending Products */}
         <AnimatedSection>
           <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full mt-10">
@@ -662,20 +670,10 @@ function Home2() {
 
         {/* ✅ Sale Video Banner */}
         <AnimatedSection>
-          <div className="relative w-full max-w-full md:h-[350px] overflow-hidden my-10">
-            <video
-              src={sportvid}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+          <div className="w-full max-w-full mx-auto p-5 lg:p-10 rounded-2xl overflow-hidden">
+            <LandscapeCarousel 
+              items={transformToCarouselItems(getSectionData("floor-4"))} 
             />
-            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-              <h2 className="text-white text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold tracking-tight text-center px-4">
-                ⚡ SALE — UP TO 50% OFF ⚡
-              </h2>
-            </div>
           </div>
         </AnimatedSection>
 
@@ -760,11 +758,11 @@ function Home2() {
 
         {/* ✅ Final Banner */}
         <AnimatedSection>
-          <div className="max-w-full">
+          <div className="w-full px-2 md:px-5 lg:px-10">
             <img
-              src="https://contents.mediadecathlon.com/s1319284/k$ddfbbd6b132bc4e201e266616da202c5/defaut.jpg"
+              src={BMSMBanner}
               alt="Buy More Save More"
-              className="w-full px-2 md:px-5 lg:px-10 max-w-full"
+              className="w-full h-auto max-w-full border rounded-2xl md:rounded-4xl"
             />
           </div>
         </AnimatedSection>

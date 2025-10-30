@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const PromotionCard = ({ image, deal, look, logo }) => {
     return (
-        <div className="relative w-[260px] sm:w-[280px] md:w-[300px] lg:w-[320px] flex-shrink-0 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 bg-white">
+        <div className="relative w-[260px] sm:w-[280px] md:w-[300px] lg:w-[320px] flex-shrink-0 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 bg-white border-2 border-gray-200">
 
             {/* Full Image */}
             <div className="relative h-[380px] sm:h-[420px] md:h-[450px] overflow-hidden">
@@ -29,8 +29,8 @@ const PromotionCard = ({ image, deal, look, logo }) => {
                 </div>
 
                 {/* Logo Strip */}
-                <div className="absolute bottom-0 w-full bg-white py-2 flex items-center justify-center">
-                    {logo && <img src={logo} alt="Brand Logo" className="h-8 object-contain" />}
+                <div className="absolute bottom-0 w-full bg-white py-1 flex items-center justify-center">
+                    {logo && <img src={logo} alt="Brand Logo" className="h-14 object-contain" />}
                 </div>
             </div>
         </div>

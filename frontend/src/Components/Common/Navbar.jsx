@@ -15,6 +15,7 @@ import {
   FiShoppingCart,
   FiX,
   FiLogOut,
+  FiClock,
 } from "react-icons/fi";
 import { ShoppingBag } from "lucide-react";
 
@@ -32,6 +33,8 @@ function Navbar() {
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
   const navRef = useRef(null);
   const userMenuRef = useRef(null);
+  const searchInputRef = useRef(null);
+  const searchContainerRef = useRef(null);
 
   const suggestions = [
     "Running shoes",
@@ -39,20 +42,28 @@ function Navbar() {
     "Yoga pants",
     "Winter jackets",
     "Sneakers",
+    "Basketball shorts",
+    "Training gloves",
+    "Sports bags",
   ];
 
+  
+
   const placeholders = [
-    "running shoes...",
-    "your perfect sportswear...",
-    "trending styles...",
-    "athletic wear...",
-    "latest collections...",
+    "Running shoes",
+    "Football jersey",
+    "Yoga pants",
+    "Winter jackets",
+    "Sneakers",
+    "Basketball shorts",
+    "Training gloves",
+    "Sports bags",
   ];
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentPlaceholder((prev) => (prev + 1) % placeholders.length);
-    }, 3000);
+    }, 4000);
     return () => clearInterval(interval);
   }, []);
 
@@ -61,16 +72,23 @@ function Navbar() {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setShowUserMenu(false);
       }
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setShowSearch(false);
+      }
     };
 
-    if (showUserMenu) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [showUserMenu]);
+  }, [showSearch, showUserMenu]);
+
+  useEffect(() => {
+    if (showSearch && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [showSearch]);
 
   const handleMouseLeaveNav = () => {
     setHoveredLink(null);
@@ -85,56 +103,53 @@ function Navbar() {
     }
   };
 
-  const handleMobileSearch = () => {
-    if (searchQuery.trim()) {
-      navigate(`/categories?q=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery("");
-      setShowSearch(false);
+  const handleSuggestionClick = (suggestion) => {
+    setSearchQuery(suggestion);
+    navigate(`/categories?q=${encodeURIComponent(suggestion)}`);
+    setSearchQuery("");
+    setShowSearch(false);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
     }
   };
 
   return (
     <>
       <style>{`
-        @keyframes placeholderFade {
-          0% { opacity: 0; transform: translateY(-5px); }
-          10% { opacity: 1; transform: translateY(0); }
-          90% { opacity: 1; transform: translateY(0); }
-          100% { opacity: 0; transform: translateY(5px); }
-        }
-
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
         @keyframes slideDown {
           from {
             opacity: 0;
-            transform: translateY(-20px);
+            transform: translateY(-8px) scale(0.95);
           }
           to {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
           }
         }
 
-        .placeholder-animate::placeholder {
-          animation: placeholderFade 3s ease-in-out;
-        }
-
-        .animate-slideIn {
-          animation: slideIn 0.2s ease-out;
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
 
         .animate-slideDown {
-          animation: slideDown 0.3s ease-out;
+          animation: slideDown 0.2s ease-out;
+        }
+
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-out;
+        }
+
+        .search-shadow {
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
       `}</style>
 
@@ -618,15 +633,117 @@ function Navbar() {
 
           {/* Desktop Search + Icons */}
           <div className="hidden lg:flex items-center lg:space-x-3">
-            {/* Search Icon Only */}
-            <Link to={"/categories"}>
+            {/* Apple-style Search Dropdown */}
+            <div className="search-container relative" ref={searchContainerRef}>
               <button
-                className="p-2 rounded-full hover:bg-blue-50 transition-colors"
+                onClick={() => setShowSearch(!showSearch)}
+                className="flex items-center hover:bg-blue-100 px-2 py-2 rounded-full transition-all duration-200 group"
                 aria-label="Search"
               >
-                <FiSearch className="text-lg cursor-pointer hover:text-blue-600 transition-colors" />
+                <FiSearch className="text-gray-500 hover:text-blue-500 transition-colors" size={16} />
+                
               </button>
-            </Link>
+
+              {/* Search Dropdown */}
+              {showSearch && (
+                <div className="transition-all duration-300 ease-out fixed left-0 right-0 top-[60px] lg:top-[80px] z-40 bg-white border-t border-gray-200 shadow-2xl">
+                  {/* Search Input */}
+                  <div className="p-3 border-b border-gray-100 max-w-6xl mx-auto">
+                    <div className="relative">
+                      <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                      <input
+                        ref={searchInputRef}
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder={`Search for ${placeholders[currentPlaceholder]}`}
+                        className="w-full pl-10 pr-10 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') setShowSearch(false);
+                          if (e.key === 'Enter') handleSearch(e);
+                        }}
+                      />
+                      {searchQuery && (
+                        <button
+                          onClick={clearSearch}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-200 rounded-full transition-colors"
+                        >
+                          <FiX className="text-gray-400 hover:text-gray-600" size={16} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Suggestions */}
+                  <div className="max-h-80 overflow-y-auto max-w-6xl mx-auto">
+                
+
+                    {/* Search Suggestions */}
+                    {searchQuery && (
+                      <div className="p-2">
+                        <div className="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                          Suggestions
+                        </div>
+                        {suggestions
+                          .filter(suggestion =>
+                            suggestion.toLowerCase().includes(searchQuery.toLowerCase())
+                          )
+                          .slice(0, 6)
+                          .map((suggestion, index) => (
+                            <button
+                              key={index}
+                              onClick={() => handleSuggestionClick(suggestion)}
+                              className="w-full text-left px-3 py-2.5 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3 group"
+                            >
+                              <FiSearch className="text-gray-400 group-hover:text-blue-600 transition-colors" size={16} />
+                              <span className="text-gray-700 group-hover:text-blue-600 transition-colors">
+                                {suggestion}
+                              </span>
+                            </button>
+                          ))}
+                        
+                        {/* No Results */}
+                        {suggestions.filter(suggestion =>
+                          suggestion.toLowerCase().includes(searchQuery.toLowerCase())
+                        ).length === 0 && (
+                          <div className="px-3 py-8 text-center text-gray-500">
+                            <FiSearch className="mx-auto mb-2 text-gray-300" size={24} />
+                            <p>No results found for "{searchQuery}"</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Quick Actions */}
+                    {!searchQuery && (
+                      <div className="p-2 border-t border-gray-100">
+                        <div className="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                          Quick Links
+                        </div>
+                        <button
+                          onClick={() => handleSuggestionClick("New Arrivals")}
+                          className="w-full text-left px-3 py-2.5 hover:bg-gray-50 rounded-lg transition-colors"
+                        >
+                          🆕 New Arrivals
+                        </button>
+                        <button
+                          onClick={() => handleSuggestionClick("Clearance Sale")}
+                          className="w-full text-left px-3 py-2.5 hover:bg-gray-50 rounded-lg transition-colors"
+                        >
+                          🔥 Clearance Sale
+                        </button>
+                        <button
+                          onClick={() => handleSuggestionClick("Best Sellers")}
+                          className="w-full text-left px-3 py-2.5 hover:bg-gray-50 rounded-lg transition-colors"
+                        >
+                          ⭐ Best Sellers
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {isAuthenticated ? (
               <div className="relative" ref={userMenuRef}>

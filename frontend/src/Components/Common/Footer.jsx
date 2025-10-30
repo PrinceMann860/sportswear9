@@ -55,15 +55,15 @@ const Footer = () => {
         <div className="flex w-[10%] md:w-[20%]">
           <span className="font-bold md:text-xl ml-2 md:ml-10">Our Promise</span>
         </div>
-        <div className="w-[80%] flex justify-around items-center md:px-4">
-          <div className="flex items-center gap-2 text-sm">
-            <span>💳</span> <span>No Cost EMI Available*</span>
+        <div className="w-[80%] flex justify-evenly items-center md:px-4">
+          <div className="flex items-center gap-2 text-xs md:text-sm">
+            <span className="text-2xl">💳</span> <span className="hidden lg:inline">No Cost EMI Available*</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <span>↩️</span> <span>Easy Returns*</span>
+            <span className="text-2xl">↩️</span> <span className="hidden lg:inline">Easy Returns*</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <span>😊</span> <span>1 million+ happy Customers</span>
+            <span className="text-2xl">😊</span> <span className="hidden lg:inline">1 million+ happy Customers</span>
           </div>
         </div>
         </div>
@@ -137,7 +137,7 @@ const Footer = () => {
           <div className="md:col-span-2 lg:col-span-4 w-[100%] text-center">
             {/* SOCIAL ICONS */}
             <h3 className="font-bold mb-2">FOLLOW US</h3>
-            <div className="flex gap-4 mb-4 w-full justify-evenly">
+            <div className="flex mb-4 w-full justify-evenly">
               <a href="#" className="bg-gray-700 p-1 rounded-sm">
                 <FaFacebook size={30} className="text-white" />
               </a>

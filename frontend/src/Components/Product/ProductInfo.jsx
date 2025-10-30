@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { fetchProductDetail, clearProductDetail } from "./Productdetailslice";
 import RecommendedProducts from "../Home/RecommendedProducts";
-import ProductGallery from "../Infopage/ProductGallery"
+import ProductGallery from "./ProductGallery"
 
 const ProductInfo = () => {
   const { id, product_uuid } = useParams();
