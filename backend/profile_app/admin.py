@@ -4,8 +4,8 @@ from .models import UserProfile, Address
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ("full_name", "user_email", "gender", "phone")
-    search_fields = ("full_name", "user__email", "phone")
+    list_display = ("full_name", "user_email", "gender", "phoneNumber")
+    search_fields = ("full_name", "user__email", "phoneNumber")
     list_filter = ("gender",)
     readonly_fields = ("user",)
 
@@ -18,12 +18,12 @@ class UserProfileAdmin(admin.ModelAdmin):
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
     list_display = (
-        "name", "mobile", "city", "state", "pincode", "address_type", "is_default", "user_profile"
+        "address_name", "mobile", "city", "state", "pincode", "is_default", "user_profile"
     )
     search_fields = (
-        "name", "mobile", "pincode", "city", "state", "user__full_name", "user__user__email"
+        "address_name", "mobile", "pincode", "city", "state", "user__full_name", "user__user__email"
     )
-    list_filter = ("address_type", "is_default", "state", "city")
+    list_filter = ("is_default", "state", "city")
     readonly_fields = ("created_at", "updated_at")
 
     def user_profile(self, obj):

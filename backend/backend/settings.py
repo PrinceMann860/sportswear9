@@ -67,6 +67,8 @@ INSTALLED_APPS = [
 
     'corsheaders',
 
+    "django_countries",
+
     # custom apps
     # 'cart',
     # 'product',

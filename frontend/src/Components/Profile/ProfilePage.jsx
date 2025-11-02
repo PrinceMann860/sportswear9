@@ -13,8 +13,9 @@ import {
   Import,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../store/slices/auth/authSlice";
+import { fetchProfile, updateProfile } from "../../store/slices/profile/profileSlice";
 import { Link } from "react-router-dom";
 
 // Helper function to calculate profile completion percentage
@@ -40,6 +41,8 @@ const calculateProfileCompletion = (profileData) => {
 const ProfilePage = () => {
   const { user, isAuthenticated, loading } = useAuth();
   const dispatch = useDispatch();
+  const profileData = useSelector((state) => state.profile.data);
+  const profileLoading = useSelector((state) => state.profile.loading);
 
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
@@ -62,7 +65,7 @@ const ProfilePage = () => {
       );
     }
   }, []);
-  const [profileData, setProfileData] = useState({
+  const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     phone: "",
@@ -77,25 +80,32 @@ const ProfilePage = () => {
     },
   });
 
-  // Initialize profile data when user data is available
+  // Fetch profile data when component mounts
   useEffect(() => {
-    if (user) {
-      setProfileData({
-        fullName: user.full_name || "",
-        email: user.email || "",
-        phone: user.phone || "+91 9876543210",
-        dateOfBirth: user.date_of_birth || "1990-01-15",
-        gender: user.gender || "Male",
+    if (isAuthenticated) {
+      dispatch(fetchProfile());
+    }
+  }, [isAuthenticated, dispatch]);
+
+  // Initialize form data when fetched
+  useEffect(() => {
+    if (profileData) {
+      setFormData({
+        fullName: profileData.full_name || user?.full_name || "",
+        email: profileData.email || user?.email || "",
+        phone: profileData.phoneNumber || "+91 9876543210",
+        dateOfBirth: profileData.date_of_birth || "1990-01-15",
+        gender: profileData.gender || "Male",
         address: {
-          street: user.address?.street || "123 Main Street",
-          city: user.address?.city || "Mumbai",
-          state: user.address?.state || "Maharashtra",
-          pincode: user.address?.pincode || "400001",
-          country: user.address?.country || "India",
+          street: profileData.address?.street || "123 Main Street",
+          city: profileData.address?.city || "Mumbai",
+          state: profileData.address?.state || "Maharashtra",
+          pincode: profileData.address?.pincode || "400001",
+          country: profileData.address?.country || "India",
         },
       });
     }
-  }, [user]);
+  }, [profileData, user]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -103,8 +113,13 @@ const ProfilePage = () => {
 
   const handleSave = () => {
     setIsEditing(false);
-    console.log("Saving profile data:", profileData);
-    // You can add an API call here to update user profile
+    dispatch(updateProfile({
+      full_name: formData.fullName,
+      gender: formData.gender,
+      phoneNumber: formData.phone,
+      date_of_birth: formData.dateOfBirth,
+      address: formData.address,
+    }));
   };
 
   const menuItems = [
@@ -208,10 +223,10 @@ if (!isAuthenticated) {
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-lg text-gray-900 truncate">
-                  {profileData.fullName || user.full_name || "User"}
+                  {formData.fullName || user.full_name || "User"}
                 </h3>
                 <p className="text-sm text-gray-600 truncate">
-                  {profileData.email || user.email}
+                  {formData.email || user.email}
                 </p>
                 <div className="flex items-center gap-1 mt-1">
                   <Star className="w-4 h-4 text-yellow-400 fill-current" />
@@ -265,14 +280,14 @@ if (!isAuthenticated) {
                   Profile Completion
                 </span>
                 <span className="text-sm font-bold text-blue-600">
-                  {calculateProfileCompletion(profileData)}%
+                  {calculateProfileCompletion(formData)}%
                 </span>
               </div>
               <div className="w-full bg-blue-200 rounded-full h-2">
                 <div
                   className="bg-blue-600 h-2 rounded-full transition-all duration-500"
                   style={{
-                    width: `${calculateProfileCompletion(profileData)}%`,
+                    width: `${calculateProfileCompletion(formData)}%`,
                   }}
                 ></div>
               </div>
@@ -308,10 +323,10 @@ if (!isAuthenticated) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                   <InputField
                     label="Full Name"
-                    value={profileData.fullName}
+                    value={formData.fullName}
                     onChange={(e) =>
-                      setProfileData({
-                        ...profileData,
+                      setFormData({
+                        ...formData,
                         fullName: e.target.value,
                       })
                     }
@@ -320,15 +335,15 @@ if (!isAuthenticated) {
                   />
                   <InputField
                     label="Email"
-                    value={profileData.email}
+                    value={formData.email}
                     disabled
                     variant="gray"
                   />
                   <InputField
                     label="Phone"
-                    value={profileData.phone}
+                    value={formData.phone}
                     onChange={(e) =>
-                      setProfileData({ ...profileData, phone: e.target.value })
+                      setFormData({ ...formData, phone: e.target.value })
                     }
                     disabled={!isEditing}
                     variant="blue"
@@ -336,10 +351,10 @@ if (!isAuthenticated) {
                   <InputField
                     label="Date of Birth"
                     type="date"
-                    value={profileData.dateOfBirth}
+                    value={formData.dateOfBirth}
                     onChange={(e) =>
-                      setProfileData({
-                        ...profileData,
+                      setFormData({
+                        ...formData,
                         dateOfBirth: e.target.value,
                       })
                     }
@@ -351,10 +366,10 @@ if (!isAuthenticated) {
                       Gender
                     </label>
                     <select
-                      value={profileData.gender}
+                      value={formData.gender}
                       onChange={(e) =>
-                        setProfileData({
-                          ...profileData,
+                        setFormData({
+                          ...formData,
                           gender: e.target.value,
                         })
                       }
@@ -386,12 +401,12 @@ if (!isAuthenticated) {
                         <InputField
                           key={field}
                           label={field.charAt(0).toUpperCase() + field.slice(1)}
-                          value={profileData.address[field]}
+                          value={formData.address[field]}
                           onChange={(e) =>
-                            setProfileData({
-                              ...profileData,
+                            setFormData({
+                              ...formData,
                               address: {
-                                ...profileData.address,
+                                ...formData.address,
                                 [field]: e.target.value,
                               },
                             })

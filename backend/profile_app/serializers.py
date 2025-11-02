@@ -4,10 +4,13 @@ from .models import UserProfile, Address
 
 class UserProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source="user.email", read_only=True)
-
+    is_active = serializers.BooleanField(source="user.is_active", read_only=True)
+    country = serializers.CharField(read_only=True)
+    locale = serializers.CharField(read_only=True)
+    
     class Meta:
         model = UserProfile
-        fields = ["email", "full_name", "gender", "phone", "profile_picture"]
+        fields = ["email", "is_active", "gender", "phoneNumber", "profile_picture", "country", "locale"]
 
 
 class AddressSerializer(serializers.ModelSerializer):

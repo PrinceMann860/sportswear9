@@ -162,17 +162,17 @@ const LandscapeCarousel = ({ items = [] }) => {
             <ChevronRight className="w-5 h-5 md:w-6 md:h-6 lg:w-8 lg:h-8" />
           </button>
 
-          {/* Dots */}
+          {/* Dots - Improved subtle design */}
           <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 flex justify-center items-center gap-2 md:gap-3 z-10">
             {items.map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
                 disabled={isAnimating.current}
-                className={`h-2 md:h-2.5 rounded-full transition-all duration-300 ${
+                className={`carousel-indicator ${
                   slideState.index === index
-                    ? "w-10 md:w-12 bg-white shadow-lg"
-                    : "w-2 md:w-2.5 bg-white/60 hover:bg-white/80"
+                    ? "active bg-white"
+                    : "bg-white/40 hover:bg-white/60"
                 }`}
                 aria-label={`Go to banner ${index + 1}`}
               />

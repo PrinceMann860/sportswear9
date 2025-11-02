@@ -111,11 +111,11 @@ export const authAPI = {
     });
   },
 
-  getCurrentUser: async () => {
-    return makeRequest('/auth/me/', {
-      method: 'GET',
-    });
-  },
+  // getCurrentUser: async () => {
+  //   return makeRequest('/auth/me/', {
+  //     method: 'GET',
+  //   });
+  // },
 
   refreshToken: async () => {
     const refreshToken = localStorage.getItem('refresh_token');
@@ -123,6 +123,21 @@ export const authAPI = {
       method: 'POST',
       body: JSON.stringify({ refresh: refreshToken }),
       skipAuth: true,
+    });
+  },
+};
+
+export const profileAPI = {
+  getProfile: async () => {
+    return makeRequest('/profile', {
+      method: 'GET',
+    });
+  },
+
+  updateProfile: async (profileData) => {
+    return makeRequest('/profile', {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
     });
   },
 };

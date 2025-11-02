@@ -4,6 +4,7 @@ import productReducer from '../Components/Product/productslice';
 import ProductdetailReducer from "../Components/Product/Productdetailslice";
 import brandReducer from "../Components/Brands/brandlistslice";
 import homepagereducer from "../Components/Home/HomePageSlice";
+import profileReducer from './slices/profile/profileSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,7 +13,7 @@ export const store = configureStore({
     productdetail: ProductdetailReducer,
     brandlist: brandReducer,
     homepage: homepagereducer,
-
+    profile: profileReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
