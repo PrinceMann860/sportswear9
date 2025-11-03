@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from auth_app.serializers import RegisterSerializer  # reuse or create an admin version
 from .models import UserProfile, Address
 from .serializers import UserProfileSerializer, AddressSerializer
+from django.shortcuts import get_object_or_404
 
 User = get_user_model()
 
@@ -72,3 +73,35 @@ class AdminAddressDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AddressSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdmin]
     lookup_field = "address_id"
+
+class AdminUserAddressListView(generics.ListAPIView):
+    """
+    GET /profile/admin/users/<user_uuid>/addresses/
+    Returns all addresses for a given user (admin only)
+    """
+    serializer_class = AddressSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+
+    def get_queryset(self):
+        user_uuid = self.kwargs.get("user_uuid")
+        user = get_object_or_404(User, user_uuid=user_uuid)
+        profile = get_object_or_404(UserProfile, user=user)
+        return Address.objects.filter(user=profile).order_by("-is_default", "-updated_at")
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        # include user info in response
+        user_uuid = self.kwargs.get("user_uuid")
+        user = get_object_or_404(User, user_uuid=user_uuid)
+        profile = getattr(user, "profile", None)
+        return Response({
+            "user": {
+                "user_uuid": user.user_uuid,
+                "email": user.email,
+                "is_active": user.is_active,
+                "is_staff": user.is_staff,
+                "profile": UserProfileSerializer(profile).data if profile else None,
+            },
+            "addresses": serializer.data
+        })

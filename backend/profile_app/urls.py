@@ -7,6 +7,7 @@ from .admin_views import (
     AdminUserDetailView,
     AdminAddressListView,
     AdminAddressDetailView,
+    AdminUserAddressListView,
 )
 
 urlpatterns = [
@@ -24,4 +25,6 @@ urlpatterns += [
     # Admin address management
     path("admin/addresses/", AdminAddressListView.as_view(), name="admin-address-list"),
     path("admin/addresses/<uuid:address_id>/", AdminAddressDetailView.as_view(), name="admin-address-detail"),
+
+    path("admin/users/<str:user_uuid>/addresses/",AdminUserAddressListView.as_view(),name="admin-user-addresses"),
 ]

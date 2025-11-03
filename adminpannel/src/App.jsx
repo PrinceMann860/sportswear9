@@ -14,6 +14,8 @@ import CategoryList from './pages/Categories/CategoryList';
 import AttributeList from './pages/Attributes/AttributeList.jsx';
 import HomepageManager from './pages/Homepage/HomepageManager';
 import ToastContainer from './components/ui/ToastContainer';
+import UserList from './pages/Users/UserList';
+import UserDetails from './pages/Users/UserDetails';
 
 function App() {
   return (
@@ -39,6 +41,13 @@ function App() {
               <Route path="attributes" element={<AttributeList />} />
               <Route path="brands" element={<BrandList />} />
               <Route path="categories" element={<CategoryList />} />
+              {/* Add these new routes */}
+              <Route path="users" element={<UserList />} />
+              <Route path="users/:id" element={<UserDetails />} />
+              
+              <Route path="analytics" element={<div className="p-6">Analytics coming soon...</div>} />
+              <Route path="settings" element={<div className="p-6">Settings coming soon...</div>} />
+
               <Route path="analytics" element={<div className="p-6">Analytics coming soon...</div>} />
               <Route path="settings" element={<div className="p-6">Settings coming soon...</div>} />
             </Route>
