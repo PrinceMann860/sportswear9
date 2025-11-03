@@ -503,7 +503,8 @@ function Home2() {
     return <div className="text-center py-10 text-red-500">Error: {error}</div>;
 
   return (
-    <main className="w-full bg-white pt-20 overflow-x-hidden">
+    // <main className="w-full bg-white pt-20 overflow-x-hidden">
+    <main className="w-full bg-white pt-20">
       <div>
         {/* ✅ Top Section */}
         <AnimatedSection>
