@@ -3,10 +3,6 @@ from shortuuid.django_fields import ShortUUIDField
 
 from categories.models import Category
 from brands.models import Brand
-# from inventory.models import Inventory
-# from attributes.models import ProductAttribute
-# from media.models import ProductImage
-# from reviews.models import Review
 import shortuuid
 from decimal import Decimal
 

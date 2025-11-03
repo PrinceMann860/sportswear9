@@ -188,6 +188,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # for collectstatic
 
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # include your project-level static folder
+]
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 

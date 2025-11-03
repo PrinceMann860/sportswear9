@@ -53,5 +53,11 @@ class Address(models.Model):
     class Meta:
         unique_together = ("user", "address_line_1", "locality_area_street", "city", "pincode")
 
+    def save(self, *args, **kwargs):
+        # If this address is marked as default, unset others for the same user
+        if self.is_default:
+            Address.objects.filter(user=self.user, is_default=True).exclude(pk=self.pk).update(is_default=False)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.address_name.title()}, {self.city} - {self.pincode}"

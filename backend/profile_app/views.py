@@ -61,6 +61,9 @@ class AddressListCreateView(generics.ListCreateAPIView):
         serializer.save(user=profile)
 
 
+from rest_framework import status
+from rest_framework.response import Response
+
 class AddressDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AddressSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -68,3 +71,22 @@ class AddressDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         profile, _ = UserProfile.objects.get_or_create(user=self.request.user)
         return Address.objects.filter(user=profile)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        address_name = instance.address_name
+        first_name = instance.first_name
+        last_name = instance.last_name
+        city = instance.city
+
+        # Delete the instance
+        self.perform_destroy(instance)
+
+        # Return a custom JSON response
+        return Response(
+            {
+                "status": "success",
+                "message": f"Address '{address_name}' for {first_name} {last_name or ''} in {city} deleted successfully."
+            },
+            status=status.HTTP_200_OK
+        )

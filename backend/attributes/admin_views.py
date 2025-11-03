@@ -97,7 +97,7 @@ class ProductVariantAttributeMediaViewSet(viewsets.ModelViewSet):
         )
 
         # Clear old images (if you want to replace)
-        media_obj.images.all().delete()
+        # media_obj.images.all().delete()
 
         uploaded = []
         for img in images:

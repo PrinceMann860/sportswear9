@@ -5,6 +5,7 @@ from .models import (
 from assets.models import ProductImage
 from products.models import Product
 
+from assets.serializers import ProductImageSerializer
 
 # ─────────────────────────────
 # Attribute serializers
@@ -62,15 +63,18 @@ class AttributeValueNestedSerializer(serializers.ModelSerializer):
         variant = self.context.get("variant") or self.parent.context.get("variant")
         if not variant:
             return []
+
         media = ProductVariantAttributeMedia.objects.filter(
             variant=variant, attribute_value=obj
         ).first()
         if not media:
             return []
-        return [
-            request.build_absolute_uri(img.image.url)
-            for img in media.images.all() if img.image
-        ]
+
+        # ✅ Use your real ProductImageSerializer to get proper fields
+        serializer = ProductImageSerializer(
+            media.images.all(), many=True, context={"request": request}
+        )
+        return serializer.data
 
 
 class ProductVariantSerializer(serializers.ModelSerializer):
@@ -115,9 +119,7 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         return rep
 
 class ProductVariantAttributeMediaUploadSerializer(serializers.ModelSerializer):
-    images = serializers.ListField(
-        child=serializers.ImageField(), write_only=True
-    )
+    images = serializers.ListField(child=serializers.ImageField(), write_only=True)
 
     class Meta:
         model = ProductVariantAttributeMedia
@@ -128,19 +130,21 @@ class ProductVariantAttributeMediaUploadSerializer(serializers.ModelSerializer):
         instance, _ = ProductVariantAttributeMedia.objects.get_or_create(**validated_data)
 
         from assets.models import ProductImage
-        uploaded = [ProductImage.objects.create(image=img) for img in images]
+        uploaded = [ProductImage.objects.create(
+            variant=instance.variant, image=img
+        ) for img in images]
 
         instance.images.set(uploaded)
         return instance
 
     def to_representation(self, instance):
         request = self.context.get("request")
+        serializer = ProductImageSerializer(
+            instance.images.all(), many=True, context={"request": request}
+        )
         return {
             "id": instance.id,
             "variant": instance.variant.id,
             "attribute_value": instance.attribute_value.value,
-            "images": [
-                request.build_absolute_uri(img.image.url)
-                for img in instance.images.all()
-            ]
+            "images": serializer.data,
         }
