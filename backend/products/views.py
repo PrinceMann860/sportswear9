@@ -1,8 +1,8 @@
 from rest_framework import generics, filters
 from rest_framework.permissions import AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Product
-from .serializers import ProductListSerializer, ProductDetailSerializer
+from .models import Product, ProductCoupon, CouponUsage
+from .serializers import ProductListSerializer, ProductDetailSerializer, ProductCouponSerializer
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 
@@ -33,7 +33,7 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
         'brand', 'category'
     ).prefetch_related(
         'variants__images',
-        'inventory',
+        'inventories',        # ✅ FIXED
         'reviews',
         'specifications'
     )
@@ -57,3 +57,4 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
         context = super().get_serializer_context()
         context['variant'] = getattr(self, 'variant', None)
         return context
+

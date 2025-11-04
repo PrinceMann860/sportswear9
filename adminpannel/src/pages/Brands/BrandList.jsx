@@ -11,6 +11,7 @@ const BrandList = () => {
     name: '',
     description: '',
     is_active: true,
+    logo: null,
   });
 
   useEffect(() => {
@@ -32,14 +33,23 @@ const BrandList = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const submitData = new FormData();
+      submitData.append('name', formData.name);
+      submitData.append('description', formData.description);
+      submitData.append('is_active', formData.is_active);
+
+      if (formData.logo) {
+        submitData.append('logo', formData.logo);
+      }
+
       if (editingBrand) {
-        await brandService.updateBrand(editingBrand.brand_uuid, formData);
+        await brandService.updateBrand(editingBrand.brand_uuid, submitData);
       } else {
-        await brandService.createBrand(formData);
+        await brandService.createBrand(submitData);
       }
       setShowForm(false);
       setEditingBrand(null);
-      setFormData({ name: '', description: '', is_active: true });
+      setFormData({ name: '', description: '', is_active: true, logo: null });
       fetchBrands();
     } catch (error) {
       console.error('Failed to save brand:', error);
@@ -52,6 +62,7 @@ const BrandList = () => {
       name: brand.name,
       description: brand.description || '',
       is_active: brand.is_active ?? true,
+      logo: null,
     });
     setShowForm(true);
   };
@@ -70,13 +81,12 @@ const BrandList = () => {
   const resetForm = () => {
     setShowForm(false);
     setEditingBrand(null);
-    setFormData({ name: '', description: '', is_active: true });
+    setFormData({ name: '', description: '', is_active: true, logo: null });
   };
 
   const toggleActive = async (brand) => {
     try {
-      const updatedData = { ...brand, is_active: !brand.is_active };
-      await brandService.updateBrand(brand.brand_uuid, updatedData);
+      await brandService.toggleBrandStatus(brand.brand_uuid, !brand.is_active);
       fetchBrands();
     } catch (error) {
       console.error('Failed to update brand status:', error);
@@ -131,6 +141,27 @@ const BrandList = () => {
                   className="input-field"
                   placeholder="Enter brand description"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Logo
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setFormData({ ...formData, logo: e.target.files[0] })}
+                  className="input-field"
+                />
+                {editingBrand?.logo && (
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-500 mb-1">Current logo:</p>
+                    <img
+                      src={editingBrand.logo}
+                      alt={editingBrand.name}
+                      className="h-16 w-16 object-contain border border-gray-200 rounded"
+                    />
+                  </div>
+                )}
               </div>
               <div>
                 <label className="flex items-center">

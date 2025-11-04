@@ -19,30 +19,48 @@ export const brandService = {
     }
   },
 
-  // Create brand
-  async createBrand(brandData) {
+  // Create brand with multipart/form-data
+  async createBrand(formData) {
     try {
-      const response = await api.post('/api/brands/admin/create/', brandData);
+      const response = await api.post('/api/brands/create/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to create brand' };
     }
   },
 
-  // Update brand
-  async updateBrand(uuid, brandData) {
+  // Update brand (full update with multipart/form-data)
+  async updateBrand(uuid, formData) {
     try {
-      const response = await api.put(`/api/brands/admin/${uuid}/update/`, brandData);
+      const response = await api.put(`/api/brands/admin/${uuid}/update/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to update brand' };
     }
   },
 
+  // Toggle brand active status (PATCH)
+  async toggleBrandStatus(uuid, is_active) {
+    try {
+      const response = await api.patch(`/api/brands/${uuid}/admin/`, { is_active });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to update brand status' };
+    }
+  },
+
   // Delete brand
   async deleteBrand(uuid) {
     try {
-      const response = await api.delete(`/api/brands/admin/${uuid}/delete/`);
+      const response = await api.delete(`/api/brands/${uuid}/admin/`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to delete brand' };

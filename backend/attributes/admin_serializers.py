@@ -78,10 +78,14 @@ class AttributeValueNestedSerializer(serializers.ModelSerializer):
 
 
 class ProductVariantSerializer(serializers.ModelSerializer):
+    stock = serializers.SerializerMethodField()
+    is_available = serializers.SerializerMethodField()
+    images = ProductImageSerializer(many=True, read_only=True)  # ✅ Add this line
+
     product_uuid = serializers.SlugRelatedField(
         slug_field="product_uuid",
         queryset=Product.objects.all(),
-        source="product"  # maps product_uuid → product FK internally
+        source="product"
     )
     attributes = AttributeValueNestedSerializer(many=True, read_only=True)
     attribute_ids = serializers.PrimaryKeyRelatedField(
@@ -90,13 +94,27 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         queryset=AttributeValue.objects.all(),
         write_only=True
     )
+
     class Meta:
         model = ProductVariant
         fields = [
             "id", "product_uuid", "sku", "price", "net", "is_default",
-            "attributes", "attribute_ids"
+            "attributes", "attribute_ids", "stock", "is_available", "images"  # ✅ added images
         ]
 
+    def get_stock(self, obj):
+        user = self.context["request"].user
+        if hasattr(obj, "inventory"):
+            # Show real numbers to admin only
+            if user.is_staff:
+                return obj.inventory.stock
+        return None
+
+    def get_is_available(self, obj):
+        if hasattr(obj, "inventory"):
+            return obj.inventory.is_available
+        return False
+    
     def get_product_uuid(self, obj):
         return obj.product.product_uuid
 

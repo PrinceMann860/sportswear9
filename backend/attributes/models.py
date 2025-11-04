@@ -4,6 +4,10 @@ from products.models import Product
 from django.utils.text import slugify
 from decimal import Decimal
 import shortuuid
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from inventory.models import Inventory
+from django.conf import settings
 
 
 class Attribute(models.Model):
@@ -101,3 +105,13 @@ class ProductVariantAttributeMedia(models.Model):
 
     def __str__(self):
         return f"{self.variant.sku} - {self.attribute_value.value}"
+
+
+@receiver(post_save, sender=ProductVariant)
+def create_inventory_for_variant(sender, instance, created, **kwargs):
+    if created:
+        Inventory.objects.get_or_create(
+            product=instance.product,
+            variant=instance,
+            defaults={"sku": instance.sku, "stock": 0}
+        )

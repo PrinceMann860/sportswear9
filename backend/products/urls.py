@@ -1,32 +1,33 @@
-# products/urls.py
 from django.urls import path
 from . import views, admin_views
-from attributes.views import ProductVariantAttributeUploadView
 
 urlpatterns = [
-    # Public APIs
+    # ===========================
+    # 🌐 Public APIs
+    # ===========================
     path('', views.ProductListAPIView.as_view(), name='product-list'),
     path('<str:product_uuid>/', views.ProductDetailAPIView.as_view(), name='product-detail'),
 
-    # Admin APIs
-    # Product CRUD
+    # ✅ Coupon Validation for checkout
+    path('coupons/validate/', admin_views.ValidateCouponAPIView.as_view(), name='validate-coupon'),
+
+   # ===========================
+    # 🛠️ Admin APIs
+    # ===========================
     path('admin/create/', admin_views.ProductCreateAPIView.as_view(), name='product-create'),
-    
-    # Product Update
+
+    # ✅ Global Coupons FIRST (to avoid conflict)
+    path("admin/coupons/", admin_views.GlobalCouponListCreateAPIView.as_view(), name="global-coupon-list-create"),
+    path("admin/coupons/<int:pk>/", admin_views.GlobalCouponDetailAPIView.as_view(), name="global-coupon-detail"),
+
+    # Product-specific
     path('admin/<str:product_uuid>/', admin_views.ProductUpdateAPIView.as_view(), name='product-update'),
-
-    # Product Variants (nested under product)
     path('admin/<str:product_uuid>/variants/', admin_views.AddVariantAPIView.as_view(), name='product-add-variant'),
-
-    # Specifications
     path('admin/<str:product_uuid>/specs/', admin_views.AddSpecificationAPIView.as_view(), name='product-add-specs'),
-
-    # Variant Media Uploads
     path('admin/<str:product_uuid>/variant/<str:variant_id>/upload-media/', admin_views.UploadVariantMediaAPIView.as_view(), name='variant-upload-media'),
+    path('admin/<str:product_uuid>/variant/<str:variant_id>/attribute/<int:attribute_value_id>/upload-media/', admin_views.UploadAttributeMediaAPIView.as_view(), name='variant-attribute-upload-media'),
 
-    path(
-        "admin/products/<str:product_uuid>/variants/<str:variant_id>/attributes/<str:attribute_value_id>/upload/",
-        ProductVariantAttributeUploadView.as_view(),
-        name="admin-variant-attribute-upload",
-    ),
+    # Product Coupons
+    path("admin/<str:product_uuid>/coupons/", admin_views.ProductCouponListCreateAPIView.as_view(), name="product-coupon-list-create"),
+    path("admin/<str:product_uuid>/coupons/<int:pk>/", admin_views.ProductCouponDetailAPIView.as_view(), name="product-coupon-detail"),
 ]

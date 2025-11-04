@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product
+from .models import Product, ProductCoupon
 from categories.models import Category
 from brands.models import Brand
 from inventory.models import Inventory
@@ -173,3 +173,19 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         ]
 
 
+# products/serializers.py
+class ProductCouponSerializer(serializers.ModelSerializer):
+    product_name = serializers.ReadOnlyField(source="product.name")
+    cupon_uuid = serializers.ReadOnlyField()# ✅ adds "id" back as alias
+
+
+    class Meta:
+        model = ProductCoupon
+        fields = [
+            "cupon_uuid", "code", "type", "value",
+            "product", "product_name",
+            "start_date", "end_date",
+            "usage_limit", "used_count",
+            "per_user_limit",
+            "active",
+        ]
