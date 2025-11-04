@@ -5,13 +5,16 @@ from django.utils.text import slugify
 
 class Category(MPTTModel):
     category_uuid = ShortUUIDField(length=12, alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', prefix='CAT-', unique=True, editable=False)
-    name = models.CharField(max_length=255, unique=True)
-    slug = models.SlugField(unique=True, blank=True)  # allow blank here; will auto-generate
+    name = models.CharField(max_length=255)  # ❌ remove unique=True
+    slug = models.SlugField(blank=True)      # allow blank here; will auto-generate
     parent = TreeForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, related_name="children")
     is_active = models.BooleanField(default=True)
 
     class MPTTMeta:
         order_insertion_by = ["name"]
+        
+    class Meta:
+        unique_together = ('parent', 'slug')  # ✅ make unique per parent
 
     def save(self, *args, **kwargs):
         if not self.slug or self.name_has_changed():  # Optional enhancement

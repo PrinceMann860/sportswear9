@@ -14,7 +14,7 @@ class InventorySerializer(serializers.ModelSerializer):
         fields = [
             'inventory_uuid', 'sku', 'product', 'variant',
             'product_name', 'variant_sku',
-            'stock', 'reserved_stock', 'available_stock',
+            'stock', 'available_stock',
             'low_stock_threshold', 'is_available', 'updated_at'
         ]
         read_only_fields = ['available_stock', 'is_available', 'updated_at']

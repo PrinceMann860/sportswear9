@@ -1,7 +1,8 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Plus, CreditCard as Edit, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
+import { Plus, CreditCard as Edit, Trash2, ChevronDown, ChevronRight, FolderPlus } from 'lucide-react';
 import { categoryService } from '../../services/categoryService';
+import { useToast } from '../../hooks/useToast';
 
 const CategoryList = () => {
   const [categories, setCategories] = useState([]);
@@ -9,6 +10,7 @@ const CategoryList = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [expandedCategories, setExpandedCategories] = useState(new Set());
+  const { showSuccess, showError } = useToast();
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -27,6 +29,7 @@ const CategoryList = () => {
       setCategories(data);
     } catch (error) {
       console.error('Failed to fetch categories:', error);
+      showError('Failed to fetch categories');
     } finally {
       setLoading(false);
     }
@@ -42,8 +45,10 @@ const CategoryList = () => {
 
       if (editingCategory) {
         await categoryService.updateCategory(editingCategory.category_uuid, categoryData);
+        showSuccess('Category updated successfully');
       } else {
         await categoryService.createCategory(categoryData);
+        showSuccess('Category created successfully');
       }
       setShowForm(false);
       setEditingCategory(null);
@@ -51,6 +56,7 @@ const CategoryList = () => {
       fetchCategories();
     } catch (error) {
       console.error('Failed to save category:', error);
+      showError('Failed to save category');
     }
   };
 
@@ -65,13 +71,25 @@ const CategoryList = () => {
     setShowForm(true);
   };
 
+  const handleAddSubCategory = (parentCategory) => {
+    setFormData({
+      name: '',
+      slug: '',
+      parent: parentCategory.category_uuid,
+      is_active: true,
+    });
+    setShowForm(true);
+  };
+
   const handleDelete = async (uuid) => {
     if (window.confirm('Are you sure you want to delete this category?')) {
       try {
         await categoryService.deleteCategory(uuid);
+        showSuccess('Category deleted successfully');
         fetchCategories();
       } catch (error) {
         console.error('Failed to delete category:', error);
+        showError('Failed to delete category');
       }
     }
   };
@@ -112,9 +130,11 @@ const CategoryList = () => {
     try {
       const updatedData = { ...category, is_active: !category.is_active };
       await categoryService.updateCategory(category.category_uuid, updatedData);
+      showSuccess(`Category ${category.is_active ? 'deactivated' : 'activated'} successfully`);
       fetchCategories();
     } catch (error) {
       console.error('Failed to update category status:', error);
+      showError('Failed to update category status');
     }
   };
 
@@ -196,6 +216,13 @@ const CategoryList = () => {
           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
             <div className="flex space-x-3">
               <button
+                onClick={() => handleAddSubCategory(category)}
+                className="text-green-600 hover:text-green-900 transition-colors duration-150"
+                title="Add subcategory"
+              >
+                <FolderPlus className="h-4 w-4" />
+              </button>
+              <button
                 onClick={() => handleEdit(category)}
                 className="text-blue-600 hover:text-blue-900 transition-colors duration-150"
               >
@@ -240,7 +267,7 @@ const CategoryList = () => {
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-lg font-semibold mb-4">
-              {editingCategory ? 'Edit Category' : 'Add New Category'}
+              {editingCategory ? 'Edit Category' : formData.parent ? 'Add Subcategory' : 'Add New Category'}
             </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -276,10 +303,16 @@ const CategoryList = () => {
                   value={formData.parent}
                   onChange={(e) => setFormData({ ...formData, parent: e.target.value })}
                   className="input-field"
+                  disabled={!!formData.parent && !editingCategory}
                 >
                   <option value="">No Parent (Top Level)</option>
                   {renderCategoryOptions(categories)}
                 </select>
+                {formData.parent && !editingCategory && (
+                  <p className="text-sm text-blue-600 mt-1">
+                    Creating subcategory under: {categories.find(c => findCategoryByUuid(c, formData.parent))?.name}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="flex items-center">
@@ -350,6 +383,18 @@ const CategoryList = () => {
       </div>
     </div>
   );
+};
+
+// Helper function to find category by UUID
+const findCategoryByUuid = (category, uuid) => {
+  if (category.category_uuid === uuid) return category;
+  if (category.children) {
+    for (const child of category.children) {
+      const found = findCategoryByUuid(child, uuid);
+      if (found) return found;
+    }
+  }
+  return null;
 };
 
 export default CategoryList;

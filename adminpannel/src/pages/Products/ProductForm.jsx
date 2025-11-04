@@ -10,8 +10,10 @@ import {
   useGetCategoriesQuery 
 } from '../../store/api/apiSlice';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
-import NestedDropdown from '../../components/ui/NestedDropdown';
+import CollapsibleDropdown from '../../components/ui/CollapsibleDropdown';
 import { useToast } from '../../hooks/useToast';
+import { categoryService } from '../../services/categoryService';
+import { brandService } from '../../services/brandService';
 
 const ProductForm = () => {
   const navigate = useNavigate();
@@ -31,10 +33,24 @@ const ProductForm = () => {
   });
 
   const [error, setError] = useState('');
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [showBrandForm, setShowBrandForm] = useState(false);
+  const [categoryFormData, setCategoryFormData] = useState({
+    name: '',
+    slug: '',
+    parent: '',
+    is_active: true,
+  });
+  const [brandFormData, setBrandFormData] = useState({
+    name: '',
+    description: '',
+    is_active: true,
+    logo: null,
+  });
 
   // API queries
-  const { data: brands = [] } = useGetBrandsQuery();
-  const { data: categories = [] } = useGetCategoriesQuery();
+  const { data: brands = [], refetch: refetchBrands } = useGetBrandsQuery();
+  const { data: categories = [], refetch: refetchCategories } = useGetCategoriesQuery();
   
   const { 
     data: product, 
@@ -70,6 +86,74 @@ const ProductForm = () => {
     setFormData({
       ...formData,
       [name]: type === 'checkbox' ? checked : value,
+    });
+  };
+
+  const handleCreateCategory = async (e) => {
+    e.preventDefault();
+    try {
+      const categoryData = {
+        ...categoryFormData,
+        parent: categoryFormData.parent || null,
+      };
+      const newCategory = await categoryService.createCategory(categoryData);
+      await refetchCategories();
+      setFormData({ ...formData, category: newCategory.category_uuid });
+      setShowCategoryForm(false);
+      setCategoryFormData({ name: '', slug: '', parent: '', is_active: true });
+      showSuccess('Category created successfully');
+    } catch (error) {
+      console.error('Failed to create category:', error);
+      showError('Failed to create category');
+    }
+  };
+
+  const handleCreateBrand = async (e) => {
+    e.preventDefault();
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', brandFormData.name);
+      formDataToSend.append('description', brandFormData.description);
+      formDataToSend.append('is_active', brandFormData.is_active);
+      if (brandFormData.logo) {
+        formDataToSend.append('logo', brandFormData.logo);
+      }
+      
+      const newBrand = await brandService.createBrand(formDataToSend);
+      await refetchBrands();
+      setFormData({ ...formData, brand: newBrand.brand_uuid });
+      setShowBrandForm(false);
+      setBrandFormData({ name: '', description: '', is_active: true, logo: null });
+      showSuccess('Brand created successfully');
+    } catch (error) {
+      console.error('Failed to create brand:', error);
+      showError('Failed to create brand');
+    }
+  };
+
+  const handleAddSubCategory = (parentCategory) => {
+    setCategoryFormData({
+      name: '',
+      slug: '',
+      parent: parentCategory.category_uuid,
+      is_active: true,
+    });
+    setShowCategoryForm(true);
+  };
+
+  const generateSlug = (name) => {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+  };
+
+  const handleCategoryNameChange = (e) => {
+    const name = e.target.value;
+    setCategoryFormData({
+      ...categoryFormData,
+      name,
+      slug: generateSlug(name),
     });
   };
 
@@ -194,12 +278,13 @@ const ProductForm = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Brand *
               </label>
+              <div className="flex space-x-2">
               <select
                 name="brand"
                 required
                 value={formData.brand}
                 onChange={handleChange}
-                className="input-field"
+                  className="input-field flex-1"
               >
                 <option value="">Select a brand</option>
                 {brands.map((brand) => (
@@ -208,18 +293,37 @@ const ProductForm = () => {
                   </option>
                 ))}
               </select>
+                <button
+                  type="button"
+                  onClick={() => setShowBrandForm(true)}
+                  className="btn-secondary text-sm px-3"
+                >
+                  New
+                </button>
+              </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category *
               </label>
-              <NestedDropdown
-                categories={categories}
-                value={formData.category}
-                onChange={(value) => setFormData({ ...formData, category: value })}
-                placeholder="Select a category"
-              />
+              <div className="flex space-x-2">
+                <CollapsibleDropdown
+                  categories={categories}
+                  value={formData.category}
+                  onChange={(value) => setFormData({ ...formData, category: value })}
+                  placeholder="Select a category"
+                  className="flex-1"
+                  onAddSubCategory={handleAddSubCategory}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCategoryForm(true)}
+                  className="btn-secondary text-sm px-3"
+                >
+                  New
+                </button>
+              </div>
             </div>
           </div>
 
@@ -302,6 +406,156 @@ const ProductForm = () => {
           </button>
         </div>
       </form>
+
+      {/* Category Form Modal */}
+      {showCategoryForm && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4">
+              {categoryFormData.parent ? 'Add Subcategory' : 'Add New Category'}
+            </h3>
+            <form onSubmit={handleCreateCategory} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Category Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={categoryFormData.name}
+                  onChange={handleCategoryNameChange}
+                  className="input-field"
+                  placeholder="Enter category name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Slug
+                </label>
+                <input
+                  type="text"
+                  value={categoryFormData.slug}
+                  onChange={(e) => setCategoryFormData({ ...categoryFormData, slug: e.target.value })}
+                  className="input-field"
+                  placeholder="category-slug"
+                />
+              </div>
+              {!categoryFormData.parent && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Parent Category
+                  </label>
+                  <CollapsibleDropdown
+                    categories={categories}
+                    value={categoryFormData.parent}
+                    onChange={(value) => setCategoryFormData({ ...categoryFormData, parent: value })}
+                    placeholder="No Parent (Top Level)"
+                  />
+                </div>
+              )}
+              <div>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={categoryFormData.is_active}
+                    onChange={(e) => setCategoryFormData({ ...categoryFormData, is_active: e.target.checked })}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">Active</span>
+                </label>
+              </div>
+              <div className="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCategoryForm(false);
+                    setCategoryFormData({ name: '', slug: '', parent: '', is_active: true });
+                  }}
+                  className="btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary">
+                  Create
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Brand Form Modal */}
+      {showBrandForm && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4">Add New Brand</h3>
+            <form onSubmit={handleCreateBrand} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Brand Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={brandFormData.name}
+                  onChange={(e) => setBrandFormData({ ...brandFormData, name: e.target.value })}
+                  className="input-field"
+                  placeholder="Enter brand name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </label>
+                <textarea
+                  rows={3}
+                  value={brandFormData.description}
+                  onChange={(e) => setBrandFormData({ ...brandFormData, description: e.target.value })}
+                  className="input-field"
+                  placeholder="Enter brand description"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Logo
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setBrandFormData({ ...brandFormData, logo: e.target.files[0] })}
+                  className="input-field"
+                />
+              </div>
+              <div>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={brandFormData.is_active}
+                    onChange={(e) => setBrandFormData({ ...brandFormData, is_active: e.target.checked })}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">Active</span>
+                </label>
+              </div>
+              <div className="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowBrandForm(false);
+                    setBrandFormData({ name: '', description: '', is_active: true, logo: null });
+                  }}
+                  className="btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary">
+                  Create
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

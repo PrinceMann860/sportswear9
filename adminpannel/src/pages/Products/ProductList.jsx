@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Plus, Search, CreditCard as Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, CreditCard as Edit, Trash2, Archive } from 'lucide-react';
 import { 
   useGetProductsQuery, 
   useDeleteProductMutation,
@@ -10,7 +10,7 @@ import {
 } from '../../store/api/apiSlice';
 import { setFilters } from '../../store/slices/productsSlice';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
-import NestedDropdown from '../../components/ui/NestedDropdown';
+import CollapsibleDropdown from '../../components/ui/CollapsibleDropdown';
 import { useToast } from '../../hooks/useToast';
 
 const ProductList = () => {
@@ -41,7 +41,8 @@ const ProductList = () => {
   const { 
     data: products = [], 
     isLoading: productsLoading, 
-    error: productsError 
+    error: productsError,
+    refetch: refetchProducts
   } = useGetProductsQuery({
     search: filters.search,
     brand: filters.brand,
@@ -57,6 +58,7 @@ const ProductList = () => {
     if (window.confirm(`Are you sure you want to delete "${productName}"?`)) {
       try {
         await deleteProduct(productUuid).unwrap();
+        await refetchProducts();
         showSuccess('Product deleted successfully');
       } catch (error) {
         showError('Failed to delete product');
@@ -133,7 +135,7 @@ const ProductList = () => {
                 </option>
               ))}
             </select>
-            <NestedDropdown
+            <CollapsibleDropdown
               categories={categories}
               value={localFilters.category}
               onChange={(value) => setLocalFilters({ ...localFilters, category: value })}
@@ -271,6 +273,14 @@ const ProductList = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium action-buttons">
                       <div className="flex space-x-3">
+                        <Link
+                          to={`/inventory?product=${product.product_uuid}`}
+                          className="text-purple-600 hover:text-purple-900 transition-colors duration-150"
+                          onClick={(e) => e.stopPropagation()}
+                          title="Manage Inventory"
+                        >
+                          <Archive className="h-4 w-4" />
+                        </Link>
                         <Link
                           to={`/products/${product.product_uuid}/edit`}
                           className="text-blue-600 hover:text-blue-900 transition-colors duration-150"

@@ -22,7 +22,7 @@ export const categoryService = {
   // Create category
   async createCategory(categoryData) {
     try {
-      const response = await api.post('/api/categories/admin/create/', categoryData);
+      const response = await api.post('/api/categories/', categoryData);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to create category' };
@@ -32,7 +32,7 @@ export const categoryService = {
   // Update category
   async updateCategory(uuid, categoryData) {
     try {
-      const response = await api.patch(`/api/categories/admin/${uuid}/update/`, categoryData);
+      const response = await api.patch(`/api/categories/${uuid}/`, categoryData);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to update category' };
@@ -42,7 +42,7 @@ export const categoryService = {
   // Delete category
   async deleteCategory(uuid) {
     try {
-      const response = await api.delete(`/api/categories/admin/${uuid}/delete/`);
+      const response = await api.delete(`/api/categories/${uuid}/`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to delete category' };
