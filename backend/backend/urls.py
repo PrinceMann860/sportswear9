@@ -35,6 +35,7 @@ urlpatterns = [
     path('api/brands/', include('brands.urls')),
     path('api/attributes/', include('attributes.urls')),
     path('api/main/', include('homepage.urls')),
+    path('api/inv/', include('inventory.urls')),
 
 ]
 

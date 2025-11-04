@@ -1,12 +1,12 @@
 # inventory/urls.py
 from django.urls import path
-from . import views
+from . import views, admin_views
 
 urlpatterns = [
     # Admin APIs
-    path('admin/', views.InventoryListCreateAPIView.as_view(), name='inventory-list'),
-    path('admin/<str:inventory_uuid>/', views.InventoryDetailAPIView.as_view(), name='inventory-detail'),
+    path("admin/", admin_views.InventoryListCreateAdminAPIView.as_view(), name="admin-inventory-list"),
+    path("admin/<str:inventory_uuid>/", admin_views.InventoryDetailAdminAPIView.as_view(), name="admin-inventory-detail"),
 
     # Public
-    path('<str:inventory_uuid>/', views.PublicInventoryAPIView.as_view(), name='public-inventory'),
+    path("<str:inventory_uuid>/", views.PublicInventoryAPIView.as_view(), name="public-inventory"),
 ]

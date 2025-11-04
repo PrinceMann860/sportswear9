@@ -25,3 +25,11 @@ class PublicInventoryAPIView(generics.RetrieveAPIView):
     serializer_class = InventorySerializer
     permission_classes = [permissions.AllowAny]
     lookup_field = "inventory_uuid"
+
+
+class PublicInventoryAPIView(generics.RetrieveAPIView):
+    queryset = Inventory.objects.filter(is_available=True).select_related("product", "variant")
+    serializer_class = InventorySerializer
+    permission_classes = [permissions.AllowAny]
+    lookup_field = "inventory_uuid"
+
