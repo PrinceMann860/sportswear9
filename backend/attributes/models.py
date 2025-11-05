@@ -52,7 +52,7 @@ class ProductVariant(models.Model):
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="variants")
     sku = models.CharField(max_length=100, unique=True, blank=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     discount = models.DecimalField(
         max_digits=5, decimal_places=2, null=True, blank=True)  # optional override
     net = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -64,6 +64,9 @@ class ProductVariant(models.Model):
         # Auto-generate SKU
         if not self.sku:
             self.sku = f"{self.product.product_uuid}-{shortuuid.uuid()[:6].upper()}"
+
+        if not self.price:
+            self.price = getattr(self.product, "price", 0)
 
         # Price and discount logic
         price = Decimal(str(self.price))

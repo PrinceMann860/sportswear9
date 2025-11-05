@@ -6,6 +6,7 @@ from assets.models import ProductImage, ProductVideo
 from django.contrib.contenttypes.fields import GenericRelation
 
 class Review(models.Model):
+    review_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="reviews")
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="reviews")
     rating = models.PositiveIntegerField(default=1)

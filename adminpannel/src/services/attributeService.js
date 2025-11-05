@@ -176,7 +176,7 @@ export const attributeService = {
   async uploadVariantAttributeImages(productUuid, variantId, attributeValueId, formData) {
     try {
       const response = await api.post(
-        `/api/products/admin/products/${productUuid}/variants/${variantId}/attributes/${attributeValueId}/upload/`,
+        `/api/products/admin/${productUuid}/variant/${variantId}/attribute/${attributeValueId}/upload-media/`,
         formData,
         {
           headers: {
