@@ -119,7 +119,7 @@ const ProductDetails = () => {
           <div className="card">
             {product.default_images && product.default_images.length > 0 ? (
               <img
-                src={product.default_images[0]}
+                src={`http://127.0.0.1:8000${product.default_images[0].url}`}
                 alt={product.name || product.title}
                 className="w-full h-64 object-cover rounded-lg"
                 onError={(e) => {

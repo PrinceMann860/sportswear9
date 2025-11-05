@@ -195,7 +195,7 @@ const ProductList = () => {
                       <div className="flex items-center">
                         {product.img ? (
                           <img
-                            src={product.img}
+                            src={`http://127.0.0.1:8000${product.img}`}
                             alt={product.title}
                             className="h-12 w-12 object-cover rounded-lg mr-4 shadow-sm"
                             onError={(e) => {

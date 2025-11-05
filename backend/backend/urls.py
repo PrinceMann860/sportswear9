@@ -36,6 +36,7 @@ urlpatterns = [
     path('api/attributes/', include('attributes.urls')),
     path('api/main/', include('homepage.urls')),
     path('api/inv/', include('inventory.urls')),
+    path('api/media/', include('assets.urls')),
 
 ]
 

@@ -25,9 +25,13 @@ urlpatterns = [
     path('admin/<str:product_uuid>/variants/', admin_views.AddVariantAPIView.as_view(), name='product-add-variant'),
     path('admin/<str:product_uuid>/specs/', admin_views.AddSpecificationAPIView.as_view(), name='product-add-specs'),
     path('admin/<str:product_uuid>/variant/<str:variant_id>/upload-media/', admin_views.UploadVariantMediaAPIView.as_view(), name='variant-upload-media'),
-    path('admin/<str:product_uuid>/variant/<str:variant_id>/attribute/<int:attribute_value_id>/upload-media/', admin_views.UploadAttributeMediaAPIView.as_view(), name='variant-attribute-upload-media'),
+    path('admin/<str:product_uuid>/variant/<str:variant_id>/attribute/<str:attribute_value_id>/upload-media/', admin_views.UploadAttributeMediaAPIView.as_view(), name='variant-attribute-upload-media'),
 
     # Product Coupons
     path("admin/<str:product_uuid>/coupons/", admin_views.ProductCouponListCreateAPIView.as_view(), name="product-coupon-list-create"),
     path("admin/<str:product_uuid>/coupons/<int:pk>/", admin_views.ProductCouponDetailAPIView.as_view(), name="product-coupon-detail"),
+
+    path("admin/<str:product_uuid>/variant/<str:variant_id>/attribute/<str:attribute_value_id>/update/", admin_views.VariantAttributeUpdateAPIView.as_view(), name="variant-attribute-update"),
+    path("admin/<str:product_uuid>/variant/<str:variant_id>/attribute/<str:attribute_value_id>/delete/", admin_views.VariantAttributeDeleteAPIView.as_view(), name="variant-attribute-delete",),
 ]
+

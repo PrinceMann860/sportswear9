@@ -5,6 +5,8 @@ from .serializers import ProductImageSerializer, ProductVideoSerializer
 class ProductImageViewSet(viewsets.ModelViewSet):
     queryset = ProductImage.objects.all()
     serializer_class = ProductImageSerializer
+    lookup_field = "image_uuid"   # 👈 THIS IS THE FIX
+
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:

@@ -52,10 +52,20 @@ export const apiSlice = createApi({
 
     // Products endpoints
     getProducts: builder.query({
-      query: (params = {}) => ({
+      query: (params = {}) => {
+        // Clean up empty parameters
+        const cleanParams = {};
+        Object.keys(params).forEach(key => {
+          if (params[key] && params[key].trim() !== '') {
+            cleanParams[key] = params[key];
+          }
+        });
+        
+        return {
         url: '/api/products/',
-        params,
-      }),
+          params: cleanParams,
+        };
+      },
       providesTags: ['Product'],
     }),
     getProduct: builder.query({

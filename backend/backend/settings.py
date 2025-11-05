@@ -30,6 +30,7 @@ SECRET_KEY = 'django-insecure-fm3qlkfvp^o5v@ksd&lb501qe@60n0bm^5cg(k5tnop@n^ewoc
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+USE_IMGPROXY = False
 
 # Allow frontend origin
 CORS_ALLOWED_ORIGINS = [

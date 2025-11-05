@@ -3,7 +3,6 @@ from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from .models import Product, ProductCoupon, CouponUsage
-from attributes.models import ProductVariant
 from assets.models import ProductImage
 from ProductSpecification.models import ProductSpecification
 from .serializers import ProductDetailSerializer, ProductCouponSerializer
@@ -12,10 +11,11 @@ from .admin_serializers import ProductCreateSerializer
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 # from .serializers import ProductAdminSerializer  # ✅ use this, not ProductDetailSerializer
-from attributes.models import AttributeValue, ProductVariantAttributeMedia
+from attributes.models import AttributeValue, ProductVariantAttributeMedia, ProductVariant, ProductAttribute, AttributeValue
 from assets.serializers import ProductImageSerializer
 from attributes.admin_serializers import ProductVariantSerializer
 from decimal import Decimal
+from rest_framework.parsers import MultiPartParser, FormParser
 
 class ProductCreateAPIView(generics.CreateAPIView):
     queryset = Product.objects.all()
@@ -147,47 +147,60 @@ class UploadVariantMediaAPIView(APIView):
 
 
 class UploadAttributeMediaAPIView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
     permission_classes = [IsAdminUser]
 
     def post(self, request, product_uuid, variant_id, attribute_value_id):
-        product = get_object_or_404(Product, product_uuid=product_uuid)
-        variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
-        attr_value = get_object_or_404(AttributeValue, id=attribute_value_id)
-
         images = request.FILES.getlist("images")
+        alt_texts = request.data.getlist("alt_texts")  # Optional manual alt texts
+
         if not images:
             return Response({"error": "No images provided"}, status=400)
 
-        uploaded_images = []
+        # ✅ Get product, variant, and attribute info
+        variant = get_object_or_404(ProductVariant, id=variant_id, product__product_uuid=product_uuid)
+        attribute_value = get_object_or_404(AttributeValue, id=attribute_value_id)
+        product = variant.product  # Get related product (to access its name)
 
-        for img in images:
-            image_obj = ProductImage.objects.create(
+        # ✅ Create or get media object for this variant+attribute combo
+        media_obj, _ = ProductVariantAttributeMedia.objects.get_or_create(
+            variant=variant,
+            attribute_value=attribute_value,
+        )
+
+        uploaded = []
+        for idx, img in enumerate(images):
+            # 🧠 Default alt text: combine attribute value + product name
+            # Example: "Blue Nike Air Jordans"
+            default_alt = f"{attribute_value.value} {product.name}".strip()
+
+            # Use manual alt text if provided; else use the default
+            alt_text = (
+                alt_texts[idx] if idx < len(alt_texts) and alt_texts[idx].strip()
+                else default_alt
+            )
+
+            product_image = ProductImage.objects.create(
                 variant=variant,
                 image=img,
-                alt_text=request.data.get("alt_text", ""),
-                is_main=request.data.get("is_main", False)
+                alt_text=alt_text,
             )
 
-            # ✅ link to attribute value
-            ProductVariantAttributeMedia.objects.create(
-                variant=variant,
-                attribute_value=attr_value,
-                image=image_obj
-            )
+            media_obj.images.add(product_image)
 
-            uploaded_images.append(image_obj)
-
-        # ✅ Proper serialization using DRF
-        serialized_images = ProductImageSerializer(uploaded_images, many=True, context={"request": request}).data
+            uploaded.append({
+                "id": product_image.id,
+                "url": product_image.image.url,
+                "alt_text": product_image.alt_text,
+            })
 
         return Response({
-            "product": product.name,
-            "variant_id": variant.id,
-            "attribute_value": attr_value.value,
-            "uploaded_count": len(uploaded_images),
-            "uploaded_images": serialized_images,
-            "message": f"{len(uploaded_images)} images uploaded successfully."
-        }, status=201)
+            "message": "Images uploaded successfully",
+            "uploaded_images": uploaded,
+            "media_id": media_obj.id
+        }, status=status.HTTP_201_CREATED)
+
+
 
 class ProductCouponListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = ProductCouponSerializer
@@ -278,3 +291,67 @@ class ValidateCouponAPIView(APIView):
             "discounted_price": str(new_price),
             "message": f"Coupon '{coupon.code}' applied successfully!",
         }, status=200)
+    
+class VariantAttributeUpdateAPIView(generics.UpdateAPIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def patch(self, request, product_uuid, variant_id, attribute_value_id):
+        """
+        Update a variant's attribute value to another AttributeValue.
+        Example:
+        PATCH /api/products/admin/<product_uuid>/variant/<variant_id>/attribute/<attribute_value_id>/update/
+        Body: {"attribute_value": "CFq7gwniDxcv"}
+        """
+        try:
+            variant = ProductVariant.objects.get(id=variant_id, product__product_uuid=product_uuid)
+        except ProductVariant.DoesNotExist:
+            return Response({"error": "Variant not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        attribute_value = request.data.get("attribute_value")
+        if not attribute_value:
+            return Response({"error": "Missing field: attribute_value"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            old_value = AttributeValue.objects.get(id=attribute_value_id)
+        except AttributeValue.DoesNotExist:
+            return Response({"error": "Old AttributeValue not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            new_value = AttributeValue.objects.get(id=attribute_value)
+        except AttributeValue.DoesNotExist:
+            return Response({"error": "New AttributeValue not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # If the variant has the old attribute value, replace it
+        if old_value in variant.attributes.all():
+            variant.attributes.remove(old_value)
+            variant.attributes.add(new_value)
+            variant.save()
+            return Response({"message": "Variant attribute updated successfully"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Variant does not have this attribute value"}, status=status.HTTP_404_NOT_FOUND)
+
+class VariantAttributeDeleteAPIView(APIView):
+    """
+    DELETE /api/products/admin/<product_uuid>/variant/<variant_id>/attribute/<attribute_value_id>/delete/
+    Removes an attribute value from a variant.
+    """
+    permission_classes = [permissions.IsAdminUser]
+
+    def delete(self, request, product_uuid, variant_id, attribute_value_id):
+        try:
+            variant = ProductVariant.objects.get(id=variant_id, product__product_uuid=product_uuid)
+        except ProductVariant.DoesNotExist:
+            return Response({"error": "Variant not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            attribute_value = AttributeValue.objects.get(id=attribute_value_id)
+        except AttributeValue.DoesNotExist:
+            return Response({"error": "Attribute value not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # ✅ Remove the attribute value if it exists in this variant
+        if attribute_value in variant.attributes.all():
+            variant.attributes.remove(attribute_value)
+            variant.save()
+            return Response({"message": "Attribute removed from variant successfully"}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({"error": "This attribute value is not linked to the variant"}, status=status.HTTP_404_NOT_FOUND)

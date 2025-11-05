@@ -147,11 +147,36 @@ export const attributeService = {
     }
   },
 
+  // Admin - Update variant attribute
+  async updateVariantAttribute(productUuid, variantId, attributeValueId, newAttributeValueId) {
+    try {
+      const response = await api.patch(
+        `/api/products/admin/${productUuid}/variant/${variantId}/attribute/${attributeValueId}/update/`,
+        { attribute_value: newAttributeValueId }
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to update variant attribute' };
+    }
+  },
+
+  // Admin - Delete variant attribute
+  async deleteVariantAttribute(productUuid, variantId, attributeValueId) {
+    try {
+      const response = await api.delete(
+        `/api/products/admin/${productUuid}/variant/${variantId}/attribute/${attributeValueId}/delete/`
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to delete variant attribute' };
+    }
+  },
+
   // Admin - Upload variant media
-  async uploadVariantMedia(productUuid, variantId, attributeValueId, formData) {
+  async uploadVariantAttributeImages(productUuid, variantId, attributeValueId, formData) {
     try {
       const response = await api.post(
-        `/api/attributes/admin/products/${productUuid}/variants/${variantId}/attributes/${attributeValueId}/media/`,
+        `/api/products/admin/products/${productUuid}/variants/${variantId}/attributes/${attributeValueId}/upload/`,
         formData,
         {
           headers: {
@@ -182,6 +207,16 @@ export const attributeService = {
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to delete variant' };
+    }
+  },
+
+  // Admin - Update media metadata
+  async updateMediaMetadata(imageId, metadata) {
+    try {
+      const response = await api.patch(`/api/media/images/${imageId}/`, metadata);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to update media metadata' };
     }
   },
 
