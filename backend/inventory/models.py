@@ -27,3 +27,16 @@ class Inventory(models.Model):
     def save(self, *args, **kwargs):
         self.is_available = self.stock > 0
         super().save(*args, **kwargs)
+
+    @property
+    def available_stock(self):
+        # if you later add reservations, subtract them here.
+        return self.stock
+
+    def reduce_stock(self, qty):
+        """Reduce stock by qty and update availability. Raises ValueError if insufficient."""
+        if qty > self.stock:
+            raise ValueError(f"Insufficient stock for {self.variant.sku}")
+        self.available_stock -= qty
+        self.is_available = self.stock > 0
+        self.save(update_fields=["available_stock"])

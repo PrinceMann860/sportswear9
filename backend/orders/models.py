@@ -8,8 +8,11 @@ class Order(models.Model):
     STATUS_CHOICES = [
         ('PENDING', 'Pending'),
         ('PAID', 'Paid'),
-        ('FAILED', 'Failed'),
+        ('PROCESSING', 'Processing'),
+        ('SHIPPED', 'Shipped'),
+        ('DELIVERED', 'Delivered'),
         ('CANCELLED', 'Cancelled'),
+        ('FAILED', 'Failed'),
     ]
 
     order_uuid = ShortUUIDField(length=12, unique=True, editable=False)

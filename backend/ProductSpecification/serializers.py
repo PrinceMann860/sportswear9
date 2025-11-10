@@ -1,6 +1,7 @@
 # specifications/serializers.py
 from rest_framework import serializers
 from .models import Specification, ProductSpecification
+from assets.serializers import ProductImageSerializer
 
 
 class SpecificationSerializer(serializers.ModelSerializer):
@@ -18,7 +19,8 @@ class ProductSpecificationSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+    images = ProductImageSerializer(many=True, read_only=True)  # ✅ spec-level images
 
     class Meta:
         model = ProductSpecification
-        fields = ['id', 'product', 'specification', 'specification_id', 'key', 'value']
+        fields = ['id', 'product', 'specification', 'specification_id', 'key', 'value', 'images']

@@ -3,6 +3,7 @@ from shortuuid.django_fields import ShortUUIDField
 from core.image_service.services import get_imgproxy_url
 from core.image_service.utils import validate_image
 from attributes.models import ProductVariant
+from ProductSpecification.models import ProductSpecification  # ✅ add this import safely (circular-safe if you use app label)
 
 
 class ProductImage(models.Model):
@@ -13,7 +14,20 @@ class ProductImage(models.Model):
         unique=True,
         editable=False
     )
-    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, related_name="images")
+    variant = models.ForeignKey(
+        "attributes.ProductVariant",
+        on_delete=models.CASCADE,
+        related_name="images",
+        null=True,
+        blank=True
+    )
+    specification = models.ForeignKey(   # ✅ NEW FIELD
+        "ProductSpecification.ProductSpecification",
+        on_delete=models.CASCADE,
+        related_name="images",
+        null=True,
+        blank=True
+    )
     image = models.ImageField(upload_to="uploads/products/", validators=[validate_image])
     alt_text = models.CharField(max_length=255, blank=True)
     is_main = models.BooleanField(default=False)
@@ -23,7 +37,8 @@ class ProductImage(models.Model):
         ordering = ["-uploaded_at"]
 
     def __str__(self):
-        return f"{self.variant.product.name} ({self.alt_text or 'image'})"
+        label = self.variant or self.specification
+        return f"{label or 'Unlinked'} ({self.alt_text or 'image'})"
 
     @property
     def original_url(self):

@@ -11,15 +11,19 @@ from .serializers import (
     LoginSerializer,
     RegisterSerializer
 )
-from .email import send_signup_success_email, send_otp_email
 from .utils import generate_otp
 from profile_app.models import UserProfile  # assuming separate profile app
+from django.db import transaction
+from .throttles import OTPRateThrottle
 
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from django.conf import settings
 from .jwtToken import create_jwt_tokens
-
+from .tasks import (
+    send_otp_email_task,
+    send_signup_success_email_task,
+)
 
 User = get_user_model()
 GOOGLE_CLIENT_ID = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
@@ -28,6 +32,7 @@ GOOGLE_CLIENT_ID = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
 # STEP 1: Send OTP
 class RegisterView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [OTPRateThrottle]
 
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -40,6 +45,7 @@ class RegisterView(APIView):
 class VerifyOTPView(APIView):
     permission_classes = [AllowAny]
 
+    @transaction.atomic
     def post(self, request):
         serializer = VerifyOTPSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -50,9 +56,12 @@ class VerifyOTPView(APIView):
         if not user:
             return Response({"detail": "User not found."}, status=404)
 
-        otp_obj = EmailOTP.objects.filter(
-            user=user, code=otp, purpose="VERIFY", used=False
-        ).order_by("-created_at").first()
+        otp_obj = (
+            EmailOTP.objects.select_for_update()
+            .filter(user=user, code=otp, purpose="VERIFY", used=False)
+            .order_by("-created_at")
+            .first()
+        )
 
         if not otp_obj:
             return Response({"detail": "Invalid OTP"}, status=400)
@@ -64,7 +73,7 @@ class VerifyOTPView(APIView):
         user.is_active = True
         user.save()
 
-        send_signup_success_email(email)
+        send_signup_success_email_task.delay(email)
         tokens = create_jwt_tokens(user)
         return Response({
             "detail": "Email verified and user logged in.",
@@ -89,7 +98,7 @@ class SetPasswordView(APIView):
         user.set_password(password)
         user.save()
 
-        send_signup_success_email(email)
+        send_signup_success_email_task.delay(email)
         tokens = create_jwt_tokens(user)
         return Response({
             "detail": "Password set successfully. Proceed to login.",
@@ -146,7 +155,7 @@ class ForgotPasswordView(APIView):
 
         otp = generate_otp()
         EmailOTP.objects.create(user=user, code=otp, purpose="RESET")
-        send_otp_email(email, otp, "RESET")
+        send_otp_email_task.delay(email, otp, "RESET")
         return Response({"detail": "Password reset OTP sent."})
 
 
@@ -179,11 +188,12 @@ class ResetPasswordView(APIView):
         user.set_password(password)
         user.save()
 
-        send_signup_success_email(email)
+        send_signup_success_email_task.delay(email)
         tokens = create_jwt_tokens(user)
         return Response({
-            "detail": "Password reset successful. Proceed to login.",
-            **tokens
+            "status": "success",
+            "message": "Password reset successful.",
+            "data": {**tokens}
         })
 
 

@@ -7,6 +7,7 @@ urlpatterns = [
     # ===========================
     path('', views.ProductListAPIView.as_view(), name='product-list'),
     path('<str:product_uuid>/', views.ProductDetailAPIView.as_view(), name='product-detail'),
+    path("<str:product_uuid>/variants/", views.ProductVariantMatrixAPIView.as_view(), name="product-variant-matrix"),
 
     # ✅ Coupon Validation for checkout
     path('coupons/validate/', admin_views.ValidateCouponAPIView.as_view(), name='validate-coupon'),

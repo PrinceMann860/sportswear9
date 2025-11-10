@@ -26,10 +26,21 @@ class AttributeUserSerializer(serializers.ModelSerializer):
 
 class ProductVariantListSerializer(serializers.ModelSerializer):
     attributes = AttributeValueUserSerializer(many=True, read_only=True)
+    effective_price = serializers.SerializerMethodField()
+    images = ProductImageSerializer(many=True, read_only=True)
+    # product_name = serializers.CharField(source="product.name", read_only=True)
+    # brand_name = serializers.CharField(source="product.brand.name", read_only=True)
 
     class Meta:
         model = ProductVariant
-        fields = ['id', 'sku', 'price', 'is_default', 'attributes', 'images']
+        fields = ['id', 'sku', 'price', 'net', 'is_default', 'attributes', 'images', 'effective_price']
+
+    def get_effective_price(self, obj):
+        """Return variant price or fallback product price"""
+        if obj.price and obj.price > 0:
+            return obj.net
+        return obj.product.net
+
 
 class VariantAttributeSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source="attribute.name")

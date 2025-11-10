@@ -39,13 +39,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 
 class EmailOTP(models.Model):
-    PURPOSE_CHOICES = (
-        ("VERIFY", "verify_email"),
-        ("RESET", "reset_password"),
-    )
+    class Purpose(models.TextChoices):
+        VERIFY = "VERIFY", "Verify Account"
+        RESET = "RESET", "Reset Password"
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     code = models.CharField(max_length=6)
-    purpose = models.CharField(max_length=10, choices=PURPOSE_CHOICES)
+    purpose = models.CharField(max_length=10, choices=Purpose.choices)
     created_at = models.DateTimeField(auto_now_add=True)
     used = models.BooleanField(default=False)
 

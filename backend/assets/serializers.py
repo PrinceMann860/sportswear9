@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import ProductImage, ProductVideo
 
+
 class ProductImageSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
 
@@ -11,7 +12,10 @@ class ProductImageSerializer(serializers.ModelSerializer):
             "image_url",
             "alt_text",
             "is_main",
-            "uploaded_at"
+            "uploaded_at",
+            "variant",         # ✅ still supported
+            "specification",
+
         ]
 
     def get_image_url(self, obj):
@@ -19,6 +23,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
         if request:
             return request.build_absolute_uri(obj.image.url)
         return obj.image.url
+
 
 class ProductVideoSerializer(serializers.ModelSerializer):
     class Meta:

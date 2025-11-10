@@ -44,6 +44,17 @@ ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = "auth_app.CustomUser"
 # Application definition
+# ==============================
+# 🛒 CART FEE CONFIGURATION
+# ==============================
+CART_HANDLING_FEE = 10        # Rs 10 handling fee
+CART_DELIVERY_FEE = 50        # Rs 50 delivery charge
+CART_RAIN_SURGE_FEE = 20      # Rs 20 extra during rain/surge
+CART_OTHER_FEE = 5            # Optional additional service charge
+
+# If subtotal > this, delivery & other fees are waived
+CART_FREE_DELIVERY_THRESHOLD = 500
+
 
 INSTALLED_APPS = [
     # Default Django apps
@@ -71,13 +82,11 @@ INSTALLED_APPS = [
     "django_countries",
 
     # custom apps
-    # 'cart',
-    # 'product',
+    'cart',
     'auth_app',
     'profile_app',
     # 'payment',
     # 'checkout',
-      # Your apps
     'brands',
     'categories',
     'attributes',
@@ -211,12 +220,48 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    # uncomment this if you want to restrict to JSON only responses
-    # 'DEFAULT_RENDERER_CLASSES': (
-    #     'rest_framework.renderers.JSONRenderer',
-    # ),
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+        'auth_app.throttles.OTPRateThrottle',  # custom fine-tuned throttle for OTP
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '30/min',          # 30 anonymous requests per minute
+        'user': '120/min',         # 120 authenticated requests per minute
+        'otp': '3/min',            # only 3 OTPs per minute per email/IP
+    },
 
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100,
+
+    # uncomment this if you want to restrict to JSON only responses
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
 }
+
+REST_FRAMEWORK.update({
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+})
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+        }
+    }
+}
+
 
 # ✅ Optional: Customize JWT behavior
 SIMPLE_JWT = {
@@ -267,3 +312,29 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('CLIENT_SECRET')
 
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+
+CELERY_BROKER_URL = os.getenv(
+    "CELERY_BROKER_URL", "amqp://guest:guest@rabbitmq:5672//")
+CELERY_RESULT_BACKEND = os.getenv(
+    "CELERY_RESULT_BACKEND", "redis://redis:6379/0")
+
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 mins
+CELERY_TASK_IGNORE_RESULT = False
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+# Redis cache setup
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.getenv("CACHE_URL", "redis://redis:6379/1"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        "TIMEOUT": 300,  # 5 minutes
+    }
+}
+THROTTLE_CACHE = "default"
