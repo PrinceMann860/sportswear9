@@ -506,18 +506,18 @@ function Home2() {
     <main className="w-full bg-white pt-20">
       <div>
         {/* ✅ Top Section */}
-        <AnimatedSection>
+         
           {/* ✅ Section 2 - Top Category Grid */}
           <CategoryGrid 
             categories={transformToCategoryItems(getSectionData("floor-1"))} 
           />
           
-          <AnimatedSection>
+           
             {/* ✅ Best selling Products */}
             <section className="px-2 sm:px-4 md:px-6 max-w-full">
               <PopularProductsCarousel products={featuredProducts} />
             </section>
-          </AnimatedSection>
+           
 
           {/* ✅ Section 1 - Landscape Carousel */}
           <div className="w-full max-w-full mx-auto p-5 lg:p-10 rounded-2xl overflow-hidden">
@@ -525,10 +525,10 @@ function Home2() {
               items={transformToCarouselItems(getSectionData("floor-2"))} 
             />
           </div>
-        </AnimatedSection>
+         
 
         {/* ✅ Floor 1 - Category Grid Below Banners */}
-        <AnimatedSection>
+         
           <div className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full">
             <CategoryGrid
               title="Shop by Category"
@@ -538,10 +538,10 @@ function Home2() {
               className="mb-12"
             />
           </div>
-        </AnimatedSection>
+         
 
         {/* ✅ Rest of your existing sections remain the same */}
-        <AnimatedSection>
+         
           <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full">
             <h2 className="text-2xl font-bold mb-4">Recently Viewed</h2>
             {featuredProducts.length > 0 ? (
@@ -554,19 +554,19 @@ function Home2() {
               <p className="text-gray-600">No featured products available.</p>
             )}
           </section>
-        </AnimatedSection>
+         
 
         {/* ✅ Sports Gear */}
-        <AnimatedSection>
+         
           <div className="mx-auto px-2 sm:px-4 md:px-6 lg:px-12 xl:px-14">
             <SportsGearCarousel
               title="Unite & Play: Shop Sports Gear"
               items={sportsGearItems}
             />
           </div>
-        </AnimatedSection>
+         
         {/* ✅ Trusted Brands */}
-        <AnimatedSection>
+         
           <section className="mt-12 sm:px-4 md:px-6 lg:px-12 xl:px-14 px-6 mx-auto max-w-full">
             <h2 className="font-semibold text-3xl md:text-4xl text-center">
               Trusted by Iconic Brands
@@ -593,38 +593,38 @@ function Home2() {
               ))}
             </div>
           </section>
-        </AnimatedSection>
+         
 
         {/* ✅ Video Section */}
-        <AnimatedSection>
+         
           <section className="mx-auto text-center px-2 sm:px-4 md:px-6 lg:px-12 xl:px-14 max-w-full">
             <h2 className="font-semibold text-xl md:text-4xl">
               Your Passion. Your Performance.
             </h2>
             <VideoGrid />
           </section>
-        </AnimatedSection>
+         
 
         {/* ✅ Festive Deals */}
-        <AnimatedSection>
+         
           <FestiveDealsGrid
             title="Festive Steal Deals!"
             items={festiveStealDeals}
           />
-        </AnimatedSection>
+         
 
         {/* ✅ Product Carousel */}
-        <AnimatedSection>
+         
           <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full">
             <ProductCarouselWithTitle
               title="The perfect Shoes is waiting"
               products={featuredProducts}
             />
           </section>
-        </AnimatedSection>
+         
 
         {/* ✅ Horizontal Scroll Carousel */}
-        {/* <AnimatedSection>
+        {/*  
           <section className="mt-5 p-5 px-2 sm:px-4 md:px-6 lg:px-12 xl:px-14 mx-auto max-w-full">
             <h2 className="text-center text-3xl font-bold">
               Curated Deals for Every Mood
@@ -633,27 +633,27 @@ function Home2() {
               <HorizontalScrollCarousel items={festiveDeals} speed={0.3} />
             </div>
           </section>
-        </AnimatedSection> */}
+          */}
 
         {/* ✅ Recommended Products */}
-        {/* <AnimatedSection>
+        {/*  
           <RecommendedProducts />
-        </AnimatedSection> */}
+          */}
 
         {/* ✅ Deals of the Day */}
-        <AnimatedSection>
+         
           <div className="px-2 sm:px-4 md:px-6 lg:px-12 mx-auto max-w-full">
             <DealsOfTheDay
               title="Shop Now: Deals of the Day"
               items={promoCards}
             />
           </div>
-        </AnimatedSection>
+         
 
 
 
         {/* ✅ Trending Products */}
-        <AnimatedSection>
+         
           <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full mt-10">
             <h2 className="text-2xl font-bold mb-4">TRENDING PRODUCTS</h2>
             {featuredProducts.length > 0 ? (
@@ -666,19 +666,19 @@ function Home2() {
               <p className="text-gray-600">No featured products available.</p>
             )}
           </section>
-        </AnimatedSection>
+         
 
         {/* ✅ Sale Video Banner */}
-        <AnimatedSection>
+         
           <div className="w-full max-w-full mx-auto p-5 lg:p-10 rounded-2xl overflow-hidden">
             <LandscapeCarousel 
               items={transformToCarouselItems(getSectionData("floor-4"))} 
             />
           </div>
-        </AnimatedSection>
+         
 
         {/* ✅ Shop by Gender */}
-        <AnimatedSection>
+         
           <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full my-10">
             <div className="w-full flex justify-between">
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">FEATURED <span className="font-semibold">CATEGORIES</span></h2>
@@ -707,9 +707,9 @@ function Home2() {
               <SportsGearCarousel title="Women Products" items={femalecards} />
             )}
           </section>
-        </AnimatedSection>
+         
         {/* ✅ New Arrivals */}
-        <AnimatedSection>
+         
           <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full">
             <h2 className="text-2xl font-bold mb-4">New Arrivals</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
@@ -718,15 +718,15 @@ function Home2() {
               ))}
             </div>
           </section>
-        </AnimatedSection>
+         
 
         {/* ✅ Sports Category Section */}
-        <AnimatedSection>
+         
           <SportsCategorySection />
-        </AnimatedSection>
+         
 
         {/* ✅ Final Banner Images */}
-        <AnimatedSection>
+         
           <div className="px-2 sm:px-4 md:px-6 lg:px-12 mx-auto grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 lg:gap-6 w-full mb-10 overflow-hidden max-w-full">
             {transformToCategoryItems(getSectionData("floor-5")).map((imgs, index) => (
               <img
@@ -737,10 +737,10 @@ function Home2() {
               />
             ))}
           </div>
-        </AnimatedSection>
+         
 
         {/* ✅ Final Banner */}
-        <AnimatedSection>
+         
           <div className="w-full px-2 md:px-5 lg:px-10">
             <img
               src={BMSMBanner}
@@ -748,11 +748,11 @@ function Home2() {
               className="w-full h-auto max-w-full border rounded-2xl md:rounded-4xl"
             />
           </div>
-        </AnimatedSection>
+         
       </div>
 
       {/* ✅ Testimonials Section */}
-      <AnimatedSection>
+       
         <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-14 mx-auto py-12 max-w-full">
           <h2 className="text-3xl md:text-4xl font-semibold text-center">
             Hear from Our Community
@@ -799,10 +799,10 @@ function Home2() {
             ))}
           </div>
         </section>
-      </AnimatedSection>
+       
 
       {/* ✅ Available On */}
-      <AnimatedSection>
+       
         <section className="max-w-full">
           <div className="text-center lg:px-4 pt-10 lg:pb-10 max-w-full">
             <h2 className="text-2xl md:text-3xl font-bold mb-8 underline underline-offset-4">
@@ -838,7 +838,7 @@ function Home2() {
             </div>
           </div>
         </section>
-      </AnimatedSection>
+       
     </main>
   );
 }
