@@ -159,6 +159,7 @@ DATABASES = {
         'HOST': tmpPostgres.hostname,
         'PORT': 5432,
         'OPTIONS': dict(parse_qsl(tmpPostgres.query)),
+        'CONN_MAX_AGE': 60,  # keep connections alive for 1 minute
     }
 }
 

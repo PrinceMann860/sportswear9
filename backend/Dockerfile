@@ -28,4 +28,4 @@ COPY . /app/
 EXPOSE 8000
 
 # Run Django server (you can replace with gunicorn later)
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "backend.asgi:application", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "--workers=8", "--worker-connections=1000"]

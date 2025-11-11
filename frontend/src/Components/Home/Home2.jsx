@@ -17,7 +17,6 @@ import { ProductCard } from "../Product/Product";
 import { Link } from "react-router-dom";
 import PopularProductsCarousel from "../Decath/PopularProductsCarousel";
 import ProductCarouselWithTitle from "../Decath/ProductCarouselWithTitle";
-import AnimatedSection from "../Home/AnimatedSection";
 import CategoryGrid from "../Decath/CategoryGrid";
 import LandscapeCarousel from "../Banner&Carousels/LandscapeCarousel";
 import SportsGearCarousel from "../Decath/SportsGearCarousel";
@@ -48,10 +47,10 @@ const transformProductData = (product) => ({
   brand: product.brand?.name,
   category: product.category?.name,
   img:
-    product.thumbnail ||
+    `http://127.0.0.1:8000/${product.img}` ||
     "https://static.nike.com/a/images/t_PDP_936_v1/f_auto,q_auto:eco/022814da-3098-4c8e-b6f9-3692dc1b4207/W+FLEX+EXPERIENCE+RN+12.png",
   img2:
-    product.thumbnail ||
+    `http://127.0.0.1:8000/${product.img2}` ||
     "https://acrossports.s3.amazonaws.com/productPhotos/NIKE/DV0746004/DV0746004_6.jpg",
   isFeatured: product.is_featured,
 });

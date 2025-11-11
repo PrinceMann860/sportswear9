@@ -11,12 +11,12 @@ const ProductGallery = ({ images = [], brandLogo }) => {
   // Convert objects like { url: "/media/..." } to full URLs
   const parsedImages = hasImages
     ? images.map((img) =>
-        typeof img === "string"
-          ? img
-          : img?.url
+      typeof img === "string"
+        ? img
+        : img?.url
           ? `${BASE_URL}${img.url}`
           : null
-      ).filter(Boolean)
+    ).filter(Boolean)
     : [];
 
   return (
@@ -27,17 +27,16 @@ const ProductGallery = ({ images = [], brandLogo }) => {
           (img, index) => (
             <div
               key={index}
-              className={`border rounded-lg overflow-hidden cursor-pointer transition-all ${
-                selectedIndex === index
-                  ? "border-[#2563EB] ring-2 ring-[#2563EB]"
-                  : "border-gray-300"
-              }`}
+              className={`border rounded-lg overflow-hidden cursor-pointer transition-all ${selectedIndex === index
+                ? "border-[#2563EB] ring-2 ring-[#2563EB]"
+                : "border-gray-300"
+                }`}
               onClick={() => setSelectedIndex(index)}
             >
               <img
                 src={img || brandLogo}
                 alt={`Thumbnail ${index + 1}`}
-                className="w-20 h-20 object-cover hover:opacity-90"
+                className="object-cover hover:opacity-90 max-w-full h-auto"
               />
             </div>
           )

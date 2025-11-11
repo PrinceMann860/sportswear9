@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
-import AnimatedSection from './AnimatedSection';
 
 const VideoClassSection = () => {
   const scrollRef = useRef(null);
@@ -75,11 +74,9 @@ const VideoClassSection = () => {
     <section className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
-          <AnimatedSection>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center md:text-left flex-1">
               Other Classes in Art &amp; Design
             </h2>
-          </AnimatedSection>
 
           {/* Desktop Navigation */}
           <div className="hidden sm:flex gap-2">
