@@ -5,7 +5,7 @@ export const productService = {
   async getProducts(params = {}) {
     try {
       const response = await api.get('/api/products/', { params });
-      return response.data;
+      return response.data?.results || response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch products' };
     }

@@ -5,7 +5,7 @@ export const userService = {
   async getUsers() {
     try {
       const response = await api.get('/profile/admin/users/');
-      return response.data;
+      return response.data?.results || response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch users' };
     }
@@ -25,7 +25,7 @@ export const userService = {
   async getUserAddresses(userUuid) {
     try {
       const response = await api.get(`/profile/admin/users/${userUuid}/addresses/`);
-      return response.data;
+      return response.data?.results || response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch user addresses' };
     }

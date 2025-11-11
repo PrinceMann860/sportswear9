@@ -36,7 +36,7 @@ const UserDetails = () => {
     try {
       setAddressesLoading(true);
       const addressData = await userService.getUserAddresses(id);
-      setAddresses(addressData.addresses || []);
+      setAddresses(addressData?.addresses || addressData || []);
     } catch (error) {
       console.error('Failed to fetch user addresses:', error);
       // Don't show error for addresses as it's not critical

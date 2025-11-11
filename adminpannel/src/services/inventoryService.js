@@ -5,7 +5,7 @@ export const inventoryService = {
   async getAllInventory() {
     try {
       const response = await api.get('/api/inv/admin/');
-      return response.data;
+      return response.data?.results || response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch inventory' };
     }

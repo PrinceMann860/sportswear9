@@ -5,7 +5,7 @@ export const attributeService = {
   async getAttributes() {
     try {
       const response = await api.get('/api/attributes/');
-      return response.data;
+      return response.data?.results || response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch attributes' };
     }
@@ -15,7 +15,7 @@ export const attributeService = {
   async getAdminAttributes() {
     try {
       const response = await api.get('/api/attributes/admin/attributes/');
-      return response.data;
+      return response.data?.results || response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch admin attributes' };
     }
@@ -55,7 +55,7 @@ export const attributeService = {
   async getAttributeValues() {
     try {
       const response = await api.get('/api/attributes/admin/values/');
-      return response.data;
+      return response.data?.results || response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch attribute values' };
     }
@@ -97,7 +97,7 @@ export const attributeService = {
       const response = await api.get('/api/attributes/admin/product-attributes/', {
         params: { product_uuid: productUuid }
       });
-      return response.data;
+      return response.data?.results || response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch product attributes' };
     }
@@ -121,7 +121,7 @@ export const attributeService = {
     try {
       const params = productUuid ? { product_uuid: productUuid } : {};
       const response = await api.get('/api/attributes/admin/variants/', { params });
-      return response.data;
+      return response.data?.results || response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch variants' };
     }
@@ -141,7 +141,7 @@ export const attributeService = {
   async getProductVariants(productUuid) {
     try {
       const response = await api.get(`/api/attributes/${productUuid}/variants/`);
-      return response.data;
+      return response.data?.results || response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch product variants' };
     }

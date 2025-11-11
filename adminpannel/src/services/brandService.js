@@ -4,7 +4,7 @@ export const brandService = {
   async getBrands() {
     try {
       const response = await api.get('/api/brands/');
-      return response.data;
+      return response.data?.results || response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch brands' };
     }

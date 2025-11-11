@@ -5,7 +5,7 @@ export const homepageService = {
   async getLevels() {
     try {
       const response = await api.get('/api/main/levels/');
-      return response.data;
+      return response.data?.results || response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch levels' };
     }

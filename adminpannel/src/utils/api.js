@@ -57,4 +57,23 @@ api.interceptors.response.use(
   }
 );
 
+// Helper function to handle paginated responses
+export const handlePaginatedResponse = (response) => {
+  // If response has results property (paginated), return results
+  if (response && typeof response === 'object' && 'results' in response) {
+    return {
+      data: response.results,
+      pagination: {
+        count: response.count,
+        next: response.next,
+        previous: response.previous,
+      }
+    };
+  }
+  // Otherwise return the response as is (non-paginated)
+  return {
+    data: Array.isArray(response) ? response : [response],
+    pagination: null
+  };
+};
 export default api;

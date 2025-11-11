@@ -5,7 +5,7 @@ export const couponService = {
   async getGlobalCoupons() {
     try {
       const response = await api.get('/api/products/admin/coupons/');
-      return response.data;
+      return response.data?.results || response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch global coupons' };
     }
@@ -42,7 +42,7 @@ export const couponService = {
   async getProductCoupons(productUuid) {
     try {
       const response = await api.get(`/api/products/admin/${productUuid}/coupons/`);
-      return response.data;
+      return response.data?.results || response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch product coupons' };
     }

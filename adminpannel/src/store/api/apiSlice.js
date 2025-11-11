@@ -22,7 +22,7 @@ export const apiSlice = createApi({
       query: () => '/api/products/',
       transformResponse: (response) => {
         // Transform products data into dashboard stats
-        const products = Array.isArray(response) ? response : [];
+        const products = response?.results || [];
         const totalProducts = products.length;
         const activeProducts = products.filter(p => p.is_active !== false).length;
         const featuredProducts = products.filter(p => p.is_featured).length;
@@ -44,7 +44,7 @@ export const apiSlice = createApi({
       query: () => '/api/products/',
       transformResponse: (response) => {
         // Return the most recent products (limit to 10)
-        const products = Array.isArray(response) ? response : [];
+        const products = response?.results || [];
         return products.slice(0, 10);
       },
       providesTags: ['Dashboard', 'Product'],
@@ -65,6 +65,9 @@ export const apiSlice = createApi({
         url: '/api/products/',
           params: cleanParams,
         };
+      },
+      transformResponse: (response) => {
+        return response?.results || [];
       },
       providesTags: ['Product'],
     }),
@@ -103,6 +106,9 @@ export const apiSlice = createApi({
     // Categories endpoints
     getCategories: builder.query({
       query: () => '/api/categories/',
+      transformResponse: (response) => {
+        return response?.results || [];
+      },
       providesTags: ['Category'],
     }),
     createCategory: builder.mutation({
@@ -132,6 +138,9 @@ export const apiSlice = createApi({
     // Brands endpoints
     getBrands: builder.query({
       query: () => '/api/brands/',
+      transformResponse: (response) => {
+        return response?.results || [];
+      },
       providesTags: ['Brand'],
     }),
     createBrand: builder.mutation({
