@@ -8,9 +8,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
     country = serializers.CharField(read_only=True)
     locale = serializers.CharField(read_only=True)
     
+    
     class Meta:
         model = UserProfile
-        fields = ["email", "is_active", "gender", "phoneNumber", "profile_picture", "country", "locale"]
+        fields = ["full_name", "email", "is_active", "gender", "phoneNumber", "country", "locale"]
 
 
 class AddressSerializer(serializers.ModelSerializer):
