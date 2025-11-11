@@ -13,7 +13,6 @@ db.sqlite3
 *.sqlite3
 
 # Media and Static
-/media/
 staticfiles/
 static/
 
@@ -71,5 +70,5 @@ celerybeat.pid
 # !*/migrations/__init__.py
 
 # the uploaded files in help section
-backend/media/documents/
+
 
