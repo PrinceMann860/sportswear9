@@ -1,88 +1,76 @@
-// src/store/slices/homepage/homepageSlice.js
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 
-// Async thunk for fetching homepage levels
+// ✅ Adjust according to your backend route
+const BASE_URL = "http://localhost:8000/api/main/levels";
+
+// ✅ Thunk for fetching homepage sections/levels
 export const fetchHomepageLevels = createAsyncThunk(
-  'homepage/fetchLevels',
+  "homepage/fetchHomepageLevels",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get('http://127.0.0.1:8000/api/main/levels/');
+      const response = await axios.get(BASE_URL);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch homepage data"
+      );
     }
   }
 );
 
+// ✅ Initial state
+const initialState = {
+  homepageLevels: [], // array of homepage levels (each may contain sections)
+  loading: false,
+  error: null,
+};
+
+// ✅ Slice
 const homepageSlice = createSlice({
-  name: 'homepage',
-  initialState: {
-    levels: [],
-    loading: false,
-    error: null,
-    lastFetched: null,
-  },
+  name: "homepage",
+  initialState,
   reducers: {
-    clearHomepageError: (state) => {
+    clearHomepage: (state) => {
+      state.homepageLevels = [];
       state.error = null;
-    },
-    resetHomepageState: (state) => {
-      state.levels = [];
-      state.loading = false;
-      state.error = null;
-      state.lastFetched = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch levels
       .addCase(fetchHomepageLevels.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchHomepageLevels.fulfilled, (state, action) => {
         state.loading = false;
-        state.levels = action.payload;
-        state.lastFetched = Date.now();
-        state.error = null;
+        const data = action.payload;
+
+        // ✅ Ensure the structure is an array
+        if (Array.isArray(data)) {
+          state.homepageLevels = data;
+        } else if (data?.results && Array.isArray(data.results)) {
+          // handle paginated response
+          state.homepageLevels = data.results;
+        } else if (data) {
+          // fallback: wrap object into array if needed
+          state.homepageLevels = [data];
+        } else {
+          state.homepageLevels = [];
+        }
       })
       .addCase(fetchHomepageLevels.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Failed to fetch homepage data';
-        state.levels = [];
+        state.error = action.payload || "Failed to load homepage data";
       });
   },
 });
 
-// Export actions
-export const { clearHomepageError, resetHomepageState } = homepageSlice.actions;
-
-// Export selectors
-export const selectHomepageLevels = (state) => state.homepage.levels;
+// ✅ Selectors
+export const selectHomepageLevels = (state) => state.homepage.homepageLevels;
 export const selectHomepageLoading = (state) => state.homepage.loading;
 export const selectHomepageError = (state) => state.homepage.error;
-export const selectHomepageLastFetched = (state) => state.homepage.lastFetched;
 
-// Export specific level selectors
-export const selectLevelByUuid = (uuid) => (state) => 
-  state.homepage.levels.find(level => level.level_uuid === uuid);
+export const { clearHomepage } = homepageSlice.actions;
 
-export const selectSectionByUuid = (sectionUuid) => (state) => {
-  for (const level of state.homepage.levels) {
-    const section = level.sections.find(sec => sec.section_uuid === sectionUuid);
-    if (section) return section;
-  }
-  return null;
-};
-
-export const selectItemsBySectionUuid = (sectionUuid) => (state) => {
-  for (const level of state.homepage.levels) {
-    const section = level.sections.find(sec => sec.section_uuid === sectionUuid);
-    if (section) return section.items || [];
-  }
-  return [];
-};
-
-// Export reducer
 export default homepageSlice.reducer;

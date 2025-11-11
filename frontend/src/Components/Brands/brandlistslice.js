@@ -1,38 +1,46 @@
-// src/redux/slices/brandSlice.js
-
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// API base URL
-const BASE_URL = "http://127.0.0.1:8000/api/brands/";
+// ✅ Adjust API base URL as needed
+const BASE_URL = "http://localhost:8000/api/brands/";
 
-// Async thunk to fetch brand list
+// ✅ Thunk for fetching brands with pagination support
 export const fetchBrands = createAsyncThunk(
-  "brands/fetchBrands",
-  async (_, { rejectWithValue }) => {
+  "brandlist/fetchBrands",
+  async (page = 1, { rejectWithValue }) => {
     try {
-      const response = await axios.get(BASE_URL);
-      return response.data; // Adjust if your response is nested like response.data.results
+      const response = await axios.get(`${BASE_URL}?page=${page}`);
+      // backend likely returns paginated data { count, next, previous, results: [] }
+      return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch brands"
+        error.response?.data || "Failed to fetch brand list"
       );
     }
   }
 );
 
-const brandSlice = createSlice({
-  name: "brands",
-  initialState: {
-    brands: [],
-    loading: false,
-    error: null,
-  },
+// ✅ Initial state
+const initialState = {
+  brands: [], // array of brands
+  count: 0, // total brands
+  next: null, // next page URL
+  previous: null, // previous page URL
+  loading: false,
+  error: null,
+};
+
+// ✅ Slice
+const brandlistSlice = createSlice({
+  name: "brandlist",
+  initialState,
   reducers: {
     clearBrands: (state) => {
       state.brands = [];
+      state.count = 0;
+      state.next = null;
+      state.previous = null;
       state.error = null;
-      state.loading = false;
     },
   },
   extraReducers: (builder) => {
@@ -43,14 +51,28 @@ const brandSlice = createSlice({
       })
       .addCase(fetchBrands.fulfilled, (state, action) => {
         state.loading = false;
-        state.brands = action.payload;
+        const data = action.payload;
+
+        // ✅ Handle paginated response safely
+        if (data && Array.isArray(data.results)) {
+          state.brands = data.results;
+          state.count = data.count || 0;
+          state.next = data.next || null;
+          state.previous = data.previous || null;
+        } else if (Array.isArray(data)) {
+          // fallback in case API returns plain array
+          state.brands = data;
+        } else {
+          state.brands = [];
+        }
       })
       .addCase(fetchBrands.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Failed to load brands";
       });
   },
 });
 
-export const { clearBrands } = brandSlice.actions;
-export default brandSlice.reducer;
+export const { clearBrands } = brandlistSlice.actions;
+
+export default brandlistSlice.reducer;

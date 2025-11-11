@@ -35,7 +35,7 @@ const CategoryGrid = ({
               className="group flex flex-col items-center"
             >
               {/* Image Container */}
-              <div className="w-full aspect-square relative overflow-hidden rounded-lg bg-background mb-2 sm:mb-3">
+              <div className="w-full aspect-square relative overflow-hidden rounded-lg bg-background mb-2 sm:mb-3 border-2 border-amber-400">
                 <img
                   src={category.image}
                   alt={category.name}

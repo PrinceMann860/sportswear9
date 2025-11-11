@@ -232,7 +232,7 @@ function Product() {
     const level = dataToUse[0];
     
     // Look for carousel sections
-    const carouselSections = level.sections.filter(sec => sec.section_type === "carousel");
+    const carouselSections = level.sections.filter(sec => sec.section_type === "floor-1");
     
     if (carouselSections.length > 0) {
       // Use the first carousel section found

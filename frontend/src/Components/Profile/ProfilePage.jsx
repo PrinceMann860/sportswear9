@@ -1,496 +1,494 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  User,
-  Edit3,
-  MapPin,
-  Heart,
-  CreditCard,
-  Settings,
-  LogOut,
-  Package,
-  Star,
-  Import,
-} from "lucide-react";
+import { User, MapPin, Package, LogOut } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../store/slices/auth/authSlice";
-import { fetchProfile, updateProfile } from "../../store/slices/profile/profileSlice";
-import { Link } from "react-router-dom";
-
-// Helper function to calculate profile completion percentage
-const calculateProfileCompletion = (profileData) => {
-  const fields = [
-    profileData.fullName,
-    profileData.email,
-    profileData.phone,
-    profileData.dateOfBirth,
-    profileData.gender,
-    profileData.address.street,
-    profileData.address.city,
-    profileData.address.state,
-    profileData.address.pincode,
-  ];
-
-  const filledFields = fields.filter(
-    (field) => field && field.trim() !== ""
-  ).length;
-  return Math.round((filledFields / fields.length) * 100);
-};
+import {
+  fetchProfile,
+  updateProfile,
+  fetchAddresses,
+  deleteAddress,
+  addAddress,
+  updateAddress,
+} from "./Profileslice";
 
 const ProfilePage = () => {
   const { user, isAuthenticated, loading } = useAuth();
   const dispatch = useDispatch();
+
   const profileData = useSelector((state) => state.profile.data);
   const profileLoading = useSelector((state) => state.profile.loading);
+  const addresses = useSelector((state) => state.profile.addresses);
 
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (window.google && document.getElementById("googleSignInDiv")) {
-      window.google.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-        callback: (response) => {
-          // handle login success from Google
-          console.log("Google Login Success:", response);
-          navigate("/profile");
-        },
-      });
-
-      window.google.accounts.id.renderButton(
-        document.getElementById("googleSignInDiv"),
-        { theme: "outline", size: "large", width: "250" }
-      );
-    }
-  }, []);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [editingAddress, setEditingAddress] = useState(null);
   const [formData, setFormData] = useState({
-    fullName: "",
+    name: "",
     email: "",
+    gender: "M",
     phone: "",
-    dateOfBirth: "",
-    gender: "",
-    address: {
-      street: "",
-      city: "",
-      state: "",
-      pincode: "",
-      country: "India",
-    },
+    country: "",
   });
 
-  // Fetch profile data when component mounts
+  const [addressForm, setAddressForm] = useState({
+    address_name: "",
+    first_name: "",
+    last_name: "",
+    mobile: "",
+    pincode: "",
+    country: "India",
+    address_line_1: "",
+    locality_area_street: "",
+    locality: "",
+    city: "",
+    state: "",
+    landmark: "",
+    is_default: false,
+  });
+
   useEffect(() => {
     if (isAuthenticated) {
       dispatch(fetchProfile());
+      dispatch(fetchAddresses());
     }
   }, [isAuthenticated, dispatch]);
 
-  // Initialize form data when fetched
   useEffect(() => {
-    if (profileData) {
-      setFormData({
-        fullName: profileData.full_name || user?.full_name || "",
-        email: profileData.email || user?.email || "",
-        phone: profileData.phoneNumber || "+91 9876543210",
-        dateOfBirth: profileData.date_of_birth || "1990-01-15",
-        gender: profileData.gender || "Male",
-        address: {
-          street: profileData.address?.street || "123 Main Street",
-          city: profileData.address?.city || "Mumbai",
-          state: profileData.address?.state || "Maharashtra",
-          pincode: profileData.address?.pincode || "400001",
-          country: profileData.address?.country || "India",
-        },
-      });
-    }
+    if (!profileData) return;
+    const { full_name, email, gender, phoneNumber, country } = profileData;
+    setFormData({
+      name: full_name || user?.full_name || "",
+      email: email || user?.email || "",
+      gender: gender || "M",
+      phone: phoneNumber || "",
+      country: country || "India",
+    });
   }, [profileData, user]);
 
-  const handleLogout = () => {
-    dispatch(logout());
+  const handleLogout = () => dispatch(logout());
+
+  const handleSaveProfile = async () => {
+    await dispatch(
+      updateProfile({
+        full_name: formData.name,
+        gender: formData.gender,
+        phoneNumber: formData.phone,
+        country: formData.country,
+      })
+    );
+    setIsEditing(false);
+    dispatch(fetchProfile());
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    dispatch(updateProfile({
-      full_name: formData.fullName,
-      gender: formData.gender,
-      phoneNumber: formData.phone,
-      date_of_birth: formData.dateOfBirth,
-      address: formData.address,
-    }));
+  // ✅ Add / Edit / Delete Address
+  const openAddAddress = () => {
+    setEditingAddress(null);
+    setAddressForm({
+      address_name: "",
+      first_name: "",
+      last_name: "",
+      mobile: "",
+      pincode: "",
+      country: "India",
+      address_line_1: "",
+      locality_area_street: "",
+      locality: "",
+      city: "",
+      state: "",
+      landmark: "",
+      is_default: false,
+    });
+    setShowAddressModal(true);
+  };
+
+  const handleAddressChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setAddressForm({
+      ...addressForm,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handleEditAddress = (addr) => {
+  setEditingAddress(addr);
+  setAddressForm({
+    address_name: addr.address_name || "",
+    first_name: addr.first_name || "",
+    last_name: addr.last_name || "",
+    mobile: addr.mobile || "",
+    pincode: addr.pincode || "",
+    country: addr.country || "India",
+    address_line_1: addr.address_line_1 || "",
+    locality_area_street: addr.locality_area_street || "",
+    locality: addr.locality || "",
+    city: addr.city || "",
+    state: addr.state || "",
+    landmark: addr.landmark || "",
+    is_default: addr.is_default || false,
+  });
+  setShowAddressModal(true);
+};
+
+
+  const handleSaveAddress = async () => {
+    if (editingAddress) {
+      await dispatch(
+        updateAddress({
+          addressId: editingAddress.address_id,
+          updatedData: addressForm,
+        })
+      );
+    } else {
+      await dispatch(addAddress(addressForm));
+    }
+    await dispatch(fetchAddresses());
+    setShowAddressModal(false);
+  };
+
+  const handleDeleteAddress = async (id) => {
+    if (window.confirm("Are you sure you want to delete this address?")) {
+      await dispatch(deleteAddress(id));
+      await dispatch(fetchAddresses());
+    }
   };
 
   const menuItems = [
-    {
-      id: "profile",
-      label: "Profile Info",
-      icon: User,
-      color: "text-blue-500",
-    },
-    {
-      id: "orders",
-      label: "My Orders",
-      icon: Package,
-      color: "text-green-500",
-    },
-    { id: "wishlist", label: "Wishlist", icon: Heart, color: "text-pink-500" },
-    {
-      id: "addresses",
-      label: "Addresses",
-      icon: MapPin,
-      color: "text-purple-500",
-    },
-    {
-      id: "payments",
-      label: "Payment Methods",
-      icon: CreditCard,
-      color: "text-orange-500",
-    },
-    {
-      id: "settings",
-      label: "Settings",
-      icon: Settings,
-      color: "text-gray-500",
-    },
+    { id: "profile", label: "Profile Info", icon: User },
+    { id: "orders", label: "My Orders", icon: Package },
+    { id: "addresses", label: "Addresses", icon: MapPin },
   ];
 
-  // ✅ NEW: handle global loading state safely
-  if (loading) {
+  if (loading || profileLoading)
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center">
-        <div className="text-center animate-pulse">
-          <div className="w-20 h-20 bg-blue-200 rounded-full mx-auto mb-6"></div>
-          <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
-          <p className="text-gray-500 mt-6">Loading your profile...</p>
-        </div>
+      <div className="h-screen flex items-center justify-center text-gray-600">
+        Loading profile...
       </div>
     );
-  }
 
-  // When user not logged in
-if (!isAuthenticated) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center pt-16 md:pt-20 pb-16 md:pb-0">
-      <div className="text-center p-8 bg-white rounded-2xl shadow-lg max-w-md mx-4">
-        <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <User size={40} className="text-blue-500" />
-        </div>
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">Please Login</h2>
-        <p className="text-gray-600 mb-6">You need to login to access your profile</p>
-        {/* 👇 same login button as Navbar */}
-        <div id="googleSignInDiv" className="flex justify-center"></div>
-      </div>
-    </div>
-  );
-}
-
-
-  // ✅ if user data still null but authenticated
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center">
-        <div className="text-center animate-pulse">
-          <div className="w-20 h-20 bg-blue-200 rounded-full mx-auto mb-6"></div>
-          <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
-          <p className="text-gray-500 mt-6">Fetching your details...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // ✅ main UI after everything is ready
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 pt-16 md:pt-20 pb-16 md:pb-0">
-      <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
-        <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
-          {/* Sidebar */}
-          <div className="w-full lg:w-80 bg-white rounded-2xl shadow-xl p-6 h-fit border border-blue-100">
-            <div className="flex items-center gap-4 mb-8 pb-6 border-b border-blue-100">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
-                {user.profile_picture ? (
-                  <img
-                    src={user.profile_picture}
-                    alt="Profile"
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
-                ) : (
-                  <User className="w-8 h-8 text-white" />
-                )}
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-lg text-gray-900 truncate">
-                  {formData.fullName || user.full_name || "User"}
-                </h3>
-                <p className="text-sm text-gray-600 truncate">
-                  {formData.email || user.email}
-                </p>
-                <div className="flex items-center gap-1 mt-1">
-                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                  <span className="text-xs text-gray-500">
-                    {user.membership_type || "Premium Member"}
-                  </span>
-                </div>
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white pt-16 pb-20">
+      <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8">
+        {/* Sidebar */}
+        <div className="w-full lg:w-80 bg-white rounded-2xl shadow-xl p-6 border border-blue-100">
+          <div className="flex items-center gap-4 mb-8 pb-6 border-b border-blue-100">
+            <div className="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white shadow-lg">
+              <User size={32} />
             </div>
+            <div>
+              <h3 className="font-semibold text-lg">
+                {formData.name || "User"}
+              </h3>
+              <p className="text-sm text-gray-500">{formData.email}</p>
+            </div>
+          </div>
 
-            {/* Menu */}
-            <nav className="space-y-2">
-              {menuItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl text-left transition-all duration-300 group ${
-                    activeTab === item.id
-                      ? "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-600 border border-blue-200 shadow-md"
-                      : "text-gray-700 hover:bg-blue-50 hover:text-blue-600 hover:shadow-sm"
-                  }`}
-                >
-                  <div
-                    className={`p-2 rounded-lg ${
-                      activeTab === item.id
-                        ? "bg-blue-100"
-                        : "bg-gray-100 group-hover:bg-blue-100"
-                    }`}
-                  >
-                    <item.icon className={`w-5 h-5 ${item.color}`} />
-                  </div>
-                  <span className="font-medium">{item.label}</span>
-                </button>
-              ))}
-
+          <nav className="space-y-2">
+            {menuItems.map((item) => (
               <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-left transition-all duration-300 text-red-600 hover:bg-red-50 hover:shadow-sm group"
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl ${
+                  activeTab === item.id
+                    ? "bg-blue-100 text-blue-600"
+                    : "hover:bg-blue-50 text-gray-700"
+                }`}
               >
-                <div className="p-2 rounded-lg bg-red-100 group-hover:bg-red-200">
-                  <LogOut className="w-5 h-5" />
-                </div>
-                <span className="font-medium">Logout</span>
+                <item.icon className="w-5 h-5" /> {item.label}
               </button>
-            </nav>
+            ))}
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50"
+            >
+              <LogOut className="w-5 h-5" /> Logout
+            </button>
+          </nav>
+        </div>
 
-            {/* Profile Completion */}
-            <div className="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-blue-900">
-                  Profile Completion
-                </span>
-                <span className="text-sm font-bold text-blue-600">
-                  {calculateProfileCompletion(formData)}%
-                </span>
+        {/* Main Content */}
+        <div className="flex-1 bg-white rounded-2xl shadow-xl p-6 border border-blue-100">
+          {/* Profile Info Tab */}
+          {activeTab === "profile" && (
+            <>
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl font-bold">Profile Information</h2>
+                <button
+                  onClick={() =>
+                    isEditing ? handleSaveProfile() : setIsEditing(true)
+                  }
+                  className="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700"
+                >
+                  {isEditing ? "Save" : "Edit"}
+                </button>
               </div>
-              <div className="w-full bg-blue-200 rounded-full h-2">
-                <div
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                  style={{
-                    width: `${calculateProfileCompletion(formData)}%`,
-                  }}
-                ></div>
-              </div>
-            </div>
-          </div>
 
-          {/* Main Content */}
-          <div className="flex-1 bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-blue-100">
-            {/* Profile Tab */}
-            {activeTab === "profile" && (
-              <div>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
-                  <div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-                      Profile Information
-                    </h2>
-                    <p className="text-gray-600 mt-2">
-                      Manage your personal information and preferences
-                    </p>
-                  </div>
-                  <button
-                    onClick={() =>
-                      isEditing ? handleSave() : setIsEditing(true)
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <InputField
+                  label="Name"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  disabled={!isEditing}
+                />
+                <InputField label="Email" value={formData.email} disabled />
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Gender
+                  </label>
+                  <select
+                    value={formData.gender}
+                    onChange={(e) =>
+                      setFormData({ ...formData, gender: e.target.value })
                     }
-                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 mt-4 sm:mt-0"
+                    disabled={!isEditing}
+                    className="w-full border rounded-lg p-2"
                   >
-                    <Edit3 className="w-4 h-4" />
-                    {isEditing ? "Save Changes" : "Edit Profile"}
-                  </button>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                  </select>
                 </div>
-
-                {/* Personal Info */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                  <InputField
-                    label="Full Name"
-                    value={formData.fullName}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        fullName: e.target.value,
-                      })
-                    }
-                    disabled={!isEditing}
-                    variant="blue"
-                  />
-                  <InputField
-                    label="Email"
-                    value={formData.email}
-                    disabled
-                    variant="gray"
-                  />
-                  <InputField
-                    label="Phone"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                    disabled={!isEditing}
-                    variant="blue"
-                  />
-                  <InputField
-                    label="Date of Birth"
-                    type="date"
-                    value={formData.dateOfBirth}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        dateOfBirth: e.target.value,
-                      })
-                    }
-                    disabled={!isEditing}
-                    variant="blue"
-                  />
-                  <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
-                    <label className="block text-sm font-semibold text-blue-900 mb-3">
-                      Gender
-                    </label>
-                    <select
-                      value={formData.gender}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          gender: e.target.value,
-                        })
-                      }
-                      disabled={!isEditing}
-                      className="w-full px-4 py-3 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-blue-100 text-gray-900 transition-all duration-300"
-                    >
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
-                      <option value="Prefer not to say">
-                        Prefer not to say
-                      </option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Address Section */}
-                <div className="mt-12">
-                  <div className="flex items-center gap-3 mb-6">
-                    <MapPin className="w-6 h-6 text-blue-500" />
-                    <h3 className="text-xl md:text-2xl font-bold text-gray-900">
-                      Address Information
-                    </h3>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                    {["street", "city", "state", "pincode", "country"].map(
-                      (field) => (
-                        <InputField
-                          key={field}
-                          label={field.charAt(0).toUpperCase() + field.slice(1)}
-                          value={formData.address[field]}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              address: {
-                                ...formData.address,
-                                [field]: e.target.value,
-                              },
-                            })
-                          }
-                          disabled={!isEditing}
-                          variant="blue"
-                          full={field === "street"}
-                        />
-                      )
-                    )}
-                  </div>
-                </div>
+                <InputField
+                  label="Phone Number"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
+                  disabled={!isEditing}
+                />
+                <InputField
+                  label="Country"
+                  value={formData.country}
+                  onChange={(e) =>
+                    setFormData({ ...formData, country: e.target.value })
+                  }
+                  disabled={!isEditing}
+                />
               </div>
-            )}
+            </>
+          )}
 
-            {/* Orders */}
-            {activeTab === "orders" && (
-              <EmptyTab
-                icon={Package}
-                color="text-blue-400"
-                title="No orders found"
-                subtitle="Start shopping to see your orders here"
-              />
-            )}
-
-            {/* Wishlist */}
-            {activeTab === "wishlist" && (
-              <EmptyTab
-                icon={Heart}
-                color="text-pink-400"
-                title="Your wishlist is empty"
-                subtitle="Add items you love to see them here"
-              />
-            )}
-          </div>
+          {/* Addresses Tab */}
+          {activeTab === "addresses" && (
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold">My Addresses</h2>
+                <button
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                  onClick={openAddAddress}
+                >
+                  + Add Address
+                </button>
+              </div>
+              {Array.isArray(addresses) && addresses.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {addresses.map((addr) => (
+                    <div
+                      key={addr.address_id}
+                      className="p-5 border border-blue-200 rounded-xl bg-blue-50 shadow-sm relative"
+                    >
+                      <h3 className="font-semibold text-lg mb-1">
+                        {addr.address_name}
+                      </h3>
+                      <p className="text-gray-700">
+                        {addr.first_name} {addr.last_name}
+                      </p>
+                      <p className="text-gray-600 text-sm">
+                        {addr.address_line_1}, {addr.city}, {addr.state}
+                      </p>
+                      <p className="text-gray-600 text-sm">
+                        {addr.country} - {addr.pincode}
+                      </p>
+                      <p className="text-gray-600 text-sm mt-1">
+                        📞 {addr.mobile}
+                      </p>
+                      <div className="absolute top-3 right-3 flex gap-3">
+                        <button
+                          onClick={() => handleEditAddress(addr)}
+                          className="text-blue-600 text-sm hover:underline"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteAddress(addr.address_id)}
+                          className="text-red-600 text-sm hover:underline"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-600">No saved addresses yet.</p>
+              )}
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Address Modal */}
+      {showAddressModal && (
+        <div className="fixed inset-0 backdrop-blur-md bg-white/30 flex justify-center items-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative">
+            <h3 className="text-xl font-semibold mb-4">
+              {editingAddress ? "Edit Address" : "Add Address"}
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              {/* ✅ Address Type Dropdown */}
+              <div className="col-span-2">
+                <label className="block text-sm font-medium mb-1">
+                  Address Type
+                </label>
+                <select
+                  name="address_name"
+                  value={addressForm.address_name}
+                  onChange={handleAddressChange}
+                  className="border rounded-lg p-2 text-sm w-full"
+                >
+                  <option value="">Select Type</option>
+                  <option value="home">Home</option>
+                  <option value="work">Work</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              {/* ✅ Rest of address fields */}
+              <input
+                type="text"
+                name="first_name"
+                placeholder="First Name"
+                value={addressForm.first_name}
+                onChange={handleAddressChange}
+                className="border rounded-lg p-2 text-sm w-full"
+              />
+              <input
+                type="text"
+                name="last_name"
+                placeholder="Last Name"
+                value={addressForm.last_name}
+                onChange={handleAddressChange}
+                className="border rounded-lg p-2 text-sm w-full"
+              />
+              <input
+                type="text"
+                name="mobile"
+                placeholder="Mobile"
+                value={addressForm.mobile}
+                onChange={handleAddressChange}
+                className="border rounded-lg p-2 text-sm w-full"
+              />
+              <input
+                type="text"
+                name="pincode"
+                placeholder="Pincode"
+                value={addressForm.pincode}
+                onChange={handleAddressChange}
+                className="border rounded-lg p-2 text-sm w-full"
+              />
+              <input
+                type="text"
+                name="country"
+                placeholder="Country"
+                value={addressForm.country}
+                onChange={handleAddressChange}
+                className="border rounded-lg p-2 text-sm w-full"
+              />
+              <input
+                type="text"
+                name="address_line_1"
+                placeholder="Address Line 1"
+                value={addressForm.address_line_1}
+                onChange={handleAddressChange}
+                className="border rounded-lg p-2 text-sm w-full"
+              />
+              <input
+                type="text"
+                name="locality_area_street"
+                placeholder="Area / Street"
+                value={addressForm.locality_area_street}
+                onChange={handleAddressChange}
+                className="border rounded-lg p-2 text-sm w-full"
+              />
+              <input
+                type="text"
+                name="locality"
+                placeholder="Locality"
+                value={addressForm.locality}
+                onChange={handleAddressChange}
+                className="border rounded-lg p-2 text-sm w-full"
+              />
+              <input
+                type="text"
+                name="city"
+                placeholder="City"
+                value={addressForm.city}
+                onChange={handleAddressChange}
+                className="border rounded-lg p-2 text-sm w-full"
+              />
+              <input
+                type="text"
+                name="state"
+                placeholder="State"
+                value={addressForm.state}
+                onChange={handleAddressChange}
+                className="border rounded-lg p-2 text-sm w-full"
+              />
+              <input
+                type="text"
+                name="landmark"
+                placeholder="Landmark"
+                value={addressForm.landmark}
+                onChange={handleAddressChange}
+                className="border rounded-lg p-2 text-sm w-full"
+              />
+
+              <label className="flex items-center gap-2 col-span-2">
+                <input
+                  type="checkbox"
+                  name="is_default"
+                  checked={addressForm.is_default}
+                  onChange={handleAddressChange}
+                />
+                Set as default
+              </label>
+            </div>
+
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setShowAddressModal(false)}
+                className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveAddress}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                {editingAddress ? "Save Changes" : "Add Address"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default ProfilePage;
-
-// ✅ small reusable input component
-const InputField = ({
-  label,
-  value,
-  onChange,
-  disabled,
-  type = "text",
-  variant = "blue",
-  full,
-}) => {
-  const baseColor = variant === "blue" ? "blue" : "gray";
-  const bg = variant === "blue" ? "bg-blue-50" : "bg-gray-50";
-  const border = variant === "blue" ? "border-blue-200" : "border-gray-200";
-
-  return (
-    <div
-      className={`${bg} p-4 rounded-xl border ${border} ${
-        full ? "md:col-span-2" : ""
-      }`}
-    >
-      <label
-        className={`block text-sm font-semibold text-${baseColor}-900 mb-3`}
-      >
-        {label}
-      </label>
-      <input
-        type={type}
-        value={value}
-        onChange={onChange}
-        disabled={disabled}
-        className={`w-full px-4 py-3 border border-${baseColor}-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-${baseColor}-500 focus:border-transparent disabled:bg-${baseColor}-100 text-gray-900 transition-all duration-300`}
-      />
-    </div>
-  );
-};
-
-// ✅ small reusable empty tab component
-const EmptyTab = ({ icon: Icon, color, title, subtitle }) => (
-  <div className="text-center py-16 bg-blue-50 rounded-2xl border border-blue-200">
-    <Icon size={64} className={`mx-auto ${color} mb-4`} />
-    <p className="text-lg text-gray-600 mb-2">{title}</p>
-    <p className="text-gray-500">{subtitle}</p>
+const InputField = ({ label, value, onChange, disabled }) => (
+  <div>
+    <label className="block text-sm font-medium mb-1">{label}</label>
+    <input
+      type="text"
+      value={value}
+      onChange={onChange}
+      disabled={disabled}
+      className="w-full border rounded-lg p-2"
+    />
   </div>
 );
+
+export default ProfilePage;

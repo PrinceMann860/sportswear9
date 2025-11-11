@@ -7,9 +7,9 @@ const SkeletonLoader = () => {
       {/* ✅ Top Category Grid Skeleton */}
       <div className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full mb-12">
         <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-4">
-          {Array.from({ length: 10 }).map((_, index) => (
+          {Array.from({ length: 8 }).map((_, index) => (
             <div key={index} className="flex flex-col items-center space-y-2">
-              <div className="w-16 h-16 md:w-20 md:h-20 lg:w-34 lg:h-34 rounded-lg bg-gray-300"></div>
+              <div className="w-16 h-16 md:w-20 md:h-20 lg:w-42 lg:h-42 rounded-lg bg-gray-300"></div>
               <div className="h-3 w-16 bg-gray-300 rounded"></div>
             </div>
           ))}
@@ -22,7 +22,7 @@ const SkeletonLoader = () => {
         <div className="flex space-x-4 overflow-hidden">
           {Array.from({ length: 6 }).map((_, index) => (
             <div key={index} className="flex-shrink-0 w-40 sm:w-48">
-              <div className="w-full h-48 bg-gray-300 rounded-lg mb-2"></div>
+              <div className="w-full h-62 bg-gray-300 rounded-lg mb-2"></div>
               <div className="h-4 w-24 bg-gray-300 rounded mb-2"></div>
               <div className="h-3 w-32 bg-gray-300 rounded mb-2"></div>
               <div className="h-4 w-20 bg-gray-300 rounded"></div>

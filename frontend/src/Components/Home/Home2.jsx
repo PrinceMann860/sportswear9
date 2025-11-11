@@ -35,7 +35,6 @@ import logo3 from "../../assets/3.svg";
 import logo4 from "../../assets/4.svg";
 import logo5 from "../../assets/5.svg";
 import logo6 from "../../assets/6.svg";
-import sportvid from "../../assets/sportvid.mp4";
 import SportsCategorySection from "./SportsCategorysection";
 import SkeletonLoader from "./SkeletonLoader";
 
@@ -534,7 +533,7 @@ function Home2() {
             <CategoryGrid
               title="Shop by Category"
               subtitle="Find Your Perfect Gear"
-              categories={transformToCategoryItems(getSectionData("floor-3"))}
+              categories={transformToCategoryItems(getSectionData("floor-1"))}
               columns="grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8"
               className="mb-12"
             />
@@ -729,24 +728,7 @@ function Home2() {
         {/* ✅ Final Banner Images */}
         <AnimatedSection>
           <div className="px-2 sm:px-4 md:px-6 lg:px-12 mx-auto grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 lg:gap-6 w-full mb-10 overflow-hidden max-w-full">
-            {[
-              {
-                image:
-                  "https://contents.mediadecathlon.com/s1313100/k$8882b7bc41a4b99d470f8f348f5db0ce/defaut.jpg",
-              },
-              {
-                image:
-                  "https://contents.mediadecathlon.com/s1313098/k$695dad62a39fd430cc8f6e67cf0a1026/defaut.jpg",
-              },
-              {
-                image:
-                  "https://contents.mediadecathlon.com/s1313099/k$ed72d795df00b80e825a6984e7624439/defaut.jpg",
-              },
-              {
-                image:
-                  "https://contents.mediadecathlon.com/s1320224/k$221c44ffdc1c81b9324ce0a06b6cd905/defaut.jpg",
-              },
-            ].map((imgs, index) => (
+            {transformToCategoryItems(getSectionData("floor-5")).map((imgs, index) => (
               <img
                 key={index}
                 src={imgs.image}

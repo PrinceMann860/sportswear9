@@ -4,7 +4,7 @@ import productReducer from '../Components/Product/productslice';
 import ProductdetailReducer from "../Components/Product/Productdetailslice";
 import brandReducer from "../Components/Brands/brandlistslice";
 import homepagereducer from "../Components/Home/HomePageSlice";
-import profileReducer from './slices/profile/profileSlice';
+import profileReducer from '../Components/Profile/Profileslice'
 
 export const store = configureStore({
   reducer: {

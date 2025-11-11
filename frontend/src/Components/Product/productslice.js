@@ -1,124 +1,140 @@
-// /src/store/slices/productSlice.js
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 
-// Async thunk for fetching products
+const BASE_URL = "http://127.0.0.1:8000/api/products/";
+
+// ✅ Fetch Products (with pagination support)
 export const fetchProducts = createAsyncThunk(
-  'products/fetchProducts',
-  async (_, { rejectWithValue }) => {
+  "products/fetchProducts",
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/products/');
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch products');
-      }
-      
-      const data = await response.json();
-      console.log('Raw API data:', data);
-      
-      // If data is an array, return it directly
-      if (Array.isArray(data)) {
-        return data;
-      }
-      
-      // If it's a single object, wrap it in an array
-      if (typeof data === 'object' && data !== null) {
-        return [data];
-      }
-      
-      // Fallback to empty array
-      return [];
-      
+      // Supports query params like { page, category, search, gender, ... }
+      const query = new URLSearchParams(params).toString();
+      const response = await axios.get(`${BASE_URL}?${query}`);
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch products"
+      );
+    }
+  }
+);
+
+// ✅ Fetch Single Product
+export const fetchProductDetail = createAsyncThunk(
+  "products/fetchProductDetail",
+  async (uuid, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${BASE_URL}${uuid}/`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch product detail"
+      );
     }
   }
 );
 
 const initialState = {
-  items: [],
+  products: [],
+  count: 0,
+  next: null,
+  previous: null,
+  productDetail: null,
   loading: false,
   error: null,
-  filters: {
-    category: 'all',
-    priceMax: 500,
-    minRating: 0,
-    selectedTags: [],
-    searchQuery: '',
-    sortBy: 'latest'
-  }
 };
 
-const productSlice = createSlice({
-  name: 'product', // This should match what's in your store configuration
+const productsSlice = createSlice({
+  name: "products",
   initialState,
   reducers: {
-    setFilters: (state, action) => {
-      state.filters = { ...state.filters, ...action.payload };
-    },
-    clearFilters: (state) => {
-      state.filters = initialState.filters;
-    },
-    setCategory: (state, action) => {
-      state.filters.category = action.payload;
-    },
-    setPriceMax: (state, action) => {
-      state.filters.priceMax = action.payload;
-    },
-    setMinRating: (state, action) => {
-      state.filters.minRating = action.payload;
-    },
-    setSelectedTags: (state, action) => {
-      state.filters.selectedTags = action.payload;
-    },
-    setSearchQuery: (state, action) => {
-      state.filters.searchQuery = action.payload;
-    },
-    setSortBy: (state, action) => {
-      state.filters.sortBy = action.payload;
-    },
-    clearError: (state) => {
+    clearProducts: (state) => {
+      state.products = [];
+      state.count = 0;
+      state.next = null;
+      state.previous = null;
       state.error = null;
-    }
+    },
+    // ✅ Optional: append more products for infinite scroll
+    appendProducts: (state, action) => {
+      const newProducts = action.payload || [];
+      if (Array.isArray(newProducts)) {
+        state.products = [...state.products, ...newProducts];
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch Products
+      // ✅ Fetch All Products
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
-        console.log('Products in state:', action.payload);
+
+        const data = action.payload;
+
+        // ✅ Handle paginated or plain array responses safely
+        if (data && Array.isArray(data.results)) {
+          state.products = data.results;
+          state.count = data.count || 0;
+          state.next = data.next || null;
+          state.previous = data.previous || null;
+        } else if (Array.isArray(data)) {
+          state.products = data;
+          state.count = data.length;
+          state.next = null;
+          state.previous = null;
+        } else if (typeof data === "object" && data !== null) {
+          // Handle possible nested object responses
+          const arr =
+            Array.isArray(data.data) || Array.isArray(data.items)
+              ? data.data || data.items
+              : [];
+          state.products = arr;
+          state.count = arr.length;
+          state.next = null;
+          state.previous = null;
+        } else {
+          state.products = [];
+          state.count = 0;
+          state.next = null;
+          state.previous = null;
+        }
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Failed to load products";
+      })
+
+      // ✅ Fetch Product Detail
+      .addCase(fetchProductDetail.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.productDetail = null;
+      })
+      .addCase(fetchProductDetail.fulfilled, (state, action) => {
+        state.loading = false;
+        state.productDetail = action.payload;
+      })
+      .addCase(fetchProductDetail.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to load product detail";
       });
-  }
+  },
 });
 
-export const { 
-  setFilters, 
-  clearFilters, 
-  setCategory, 
-  setPriceMax, 
-  setMinRating, 
-  setSelectedTags, 
-  setSearchQuery, 
-  setSortBy,
-  clearError 
-} = productSlice.actions;
+export const { clearProducts, appendProducts } = productsSlice.actions;
+export default productsSlice.reducer;
 
-// FIXED SELECTORS - using state.product instead of state.products
-export const selectAllProducts = (state) => {
-  console.log('Redux state:', state);
-  console.log('Products in selector:', state?.product?.items);
-  return state?.product?.items || [];
-};
-export const selectProductsLoading = (state) => state?.product?.loading || false;
-export const selectProductsError = (state) => state?.product?.error || null;
-export const selectProductsFilters = (state) => state?.product?.filters || initialState.filters;
+// ✅ Selectors
+export const selectAllProducts = (state) => state.product.products;
+export const selectProductsCount = (state) => state.product.count;
+export const selectProductsLoading = (state) => state.product.loading;
+export const selectProductDetail = (state) => state.product.productDetail;
 
-export default productSlice.reducer;
+// ✅ Add missing export for error selector
+export const selectProductsError = (state) => state.product.error;
+
