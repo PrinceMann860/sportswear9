@@ -220,11 +220,11 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle',
-        'auth_app.throttles.OTPRateThrottle',  # custom fine-tuned throttle for OTP
-    ],
+    # 'DEFAULT_THROTTLE_CLASSES': [
+    #     'rest_framework.throttling.AnonRateThrottle',
+    #     'rest_framework.throttling.UserRateThrottle',
+    #     'auth_app.throttles.OTPRateThrottle',  # custom fine-tuned throttle for OTP
+    # ],
     'DEFAULT_THROTTLE_RATES': {
         'anon': '30/min',          # 30 anonymous requests per minute
         'user': '120/min',         # 120 authenticated requests per minute
