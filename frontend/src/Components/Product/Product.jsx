@@ -84,7 +84,7 @@ function ProductCard({ product }) {
   const count = product.rating?.count || 100;
 
   return (
-    <Link to={`/ProductInfo/${product.id}`}>
+    <Link to={`/ProductInfo/${product.product_uuid||product.id}`}>
       <div className="relative max-w-[300px] bg-white overflow-hidden border border-gray-200 hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col rounded-lg">
         <div className="group relative w-full h-46 md:h-54 lg:h-70 flex items-center justify-center bg-gray-50">
           <img

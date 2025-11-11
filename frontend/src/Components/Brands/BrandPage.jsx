@@ -20,6 +20,7 @@ const BrandPage = () => {
     (state) => state.brandlist
   );
   const products = useSelector(selectAllProducts);
+  
   const productsLoading = useSelector(selectProductsLoading);
 
   const [viewMode, setViewMode] = useState("grid");
@@ -130,7 +131,6 @@ const BrandPage = () => {
 
           
         </div>
-
         {/* 🛒 Product Grid */}
         <div
           className={`grid gap-5 ${
@@ -141,7 +141,7 @@ const BrandPage = () => {
         >
           {brandProducts.length > 0 ? (
             brandProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.product_uuid} product={product} />
             ))
           ) : (
             <p className="text-gray-600 col-span-full text-center py-12 text-lg">

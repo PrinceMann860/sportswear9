@@ -4,8 +4,8 @@ import productReducer from '../Components/Product/productslice';
 import ProductdetailReducer from "../Components/Product/Productdetailslice";
 import brandReducer from "../Components/Brands/brandlistslice";
 import homepagereducer from "../Components/Home/HomePageSlice";
-import profileReducer from '../Components/Profile/Profileslice'
-
+import profileReducer from '../Components/Profile/Profileslice';
+import cartReducer from '../Components/Cart/Cartslice';
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -14,6 +14,7 @@ export const store = configureStore({
     brandlist: brandReducer,
     homepage: homepagereducer,
     profile: profileReducer,
+    cart: cartReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
