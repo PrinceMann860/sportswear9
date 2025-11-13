@@ -16,14 +16,11 @@ import {
 import { ProductCard } from "../Product/Product";
 import { Link } from "react-router-dom";
 import PopularProductsCarousel from "../Decath/PopularProductsCarousel";
-import ProductCarouselWithTitle from "../Decath/ProductCarouselWithTitle";
 import CategoryGrid from "../Decath/CategoryGrid";
 import LandscapeCarousel from "../Banner&Carousels/LandscapeCarousel";
 import SportsGearCarousel from "../Decath/SportsGearCarousel";
 import FestiveDealsGrid from "../Decath/FestiveDealsGrid";
 import BMSMBanner from "../../assets/BMSM.jpg"
-import HorizontalScrollCarousel from "../Banner&Carousels/HorizontalScrollCarousel";
-import RecommendedProducts from "./RecommendedProducts";
 import VideoGrid from "./VideoGrid";
 import { DealsOfTheDay } from "../Banner&Carousels/DealsOfTheDay";
 import { fetchBrands } from "../Brands/brandlistslice";
@@ -241,50 +238,6 @@ const fallbackData = [
 ];
 
 // ✅ Fallback data for other sections
-const sportsGearItems = [
-  {
-    name: "Golf",
-    image:
-      "https://media.istockphoto.com/id/171362434/photo/golfer-swinging-at-sunset.jpg?s=612x612&w=0&k=20&c=hqIIHoIH2IQ0EpWOSt98-J3KEiY_ISivbuA2T8pjYug=",
-    link: "#",
-  },
-  {
-    name: "Cricket Trousers",
-    image:
-      "https://ocs-sport.ams3.cdn.digitaloceanspaces.com/let/2015/06/reid762.jpg",
-    link: "#",
-  },
-  {
-    name: "Tennis",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS683LpVYvV2SaCQmycBNPxhx7YYLH9_HMKPQ&s",
-    link: "#",
-  },
-  {
-    name: "Basketball",
-    image:
-      "https://cdn.pixabay.com/photo/2022/04/09/15/10/basketball-7121617_1280.jpg",
-    link: "#",
-  },
-  {
-    name: "GYM",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRM7keGEpuMGAMjwNg9YGQYY6ApcjcA3MoqkTc9DaBTZ29nUq7BiC3cC6PdOLrkA1UmKQ&usqp=CAU",
-    link: "#",
-  },
-  {
-    name: "Yoga",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQS0pUCsbpuq7EZNZ8t5vlenrjVYcmzSkLx6Q&s",
-    link: "#",
-  },
-  {
-    name: "Running",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5zLb3NX0iZN_-V8d1srf31bm22sftIO531Q&s",
-    link: "#",
-  },
-];
 const festiveStealDeals = [
   {
     name: "Football",
@@ -497,8 +450,8 @@ function Home2() {
       </div>
     );
   
-  if (error)
-    return <div className="text-center py-10 text-red-500">Error: {error}</div>;
+  if (homepageError||error)
+    return <div className="text-center my-[100px] text-red-500">Error <br /><br />{error}</div>;
 
   return (
     // <main className="w-full bg-white pt-20 overflow-x-hidden">
@@ -555,14 +508,7 @@ function Home2() {
           </section>
          
 
-        {/* ✅ Sports Gear */}
-         
-          <div className="mx-auto px-2 sm:px-4 md:px-6 lg:px-12 xl:px-14">
-            <SportsGearCarousel
-              title="Unite & Play: Shop Sports Gear"
-              items={sportsGearItems}
-            />
-          </div>
+        
          
         {/* ✅ Trusted Brands */}
          
@@ -612,33 +558,6 @@ function Home2() {
           />
          
 
-        {/* ✅ Product Carousel */}
-         
-          <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full">
-            <ProductCarouselWithTitle
-              title="The perfect Shoes is waiting"
-              products={featuredProducts}
-            />
-          </section>
-         
-
-        {/* ✅ Horizontal Scroll Carousel */}
-        {/*  
-          <section className="mt-5 p-5 px-2 sm:px-4 md:px-6 lg:px-12 xl:px-14 mx-auto max-w-full">
-            <h2 className="text-center text-3xl font-bold">
-              Curated Deals for Every Mood
-            </h2>
-            <div className="mt-10">
-              <HorizontalScrollCarousel items={festiveDeals} speed={0.3} />
-            </div>
-          </section>
-          */}
-
-        {/* ✅ Recommended Products */}
-        {/*  
-          <RecommendedProducts />
-          */}
-
         {/* ✅ Deals of the Day */}
          
           <div className="px-2 sm:px-4 md:px-6 lg:px-12 mx-auto max-w-full">
@@ -667,11 +586,10 @@ function Home2() {
           </section>
          
 
-        {/* ✅ Sale Video Banner */}
          
           <div className="w-full max-w-full mx-auto p-5 lg:p-10 rounded-2xl overflow-hidden">
             <LandscapeCarousel 
-              items={transformToCarouselItems(getSectionData("floor-4"))} 
+              items={transformToCarouselItems(getSectionData("floor-3"))} 
             />
           </div>
          
