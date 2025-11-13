@@ -38,6 +38,7 @@ urlpatterns = [
     path('api/inv/', include('inventory.urls')),
     path('api/media/', include('assets.urls')),
     path('api/v1/', include('cart.urls')),
+    path('api/v1/', include('ProductSpecification.urls')),
 ]
 
 # (optional) serve static and media files in dev mode

@@ -104,14 +104,15 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
 
     queryset = (
         Product.objects.filter(is_active=True)
-        .select_related("brand", "category")
+        .select_related("brand", "category", "spec_content")
         .prefetch_related(
-            "variants__images",
+            "variants__images",   # ✅ nested relation
             "inventories",
             "reviews",
-            "specifications"
+            "variants"
         )
     )
+
 
     def retrieve(self, request, *args, **kwargs):
         product_uuid = kwargs.get("product_uuid")

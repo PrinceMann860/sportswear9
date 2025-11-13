@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from .models import Product, ProductCoupon, CouponUsage
 from assets.models import ProductImage
-from ProductSpecification.models import ProductSpecification
+from ProductSpecification.models import ProductSpecificationContent
 from .serializers import ProductDetailSerializer, ProductCouponSerializer
 from .admin_serializers import ProductCreateSerializer
 # products/admin_views.py (continue)
@@ -81,15 +81,17 @@ class AddSpecificationAPIView(APIView):
 
     def post(self, request, product_uuid):
         product = get_object_or_404(Product, product_uuid=product_uuid)
-        specs = request.data.get("specs", [])
+        data = request.data.get("data", {})
 
-        for spec in specs:
-            ProductSpecification.objects.create(
-                product=product,
-                key=spec.get("key"),
-                value=spec.get("value")
-            )
-        return Response({"message": "Specifications added"}, status=201)
+        # Create or update specification content for the product
+        spec_obj, created = ProductSpecificationContent.objects.update_or_create(
+            product=product,
+            defaults={"data": data}
+        )
+
+        msg = "Specification created" if created else "Specification updated"
+        return Response({"message": msg, "data": spec_obj.data}, status=status.HTTP_200_OK)
+
 
 
 # products/admin_views.py

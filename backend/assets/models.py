@@ -3,7 +3,7 @@ from shortuuid.django_fields import ShortUUIDField
 from core.image_service.services import get_imgproxy_url
 from core.image_service.utils import validate_image
 from attributes.models import ProductVariant
-from ProductSpecification.models import ProductSpecification  # ✅ add this import safely (circular-safe if you use app label)
+from ProductSpecification.models import ProductSpecificationContent  # ✅ add this import safely (circular-safe if you use app label)
 
 
 class ProductImage(models.Model):
@@ -21,10 +21,10 @@ class ProductImage(models.Model):
         null=True,
         blank=True
     )
-    specification = models.ForeignKey(   # ✅ NEW FIELD
-        "ProductSpecification.ProductSpecification",
+    spec_content = models.ForeignKey(
+        "ProductSpecification.ProductSpecificationContent",
         on_delete=models.CASCADE,
-        related_name="images",
+        related_name="media",
         null=True,
         blank=True
     )

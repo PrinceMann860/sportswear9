@@ -7,7 +7,7 @@ from attributes.models import ProductAttribute
 from assets.models import ProductImage
 from reviews.models import Review
 from attributes.admin_serializers import ProductVariantSerializer
-from ProductSpecification.serializers import ProductSpecificationSerializer
+from ProductSpecification.serializers import ProductSpecificationContentSerializer
 from attributes.models import ProductVariant
 from collections import defaultdict
 from datetime import timedelta
@@ -191,7 +191,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     inventory = InventorySerializer(read_only=True)  # ✅ fixed
     variants = ProductVariantSerializer(many=True, read_only=True)
-    specifications = ProductSpecificationSerializer(many=True, read_only=True)  # ✅ Added here
+    specifications = ProductSpecificationContentSerializer(many=True, read_only=True)  # ✅ Added here
     reviews = ReviewSerializer(many=True, read_only=True)
     average_rating = serializers.SerializerMethodField()
     default_images = serializers.SerializerMethodField()
@@ -303,7 +303,7 @@ class ProductDetailUnifiedSerializer(serializers.ModelSerializer):
     brand = serializers.SerializerMethodField()
     category = serializers.CharField(source="category.name", read_only=True)
     variants = serializers.SerializerMethodField()
-    specifications = ProductSpecificationSerializer(many=True, read_only=True)  # ✅ include specifications
+    specifications = ProductSpecificationContentSerializer(many=True, read_only=True)  # ✅ include specifications
     reviews = ReviewSerializer(many=True, read_only=True)
 
     average_rating = serializers.SerializerMethodField()  # ✅ added

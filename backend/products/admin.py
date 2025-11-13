@@ -4,7 +4,7 @@ from django.contrib import admin
 from .models import Product
 from attributes.models import ProductVariant
 from assets.models import ProductImage
-from ProductSpecification.models import ProductSpecification
+from ProductSpecification.models import ProductSpecificationContent
 
 # Inline for Product Images
 class ProductImageInline(admin.TabularInline):
@@ -28,7 +28,7 @@ class ProductVariantInline(admin.TabularInline):
 
 # Inline for Product Specifications
 class ProductSpecificationInline(admin.TabularInline):
-    model = ProductSpecification
+    model = ProductSpecificationContent
     extra = 1
 
 # Product Admin
