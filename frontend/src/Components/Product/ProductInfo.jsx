@@ -251,12 +251,7 @@ const ProductInfo = () => {
       product_uuid: product.product_uuid,
       variant_id: selectedVariant.variant_id,
       color_id: selectedColorObj.key,
-      size: selectedSize,
       quantity: quantity,
-      price: selectedVariant.price || product.price,
-      product_name: product.title,
-      color_name: selectedColorObj.name,
-      image_url: galleryImages[0]?.url || product.images[0]?.url,
     };
 
     dispatch(addToCart(payload))
