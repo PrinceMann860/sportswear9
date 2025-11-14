@@ -21,6 +21,8 @@ from django.shortcuts import get_object_or_404
 from assets.models import ProductImage
 from .models import ProductVariant, AttributeValue, ProductVariantAttributeMedia
 from products.models import Product
+from .admin_serializers import ProductVariantAttributeMediaUploadSerializer
+from django.db.models import Prefetch
 
 # ---------------------- Admin Views ----------------------
 
@@ -65,7 +67,7 @@ class ProductVariantAdminView(generics.ListCreateAPIView):
 
 # attributes/views.py
 class AttributeListUserView(generics.ListAPIView):
-    queryset = Attribute.objects.prefetch_related("values__variant_media__images")
+    queryset = Attribute.objects.prefetch_related("values", Prefetch("values__variant_media__images", queryset=ProductImage.objects.only("id", "image")))    
     serializer_class = AttributeUserSerializer
     permission_classes = [permissions.AllowAny]
 

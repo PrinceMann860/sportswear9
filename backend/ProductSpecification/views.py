@@ -18,7 +18,7 @@ class ProductSpecificationContentViewSet(viewsets.ModelViewSet):
         """
         Allow optional filtering by product_uuid
         """
-        queryset = ProductSpecificationContent.objects.all().select_related("product")
+        queryset = ProductSpecificationContent.objects.select_related("product").prefetch_related("media")
         product_uuid = self.request.query_params.get("product_uuid")
         if product_uuid:
             queryset = queryset.filter(product__product_uuid=product_uuid)

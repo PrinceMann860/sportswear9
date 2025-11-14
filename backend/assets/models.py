@@ -37,7 +37,7 @@ class ProductImage(models.Model):
         ordering = ["-uploaded_at"]
 
     def __str__(self):
-        label = self.variant or self.specification
+        label = self.variant or self.spec_content
         return f"{label or 'Unlinked'} ({self.alt_text or 'image'})"
 
     @property

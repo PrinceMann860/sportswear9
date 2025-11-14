@@ -14,7 +14,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
             "is_main",
             "uploaded_at",
             "variant",         # ✅ still supported
-            "specification",
+            "spec_content",   # <-- FIXED
 
         ]
 

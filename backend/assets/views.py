@@ -16,6 +16,8 @@ class ProductImageViewSet(viewsets.ModelViewSet):
 class ProductVideoViewSet(viewsets.ModelViewSet):
     queryset = ProductVideo.objects.all()
     serializer_class = ProductVideoSerializer
+    lookup_field = "video_uuid"
+
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
