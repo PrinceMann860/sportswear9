@@ -62,11 +62,11 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = [
-            "cart_id", "user", "items", "subtotal",
+            "cart_id",  "items", "subtotal",
             "applied_fees", "total_fees", "total_items",
             "discount_amount", "total_price"
         ]
-        read_only_fields = ["user", "subtotal", "applied_fees", "total_fees", "total_price"]
+        read_only_fields = ["subtotal", "applied_fees", "total_fees", "total_price"]
 
     def get_applied_fees(self, obj):
         """Return fees in a readable structure."""

@@ -202,7 +202,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         fields = [
             'product_uuid', 'name', 'description', 'price', 'disc', 'net',  'brand', 'category',
             'inventory', 'variants', 'specifications', 'reviews',
-            'default_images', 'average_rating', 'created_at', 'updated_at'
+            'default_images', 'average_rating',
         ]
 
     def get_average_rating(self, obj):

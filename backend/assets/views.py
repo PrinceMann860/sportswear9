@@ -8,7 +8,7 @@ class ProductImageViewSet(viewsets.ModelViewSet):
     lookup_field = "image_uuid"   # 👈 THIS IS THE FIX
 
 
-    def get_permissions(self):
+    async def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]
@@ -19,7 +19,7 @@ class ProductVideoViewSet(viewsets.ModelViewSet):
     lookup_field = "video_uuid"
 
 
-    def get_permissions(self):
+    async def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]
