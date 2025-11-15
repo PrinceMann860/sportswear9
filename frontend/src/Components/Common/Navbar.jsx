@@ -47,8 +47,6 @@ function Navbar() {
     "Sports bags",
   ];
 
-  
-
   const placeholders = [
     "Running shoes",
     "Football jersey",
@@ -72,7 +70,10 @@ function Navbar() {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setShowUserMenu(false);
       }
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target)
+      ) {
         setShowSearch(false);
       }
     };
@@ -640,8 +641,10 @@ function Navbar() {
                 className="flex items-center hover:bg-blue-100 px-2 py-2 rounded-full transition-all duration-200 group"
                 aria-label="Search"
               >
-                <FiSearch className="text-gray-500 hover:text-blue-500 transition-colors" size={16} />
-                
+                <FiSearch
+                  className="text-gray-500 hover:text-blue-500 transition-colors"
+                  size={16}
+                />
               </button>
 
               {/* Search Dropdown */}
@@ -650,7 +653,10 @@ function Navbar() {
                   {/* Search Input */}
                   <div className="p-3 border-b border-gray-100 max-w-6xl mx-auto">
                     <div className="relative">
-                      <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                      <FiSearch
+                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                        size={18}
+                      />
                       <input
                         ref={searchInputRef}
                         type="text"
@@ -659,8 +665,8 @@ function Navbar() {
                         placeholder={`Search for ${placeholders[currentPlaceholder]}`}
                         className="w-full pl-10 pr-10 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
                         onKeyDown={(e) => {
-                          if (e.key === 'Escape') setShowSearch(false);
-                          if (e.key === 'Enter') handleSearch(e);
+                          if (e.key === "Escape") setShowSearch(false);
+                          if (e.key === "Enter") handleSearch(e);
                         }}
                       />
                       {searchQuery && (
@@ -668,7 +674,10 @@ function Navbar() {
                           onClick={clearSearch}
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-200 rounded-full transition-colors"
                         >
-                          <FiX className="text-gray-400 hover:text-gray-600" size={16} />
+                          <FiX
+                            className="text-gray-400 hover:text-gray-600"
+                            size={16}
+                          />
                         </button>
                       )}
                     </div>
@@ -676,8 +685,6 @@ function Navbar() {
 
                   {/* Suggestions */}
                   <div className="max-h-80 overflow-y-auto max-w-6xl mx-auto">
-                
-
                     {/* Search Suggestions */}
                     {searchQuery && (
                       <div className="p-2">
@@ -685,8 +692,10 @@ function Navbar() {
                           Suggestions
                         </div>
                         {suggestions
-                          .filter(suggestion =>
-                            suggestion.toLowerCase().includes(searchQuery.toLowerCase())
+                          .filter((suggestion) =>
+                            suggestion
+                              .toLowerCase()
+                              .includes(searchQuery.toLowerCase())
                           )
                           .slice(0, 6)
                           .map((suggestion, index) => (
@@ -695,19 +704,27 @@ function Navbar() {
                               onClick={() => handleSuggestionClick(suggestion)}
                               className="w-full text-left px-3 py-2.5 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3 group"
                             >
-                              <FiSearch className="text-gray-400 group-hover:text-blue-600 transition-colors" size={16} />
+                              <FiSearch
+                                className="text-gray-400 group-hover:text-blue-600 transition-colors"
+                                size={16}
+                              />
                               <span className="text-gray-700 group-hover:text-blue-600 transition-colors">
                                 {suggestion}
                               </span>
                             </button>
                           ))}
-                        
+
                         {/* No Results */}
-                        {suggestions.filter(suggestion =>
-                          suggestion.toLowerCase().includes(searchQuery.toLowerCase())
+                        {suggestions.filter((suggestion) =>
+                          suggestion
+                            .toLowerCase()
+                            .includes(searchQuery.toLowerCase())
                         ).length === 0 && (
                           <div className="px-3 py-8 text-center text-gray-500">
-                            <FiSearch className="mx-auto mb-2 text-gray-300" size={24} />
+                            <FiSearch
+                              className="mx-auto mb-2 text-gray-300"
+                              size={24}
+                            />
                             <p>No results found for "{searchQuery}"</p>
                           </div>
                         )}
@@ -727,7 +744,9 @@ function Navbar() {
                           🆕 New Arrivals
                         </button>
                         <button
-                          onClick={() => handleSuggestionClick("Clearance Sale")}
+                          onClick={() =>
+                            handleSuggestionClick("Clearance Sale")
+                          }
                           className="w-full text-left px-3 py-2.5 hover:bg-gray-50 rounded-lg transition-colors"
                         >
                           🔥 Clearance Sale
@@ -758,7 +777,7 @@ function Navbar() {
                 </button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-2xl shadow-2xl py-3 animate-slideIn">
+                  <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-2xl shadow-2xl py-3 animate-slideIn z-50">
                     <div className="px-4 py-2 border-b border-gray-100">
                       <p className="text-sm font-semibold text-gray-900 truncate">
                         {profile?.full_name}
@@ -860,7 +879,14 @@ function Navbar() {
         </div>
 
         {/* Mobile Sidebar */}
-        <MobileSidebar isOpen={open} onClose={() => setOpen(false)} />
+        <MobileSidebar
+          isOpen={open}
+          onClose={() => setOpen(false)}
+          openAuthModal={(mode) => {
+            setAuthMode(mode);
+            setAuthOpen(true);
+          }}
+        />
       </nav>
 
       {/* Auth Modal */}

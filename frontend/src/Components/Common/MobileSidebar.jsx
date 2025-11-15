@@ -1,14 +1,24 @@
 import { useState, useEffect } from 'react';
-import { X, ChevronRight, User, Heart, ShoppingBag, Gift, HelpCircle , Settings } from 'lucide-react';
+import {
+  X,
+  ChevronRight,
+  User,
+  Heart,
+  ShoppingBag,
+  Gift,
+  HelpCircle,
+  Settings,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+
 const ad1 =
   'https://media.wellmed.workers.dev/?file=MZSWWSRXGI3G62JWJZAXOMSCMJLW4&mode=inline';
 const ad2 =
   'https://media.wellmed.workers.dev/?file=KZBVGM2UGJDVASTYGVRG23JRG3TV2&mode=inline';
 
-const MobileSidebar = ({ isOpen, onClose }) => {
+const MobileSidebar = ({ isOpen, onClose, openAuthModal }) => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [expandedCategory, setExpandedCategory] = useState(null);
@@ -103,8 +113,6 @@ const MobileSidebar = ({ isOpen, onClose }) => {
     },
   ];
 
-  const menuItems = [{ icon: HelpCircle, label: 'Help Center', path: '/help' }];
-
   const handleNavigation = (path) => {
     navigate(path);
     onClose();
@@ -116,6 +124,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
 
   return (
     <>
+      {/* BACKDROP */}
       <div
         className={`fixed inset-0 bg-black transition-opacity duration-300 z-[60] xl:hidden ${
           isOpen ? 'opacity-50 visible' : 'opacity-0 invisible'
@@ -123,23 +132,27 @@ const MobileSidebar = ({ isOpen, onClose }) => {
         onClick={onClose}
       />
 
+      {/* SIDEBAR */}
       <div
         className={`fixed top-0 left-0 h-full w-80 bg-white shadow-2xl z-[70] transform transition-transform duration-300 ease-out xl:hidden overflow-y-auto ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="flex flex-col h-full">
-          <div className="flex flex-col gap-4 ">
+          {/* Banner */}
+          <div className="flex flex-col gap-4">
             <Link>
               <img src={ad2} alt="" className="w-full h-27 cursor-pointer" />
             </Link>
-            {/* <Link><img src={ad1} alt="" className='w-full h-40 cursor-pointer'/></Link> */}
           </div>
+
+          {/* USER HEADER */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                 <User className="w-5 h-5 text-blue-500" />
               </div>
+
               <div>
                 {user ? (
                   <>
@@ -150,7 +163,10 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                   </>
                 ) : (
                   <button
-                    onClick={() => handleNavigation('/login')}
+                    onClick={() => {
+                      if (openAuthModal) openAuthModal('login');
+                      onClose();
+                    }}
                     className="font-semibold text-sm text-blue-500"
                   >
                     Login / Sign Up
@@ -158,6 +174,8 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                 )}
               </div>
             </div>
+
+            {/* Close Button */}
             <button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -166,6 +184,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
             </button>
           </div>
 
+          {/* CATEGORY LIST */}
           <div className="flex-1 overflow-y-auto">
             <div className="py-2">
               <div className="px-4 py-2">
@@ -190,6 +209,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
                     />
                   </button>
 
+                  {/* SUBCATEGORIES */}
                   <div
                     className={`overflow-hidden transition-all duration-300 ${
                       expandedCategory === category.id ? 'max-h-96' : 'max-h-0'
@@ -215,9 +235,9 @@ const MobileSidebar = ({ isOpen, onClose }) => {
               ))}
             </div>
 
+            {/* HELP CENTER */}
             <div className="py-2 border-t border-gray-200">
               <button
-                key={'Help Center'}
                 onClick={() => handleNavigation('/contact')}
                 className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors"
               >
@@ -227,6 +247,7 @@ const MobileSidebar = ({ isOpen, onClose }) => {
             </div>
           </div>
 
+          {/* LOGOUT */}
           {user && (
             <div className="p-4 border-t border-gray-200">
               <button
