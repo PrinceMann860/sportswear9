@@ -56,26 +56,26 @@ const fallbackHomepageData = [
             image: "http://127.0.0.1:8000/media/homepage/defaut.avif",
             title: "banner 1",
             link: "",
-            order: 1
+            order: 1,
           },
           {
             item_uuid: "ITM-F4AA2NB2JUMOT0",
             image: "http://127.0.0.1:8000/media/homepage/defaut_1.avif",
             title: "banner 1",
             link: "",
-            order: 2
+            order: 2,
           },
           {
             item_uuid: "ITM-QG9LXY841QZVFP",
             image: "http://127.0.0.1:8000/media/homepage/defaut_1_SZpsUR6.avif",
             title: "banner 3",
             link: "",
-            order: 3
-          }
-        ]
-      }
-    ]
-  }
+            order: 3,
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 // ✅ Product Card (unchanged)
@@ -84,14 +84,22 @@ function ProductCard({ product }) {
   const count = product.rating?.count || 100;
 
   return (
-    <Link to={`/ProductInfo/${product.product_uuid||product.id}`}>
+    <Link to={`/ProductInfo/${product.product_uuid || product.id}`}>
       <div className="relative max-w-[300px] bg-white overflow-hidden border border-gray-200 hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col rounded-lg">
         <div className="group relative w-full h-46 md:h-54 lg:h-70 flex items-center justify-center bg-gray-50">
+          {/* ⭐ FEATURED BADGE */}
+          {product.isFeatured && (
+            <div className="absolute bg-yellow-400 text-black text-xs font-bold px-2 py-1 top-0 left-0 shadow">
+              FEATURED
+            </div>
+          )}
+
           <img
             src={product.img}
             alt={product.title}
             className="absolute w-full h-full object-fill transition-opacity duration-500 group-hover:opacity-0"
           />
+
           {product.img2 && (
             <img
               src={product.img2}
@@ -101,17 +109,14 @@ function ProductCard({ product }) {
           )}
         </div>
 
-        <div className="flex justify-between">
-          <div className="px-4 pt-3 text-sm font-medium text-gray-700">
-            ⭐ {rating} <span className="text-gray-500">| {count}</span>
+        <div className="relative bottom-11 left-2">
+          <div className="flex p-2 text-sm font-semibold text-gray-900 bg-white/70 w-16">
+            ⭐ {rating}
           </div>
-          <button className="mx-4 mt-3 w-6 h-6 sm:w-7 sm:h-7 bg-white rounded-full flex items-center justify-center border border-gray-300 hover:border-primary hover:bg-primary/5 transition-all duration-300">
-            <Heart className="w-3 h-3 sm:w-4 sm:h-4 transition-all duration-300" />
-          </button>
         </div>
 
-        <div className="px-4 text-start flex flex-col flex-grow min-h-[120px]">
-          <p className="text-xs font-semibold text-gray-600 uppercase">
+        <div className="mt-[-22px] px-4 text-start flex flex-col flex-grow min-h-[120px]">
+          <p className="font-bold text-gray-900 uppercase">
             {typeof product.brand === "object"
               ? product.brand?.name
               : product.brand}
@@ -119,7 +124,7 @@ function ProductCard({ product }) {
           <h3 className="font-semibold text-gray-900 line-clamp-2 mt-1">
             {product.title}
           </h3>
-          <div className="mt-1">
+          <div className="mt-1 flex items-center gap-2">
             <p className="text-lg font-bold text-gray-900">{product.price}</p>
             <p className="text-sm text-gray-500">
               <span className="line-through mr-1">{product.original}</span>
@@ -199,7 +204,7 @@ const transformProductData = (apiProduct) => ({
 
 function Product() {
   const dispatch = useDispatch();
-  const { '*': path } = useParams();
+  const { "*": path } = useParams();
   const location = useLocation();
   const apiProducts = useSelector(selectAllProducts);
   const loading = useSelector(selectProductsLoading);
@@ -225,26 +230,31 @@ function Product() {
 
   // ✅ Extract banners from API data with fallback (same as homepage)
   const getBannerData = () => {
-    const dataToUse = homepageData && homepageData.length > 0 ? homepageData : fallbackHomepageData;
-    
+    const dataToUse =
+      homepageData && homepageData.length > 0
+        ? homepageData
+        : fallbackHomepageData;
+
     if (!dataToUse || !dataToUse[0]?.sections) return fallbackBanners;
-    
+
     const level = dataToUse[0];
-    
+
     // Look for carousel sections
-    const carouselSections = level.sections.filter(sec => sec.section_type === "floor-1");
-    
+    const carouselSections = level.sections.filter(
+      (sec) => sec.section_type === "floor-1"
+    );
+
     if (carouselSections.length > 0) {
       // Use the first carousel section found
       const carouselSection = carouselSections[0];
-      return carouselSection.items.map(item => ({
+      return carouselSection.items.map((item) => ({
         id: item.item_uuid,
         image: item.image,
         title: item.title,
         link: item.link,
       }));
     }
-    
+
     // Fallback to predefined banners if no carousel sections found
     return fallbackBanners;
   };
@@ -265,40 +275,49 @@ function Product() {
 
   // ✅ Simple path detection
   const activePath = useMemo(() => {
-    if (location.pathname === '/sports') return 'sports';
-    if (!path) return 'all';
+    if (location.pathname === "/sports") return "sports";
+    if (!path) return "all";
     return path.toLowerCase();
   }, [path, location.pathname]);
 
   // ✅ Simple display name
   const getDisplayName = () => {
-    if (activePath === 'sports') return 'Sports & Lifestyle';
-    if (activePath === 'all') return 'All Products';
-    
-    return activePath.split('/')
-      .map(part => part.split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ')
+    if (activePath === "sports") return "Sports & Lifestyle";
+    if (activePath === "all") return "All Products";
+
+    return activePath
+      .split("/")
+      .map((part) =>
+        part
+          .split("-")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ")
       )
-      .join(' → ');
+      .join(" → ");
   };
 
   // ✅ Enhanced filtering with New Drops logic
   const filteredProducts = useMemo(() => {
     let filtered = products.filter((p) => {
       const priceValue = parseFloat(p.price.replace("₹", "")) || 0;
-      const productText = `${p.category} ${p.brand?.name} ${p.title}`.toLowerCase();
+      const productText =
+        `${p.category} ${p.brand?.name} ${p.title}`.toLowerCase();
 
       // ✅ Filter by active path with special logic for new drops
       let matchesPath = false;
-      
-      if (activePath === 'all') {
+
+      if (activePath === "all") {
         matchesPath = true;
-      } else if (activePath === 'sports') {
-        matchesPath = productText.includes('sports') || productText.includes('lifestyle');
-      } else if (activePath.includes('new-drops') || activePath.includes('new-arrivals') || activePath.includes('new-in')) {
+      } else if (activePath === "sports") {
+        matchesPath =
+          productText.includes("sports") || productText.includes("lifestyle");
+      } else if (
+        activePath.includes("new-drops") ||
+        activePath.includes("new-arrivals") ||
+        activePath.includes("new-in")
+      ) {
         // ✅ Show only first 6 products for new drops/arrivals categories
-        const productIndex = products.findIndex(prod => prod.id === p.id);
+        const productIndex = products.findIndex((prod) => prod.id === p.id);
         matchesPath = productIndex < 6; // First 6 products
       } else {
         // Regular category filtering
@@ -324,90 +343,97 @@ function Product() {
     });
 
     return filtered;
-  }, [products, selectedCategory, selectedBrand, priceRange, sortOption, activePath]);
+  }, [
+    products,
+    selectedCategory,
+    selectedBrand,
+    priceRange,
+    sortOption,
+    activePath,
+  ]);
 
   if (loading || homepageLoading)
     return (
       <div className="mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-16 lg:py-20 bg-gray-50 animate-pulse">
-      {/* Hero Carousel Skeleton */}
-      <div className="mb-10">
-        <div className="w-full h-48 md:h-64 lg:h-80 bg-gray-300 rounded-xl"></div>
-      </div>
+        {/* Hero Carousel Skeleton */}
+        <div className="mb-10">
+          <div className="w-full h-48 md:h-64 lg:h-80 bg-gray-300 rounded-xl"></div>
+        </div>
 
-      {/* Page Title Skeleton */}
-      <div className="mb-6">
-        <div className="h-8 w-64 bg-gray-300 rounded mb-2"></div>
-        <div className="h-4 w-32 bg-gray-300 rounded"></div>
-      </div>
+        {/* Page Title Skeleton */}
+        <div className="mb-6">
+          <div className="h-8 w-64 bg-gray-300 rounded mb-2"></div>
+          <div className="h-4 w-32 bg-gray-300 rounded"></div>
+        </div>
 
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Sidebar Filters Skeleton */}
-        <aside className="hidden md:block md:w-1/4 lg:w-1/5 border border-gray-200 rounded-xl p-4">
-          {/* Filters Title */}
-          <div className="h-6 w-20 bg-gray-300 rounded mb-4"></div>
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Sidebar Filters Skeleton */}
+          <aside className="hidden md:block md:w-1/4 lg:w-1/5 border border-gray-200 rounded-xl p-4">
+            {/* Filters Title */}
+            <div className="h-6 w-20 bg-gray-300 rounded mb-4"></div>
 
-          {/* Category Filter Skeleton */}
-          <div className="mb-6">
-            <div className="h-5 w-24 bg-gray-300 rounded mb-2"></div>
-            <div className="space-y-2">
-              {[1, 2, 3, 4, 5].map((item) => (
-                <div key={item} className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-gray-300 rounded"></div>
-                  <div className="h-3 w-20 bg-gray-300 rounded"></div>
-                </div>
+            {/* Category Filter Skeleton */}
+            <div className="mb-6">
+              <div className="h-5 w-24 bg-gray-300 rounded mb-2"></div>
+              <div className="space-y-2">
+                {[1, 2, 3, 4, 5].map((item) => (
+                  <div key={item} className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-gray-300 rounded"></div>
+                    <div className="h-3 w-20 bg-gray-300 rounded"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Brand Filter Skeleton */}
+            <div className="mb-6">
+              <div className="h-5 w-20 bg-gray-300 rounded mb-2"></div>
+              <div className="space-y-2">
+                {[1, 2, 3, 4].map((item) => (
+                  <div key={item} className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-gray-300 rounded"></div>
+                    <div className="h-3 w-24 bg-gray-300 rounded"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Price Filter Skeleton */}
+            <div>
+              <div className="h-5 w-28 bg-gray-300 rounded mb-2"></div>
+              <div className="w-full h-2 bg-gray-300 rounded mb-1"></div>
+              <div className="flex justify-between">
+                <div className="h-3 w-8 bg-gray-300 rounded"></div>
+                <div className="h-3 w-12 bg-gray-300 rounded"></div>
+              </div>
+            </div>
+          </aside>
+
+          {/* Main Product Grid Skeleton */}
+          <main className="flex-1">
+            {/* Filter Bar Skeleton */}
+            <div className="flex items-center justify-between mb-4 border-b pb-3">
+              <div className="md:hidden h-8 w-20 bg-gray-300 rounded"></div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-gray-300 rounded"></div>
+                <div className="h-8 w-40 bg-gray-300 rounded"></div>
+              </div>
+            </div>
+
+            {/* Product Grid Skeleton */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item) => (
+                <ProductCardSkeleton key={item} />
               ))}
             </div>
-          </div>
+          </main>
+        </div>
 
-          {/* Brand Filter Skeleton */}
-          <div className="mb-6">
-            <div className="h-5 w-20 bg-gray-300 rounded mb-2"></div>
-            <div className="space-y-2">
-              {[1, 2, 3, 4].map((item) => (
-                <div key={item} className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-gray-300 rounded"></div>
-                  <div className="h-3 w-24 bg-gray-300 rounded"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Price Filter Skeleton */}
-          <div>
-            <div className="h-5 w-28 bg-gray-300 rounded mb-2"></div>
-            <div className="w-full h-2 bg-gray-300 rounded mb-1"></div>
-            <div className="flex justify-between">
-              <div className="h-3 w-8 bg-gray-300 rounded"></div>
-              <div className="h-3 w-12 bg-gray-300 rounded"></div>
-            </div>
-          </div>
-        </aside>
-
-        {/* Main Product Grid Skeleton */}
-        <main className="flex-1">
-          {/* Filter Bar Skeleton */}
-          <div className="flex items-center justify-between mb-4 border-b pb-3">
-            <div className="md:hidden h-8 w-20 bg-gray-300 rounded"></div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-gray-300 rounded"></div>
-              <div className="h-8 w-40 bg-gray-300 rounded"></div>
-            </div>
-          </div>
-
-          {/* Product Grid Skeleton */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item) => (
-              <ProductCardSkeleton key={item} />
-            ))}
-          </div>
-        </main>
+        {/* Bottom Banner Skeleton */}
+        <div className="mt-14 rounded-2xl overflow-hidden">
+          <div className="w-full h-32 md:h-48 bg-gray-300"></div>
+        </div>
       </div>
-
-      {/* Bottom Banner Skeleton */}
-      <div className="mt-14 rounded-2xl overflow-hidden">
-        <div className="w-full h-32 md:h-48 bg-gray-300"></div>
-      </div>
-    </div>
     );
 
   if (error)
@@ -437,8 +463,13 @@ function Product() {
         </h1>
         <p className="text-gray-600">
           Showing {filteredProducts.length} products
-          {(activePath.includes('new-drops') || activePath.includes('new-arrivals') || activePath.includes('new-in')) && (
-            <span className="text-blue-600 font-medium"> • Latest Arrivals</span>
+          {(activePath.includes("new-drops") ||
+            activePath.includes("new-arrivals") ||
+            activePath.includes("new-in")) && (
+            <span className="text-blue-600 font-medium">
+              {" "}
+              • Latest Arrivals
+            </span>
           )}
         </p>
       </div>

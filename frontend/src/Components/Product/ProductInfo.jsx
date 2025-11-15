@@ -1,6 +1,6 @@
 // ProductInfo.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../Cart/Cartslice";
 import {
@@ -31,12 +31,15 @@ const ProductInfo = () => {
   const { id, product_uuid } = useParams();
   const productId = id || product_uuid;
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const productFromState = useSelector((state) => state.productdetail?.data);
   const loading = useSelector((state) => state.productdetail?.loading);
   const error = useSelector((state) => state.productdetail?.error);
 
   const [selectedImage, setSelectedImage] = useState(0);
+  const cartState = useSelector((state) => state.cart);
+
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -72,16 +75,22 @@ const ProductInfo = () => {
 
     const title = productFromState.name || productFromState.title || "Product";
     const description = productFromState.description || "";
-    
+
     // Enhanced price handling
     let price = productFromState.net || productFromState.price || 0;
     let original = productFromState.price || productFromState.original || 0;
     let discount = productFromState.disc || productFromState.discount || 0;
-    
+
     // Ensure numeric values for calculations
-    price = typeof price === 'string' ? parseFloat(price.replace('₹', '')) || 0 : Number(price) || 0;
-    original = typeof original === 'string' ? parseFloat(original.replace('₹', '')) || 0 : Number(original) || 0;
-    
+    price =
+      typeof price === "string"
+        ? parseFloat(price.replace("₹", "")) || 0
+        : Number(price) || 0;
+    original =
+      typeof original === "string"
+        ? parseFloat(original.replace("₹", "")) || 0
+        : Number(original) || 0;
+
     // Calculate discount if not provided
     if (!discount && original > price && original > 0) {
       discount = Math.round(((original - price) / original) * 100);
@@ -238,53 +247,70 @@ const ProductInfo = () => {
   }, [product, selectedColorObj]);
 
   const handleAddToCart = () => {
-    if (!product || !selectedColorObj || !selectedSize) return;
+  const token =
+    localStorage.getItem("access_token") ||
+    localStorage.getItem("accessToken") ||
+    localStorage.getItem("token");
 
-    // Find the specific variant for selected color and size
-    const selectedVariant = selectedColorObj.sizes.find(
-      (size) => size.value === selectedSize
-    );
+  // 🔐 If user is not logged in → open login modal from Navbar
+  if (!token) {
+    window.dispatchEvent(new CustomEvent("open-login-modal"));
+    return;
+  }
 
-    if (!selectedVariant) return;
+  // Validation
+  if (!product || !selectedColorObj || !selectedSize) return;
 
-    const payload = {
-      product_uuid: product.product_uuid,
-      variant_id: selectedVariant.variant_id,
-      color_id: selectedColorObj.key,
-      quantity: quantity,
-    };
+  const selectedVariant = selectedColorObj.sizes.find(
+    (size) => size.value === selectedSize
+  );
 
-    dispatch(addToCart(payload))
-      .unwrap()
-      .then(() => {
-        // Show success message
-        const event = new CustomEvent('showToast', {
-          detail: {
-            message: '✅ Added to cart successfully!',
-            type: 'success'
-          }
-        });
-        window.dispatchEvent(event);
-      })
-      .catch((err) => {
-        console.error(err);
-        const event = new CustomEvent('showToast', {
-          detail: {
-            message: '❌ Failed to add item to cart',
-            type: 'error'
-          }
-        });
-        window.dispatchEvent(event);
-      });
+  const payload = {
+    product_uuid: product.product_uuid,
+    variant_id: selectedVariant.variant_id,
+    color_id: selectedColorObj.key,
+    quantity,
   };
+
+  // DISPATCH ADD TO CART
+  dispatch(addToCart(payload))
+    .unwrap()
+    .then(() => {
+      // Success toast
+      window.dispatchEvent(
+        new CustomEvent("showToast", {
+          detail: {
+            message: "Added to cart successfully!",
+            type: "success",
+          },
+        })
+      );
+
+      // Redirect to cart after slight delay
+      setTimeout(() => {
+        navigate("/cart");
+      }, 300);
+    })
+    .catch(() => {
+      // Failure toast
+      window.dispatchEvent(
+        new CustomEvent("showToast", {
+          detail: { message: "Failed to add to cart!", type: "error" },
+        })
+      );
+    });
+};
+
 
   const handleWishlistToggle = () => {
     setIsWishlisted(!isWishlisted);
-    const event = new CustomEvent('showToast', {
+    const event = new CustomEvent("showToast", {
       detail: {
-        message: !isWishlisted ? '❤️ Added to wishlist' : '💔 Removed from wishlist',
-        type: 'success'
-      }
+        message: !isWishlisted
+          ? "❤️ Added to wishlist"
+          : "💔 Removed from wishlist",
+        type: "success",
+      },
     });
     window.dispatchEvent(event);
   };
@@ -351,8 +377,8 @@ const ProductInfo = () => {
 
   // Format price with Indian Rupee symbol
   const formatPrice = (price) => {
-    if (typeof price === 'number') {
-      return `₹${price.toLocaleString('en-IN')}`;
+    if (typeof price === "number") {
+      return `₹${price.toLocaleString("en-IN")}`;
     }
     return `₹${price}`;
   };
@@ -386,9 +412,13 @@ const ProductInfo = () => {
       <div className="pt-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
-            <p className="text-red-600 font-medium mb-2">Error loading product details</p>
-            <p className="text-red-500 text-sm">{error || "Product not found"}</p>
-            <button 
+            <p className="text-red-600 font-medium mb-2">
+              Error loading product details
+            </p>
+            <p className="text-red-500 text-sm">
+              {error || "Product not found"}
+            </p>
+            <button
               onClick={() => window.history.back()}
               className="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
             >
@@ -404,7 +434,8 @@ const ProductInfo = () => {
   const SportsWear9Product = {
     title: product.title,
     price: formatPrice(product.price),
-    original: product.original > product.price ? formatPrice(product.original) : null,
+    original:
+      product.original > product.price ? formatPrice(product.original) : null,
     discount: product.discount ? `${product.discount}% OFF` : null,
     description: product.description,
     features: product.features,
@@ -424,7 +455,8 @@ const ProductInfo = () => {
     material: product.specifications?.material || "100% Recycled Polyester",
     weight: product.specifications?.weight || "450g",
     care: product.specifications?.care || "Machine Washable",
-    activityType: product.specifications?.activityType || "Running, Training, Outdoor",
+    activityType:
+      product.specifications?.activityType || "Running, Training, Outdoor",
     bestFor: product.specifications?.bestFor || "All weather conditions",
   };
 
@@ -677,33 +709,31 @@ const ProductInfo = () => {
                 <button
                   onClick={handleAddToCart}
                   disabled={
+                    cartState.loading ||
                     !selectedColor ||
                     !selectedSize ||
                     !SportsWear9Product.inStock
                   }
-                  className={`flex-1 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-sm sm:text-base ${
-                    !selectedColor ||
-                    !selectedSize ||
-                    !SportsWear9Product.inStock
-                      ? "bg-gray-400 cursor-not-allowed text-white"
-                      : "bg-blue-600 hover:bg-blue-700 text-white"
-                  }`}
+                  className={`flex-1 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2
+    ${cartState.loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"}
+    text-white`}
                 >
-                  <ShoppingCart size={18} />
-                  {!SportsWear9Product.inStock ? "Out of Stock" : "Add to Cart"}
+                  {cartState.loading ? "Adding..." : "Add to Cart"}
                 </button>
-                <button 
+                <button
                   onClick={handleWishlistToggle}
                   className={`p-3 border-2 rounded-lg transition-colors flex-shrink-0 ${
-                    isWishlisted 
-                      ? "border-red-500 bg-red-50" 
+                    isWishlisted
+                      ? "border-red-500 bg-red-50"
                       : "border-gray-300 hover:border-blue-300"
                   }`}
                 >
-                  <Heart 
+                  <Heart
                     className={`w-5 h-5 sm:w-6 sm:h-6 ${
-                      isWishlisted ? "text-red-500 fill-red-500" : "text-gray-600"
-                    }`} 
+                      isWishlisted
+                        ? "text-red-500 fill-red-500"
+                        : "text-gray-600"
+                    }`}
                   />
                 </button>
               </div>
@@ -781,8 +811,9 @@ const ProductInfo = () => {
                 ];
 
                 const totalPrice =
-                  parseInt(SportsWear9Product.price.replace('₹', '').replace(/,/g, '')) +
-                  comboProducts.reduce((acc, p) => acc + p.price, 0);
+                  parseInt(
+                    SportsWear9Product.price.replace("₹", "").replace(/,/g, "")
+                  ) + comboProducts.reduce((acc, p) => acc + p.price, 0);
 
                 return (
                   <div className="flex flex-col">
@@ -845,7 +876,7 @@ const ProductInfo = () => {
                         Total price:
                       </p>
                       <p className="text-xl font-bold text-gray-900 mb-4">
-                        ₹{totalPrice.toLocaleString('en-IN')}
+                        ₹{totalPrice.toLocaleString("en-IN")}
                       </p>
                       <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-full transition">
                         Add all to Cart

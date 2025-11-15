@@ -3,73 +3,145 @@ import axios from "axios";
 
 const BASE_URL = "http://127.0.0.1:8000/api/v1/cart/";
 
-// Function to get authorization header with token
+// ⚠️ AUTH HEADERS — NEVER TOUCHED
 const getAuthHeader = () => {
-  const token = localStorage.getItem("access_token"); // Ensure correct token key
-  if (!token) {
-    throw new Error("No access token found");
-  }
+  const token = localStorage.getItem("access_token");
+  if (!token) throw new Error("No access token found");
   return { headers: { Authorization: `Bearer ${token}` } };
 };
 
-// Fetch Cart Items
-export const fetchCartItems = createAsyncThunk("cart/fetchCartItems", async (_, { rejectWithValue }) => {
-  try {
-    const res = await axios.get(BASE_URL, getAuthHeader());
-    console.log("Fetched Cart Items:", res.data); // Log the response data
-    return res.data;
-  } catch (err) {
-    console.error("Error fetching cart items:", err); // Log the error
-    return rejectWithValue(err.response?.data || "Failed to fetch cart");
+/* ---------------------------------------------------
+   FETCH CART ITEMS
+----------------------------------------------------- */
+export const fetchCartItems = createAsyncThunk(
+  "cart/fetchCartItems",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(BASE_URL, getAuthHeader());
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Failed to fetch cart");
+    }
   }
-});
+);
 
-// Add to Cart
-export const addToCart = createAsyncThunk("cart/addToCart", async (cartData, { rejectWithValue }) => {
-  try {
-    console.log("Adding item to cart with data:", cartData); // Log cartData
-    const res = await axios.post(`${BASE_URL}add/`, cartData, getAuthHeader());
-    console.log("Item added to cart:", res.data); // Log response data
-    return res.data;
-  } catch (err) {
-    console.error("Error adding item to cart:", err); // Log the error
-    return rejectWithValue(err.response?.data || "Failed to add item");
+/* ---------------------------------------------------
+   ADD TO CART
+----------------------------------------------------- */
+export const addToCart = createAsyncThunk(
+  "cart/addToCart",
+  async (cartData, { rejectWithValue }) => {
+    try {
+      const res = await axios.post(
+        `${BASE_URL}add/`,
+        cartData,
+        getAuthHeader()
+      );
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Failed to add item");
+    }
   }
-});
+);
 
+/* ---------------------------------------------------
+   UPDATE CART ITEM (PATCH)
+----------------------------------------------------- */
+export const updateCartItem = createAsyncThunk(
+  "cart/updateCartItem",
+  async ({ id, quantity }, { rejectWithValue }) => {
+    try {
+      const res = await axios.patch(
+        `http://127.0.0.1:8000/api/v1/cart-items/${id}/`,
+        { quantity: quantity.toString() },
+        getAuthHeader()
+      );
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Failed to update cart");
+    }
+  }
+);
+
+/* ---------------------------------------------------
+   DELETE CART ITEM
+----------------------------------------------------- */
+export const deleteCartItem = createAsyncThunk(
+  "cart/deleteCartItem",
+  async (id, { rejectWithValue }) => {
+    try {
+      await axios.delete(
+        `http://127.0.0.1:8000/api/v1/cart-items/${id}/`,
+        getAuthHeader()
+      );
+      return id; // return id to remove locally
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Failed to delete item");
+    }
+  }
+);
+
+/* ---------------------------------------------------
+   SLICE
+----------------------------------------------------- */
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
     items: [],
+    subtotal: 0,
+    total_price: 0,
+    total_items: 0,
     loading: false,
     error: null,
   },
+
   reducers: {},
+
   extraReducers: (builder) => {
     builder
-      // Fetch Cart Items
+      /* ---------------- FETCH ---------------- */
       .addCase(fetchCartItems.pending, (state) => {
         state.loading = true;
       })
       .addCase(fetchCartItems.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+        state.items = action.payload.items || [];
+        state.subtotal = Number(action.payload.subtotal) || 0;
+        state.total_price = Number(action.payload.total_price) || 0;
+        state.total_items = action.payload.total_items || 0;
       })
       .addCase(fetchCartItems.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      // Add Item to Cart
+
+      /* ---------------- ADD ---------------- */
       .addCase(addToCart.pending, (state) => {
         state.loading = true;
       })
       .addCase(addToCart.fulfilled, (state, action) => {
         state.loading = false;
-        state.items.push(action.payload); // Add the new item to the cart
+        state.items.push(action.payload); // add item locally
       })
       .addCase(addToCart.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      /* ---------------- UPDATE ---------------- */
+      .addCase(updateCartItem.fulfilled, (state, action) => {
+        const updated = action.payload;
+        const index = state.items.findIndex(
+          (item) => item.cart_item_id === updated.cart_item_id
+        );
+        if (index !== -1) state.items[index] = updated;
+      })
+
+      /* ---------------- DELETE ---------------- */
+      .addCase(deleteCartItem.fulfilled, (state, action) => {
+        state.items = state.items.filter(
+          (item) => item.cart_item_id !== action.payload
+        );
       });
   },
 });
