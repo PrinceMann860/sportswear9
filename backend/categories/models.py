@@ -35,3 +35,6 @@ class Category(MPTTModel):
     
     def get_ancestors_slugs(self):
         return " > ".join([ancestor.name for ancestor in self.get_ancestors(include_self=True)])
+    def get_descendants_ids(self):
+        """Returns this category + all descendant category IDs."""
+        return list(self.get_descendants(include_self=True).values_list("id", flat=True))

@@ -1,8 +1,10 @@
 // ProductInfo.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../Cart/Cartslice";
+import SEO from "../Common/SEO.jsx"; 
+
 import {
   Star,
   Heart,
@@ -31,15 +33,12 @@ const ProductInfo = () => {
   const { id, product_uuid } = useParams();
   const productId = id || product_uuid;
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const productFromState = useSelector((state) => state.productdetail?.data);
   const loading = useSelector((state) => state.productdetail?.loading);
   const error = useSelector((state) => state.productdetail?.error);
 
   const [selectedImage, setSelectedImage] = useState(0);
-  const cartState = useSelector((state) => state.cart);
-
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -82,14 +81,8 @@ const ProductInfo = () => {
     let discount = productFromState.disc || productFromState.discount || 0;
 
     // Ensure numeric values for calculations
-    price =
-      typeof price === "string"
-        ? parseFloat(price.replace("₹", "")) || 0
-        : Number(price) || 0;
-    original =
-      typeof original === "string"
-        ? parseFloat(original.replace("₹", "")) || 0
-        : Number(original) || 0;
+    price = typeof price === 'string' ? parseFloat(price.replace('₹', '')) || 0 : Number(price) || 0;
+    original = typeof original === 'string' ? parseFloat(original.replace('₹', '')) || 0 : Number(original) || 0;
 
     // Calculate discount if not provided
     if (!discount && original > price && original > 0) {
@@ -98,13 +91,13 @@ const ProductInfo = () => {
 
     const specifications =
       productFromState.specifications &&
-      typeof productFromState.specifications === "object"
+        typeof productFromState.specifications === "object"
         ? productFromState.specifications
         : {};
 
     let images =
       Array.isArray(productFromState.default_images) &&
-      productFromState.default_images.length > 0
+        productFromState.default_images.length > 0
         ? productFromState.default_images
         : [];
 
@@ -247,70 +240,53 @@ const ProductInfo = () => {
   }, [product, selectedColorObj]);
 
   const handleAddToCart = () => {
-  const token =
-    localStorage.getItem("access_token") ||
-    localStorage.getItem("accessToken") ||
-    localStorage.getItem("token");
+    if (!product || !selectedColorObj || !selectedSize) return;
 
-  // 🔐 If user is not logged in → open login modal from Navbar
-  if (!token) {
-    window.dispatchEvent(new CustomEvent("open-login-modal"));
-    return;
-  }
+    // Find the specific variant for selected color and size
+    const selectedVariant = selectedColorObj.sizes.find(
+      (size) => size.value === selectedSize
+    );
 
-  // Validation
-  if (!product || !selectedColorObj || !selectedSize) return;
+    if (!selectedVariant) return;
 
-  const selectedVariant = selectedColorObj.sizes.find(
-    (size) => size.value === selectedSize
-  );
+    const payload = {
+      product_uuid: product.product_uuid,
+      variant_id: selectedVariant.variant_id,
+      color_id: selectedColorObj.key,
+      quantity: quantity,
+    };
 
-  const payload = {
-    product_uuid: product.product_uuid,
-    variant_id: selectedVariant.variant_id,
-    color_id: selectedColorObj.key,
-    quantity,
-  };
-
-  // DISPATCH ADD TO CART
-  dispatch(addToCart(payload))
-    .unwrap()
-    .then(() => {
-      // Success toast
-      window.dispatchEvent(
-        new CustomEvent("showToast", {
+    dispatch(addToCart(payload))
+      .unwrap()
+      .then(() => {
+        // Show success message
+        const event = new CustomEvent('showToast', {
           detail: {
-            message: "Added to cart successfully!",
-            type: "success",
-          },
-        })
-      );
-
-      // Redirect to cart after slight delay
-      setTimeout(() => {
-        navigate("/cart");
-      }, 300);
-    })
-    .catch(() => {
-      // Failure toast
-      window.dispatchEvent(
-        new CustomEvent("showToast", {
-          detail: { message: "Failed to add to cart!", type: "error" },
-        })
-      );
-    });
-};
-
+            message: '✅ Added to cart successfully!',
+            type: 'success'
+          }
+        });
+        window.dispatchEvent(event);
+      })
+      .catch((err) => {
+        console.error(err);
+        const event = new CustomEvent('showToast', {
+          detail: {
+            message: '❌ Failed to add item to cart',
+            type: 'error'
+          }
+        });
+        window.dispatchEvent(event);
+      });
+  };
 
   const handleWishlistToggle = () => {
     setIsWishlisted(!isWishlisted);
-    const event = new CustomEvent("showToast", {
+    const event = new CustomEvent('showToast', {
       detail: {
-        message: !isWishlisted
-          ? "❤️ Added to wishlist"
-          : "💔 Removed from wishlist",
-        type: "success",
-      },
+        message: !isWishlisted ? '❤️ Added to wishlist' : '💔 Removed from wishlist',
+        type: 'success'
+      }
     });
     window.dispatchEvent(event);
   };
@@ -377,8 +353,8 @@ const ProductInfo = () => {
 
   // Format price with Indian Rupee symbol
   const formatPrice = (price) => {
-    if (typeof price === "number") {
-      return `₹${price.toLocaleString("en-IN")}`;
+    if (typeof price === 'number') {
+      return `₹${price.toLocaleString('en-IN')}`;
     }
     return `₹${price}`;
   };
@@ -412,12 +388,8 @@ const ProductInfo = () => {
       <div className="pt-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
-            <p className="text-red-600 font-medium mb-2">
-              Error loading product details
-            </p>
-            <p className="text-red-500 text-sm">
-              {error || "Product not found"}
-            </p>
+            <p className="text-red-600 font-medium mb-2">Error loading product details</p>
+            <p className="text-red-500 text-sm">{error || "Product not found"}</p>
             <button
               onClick={() => window.history.back()}
               className="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
@@ -434,8 +406,7 @@ const ProductInfo = () => {
   const SportsWear9Product = {
     title: product.title,
     price: formatPrice(product.price),
-    original:
-      product.original > product.price ? formatPrice(product.original) : null,
+    original: product.original > product.price ? formatPrice(product.original) : null,
     discount: product.discount ? `${product.discount}% OFF` : null,
     description: product.description,
     features: product.features,
@@ -455,8 +426,7 @@ const ProductInfo = () => {
     material: product.specifications?.material || "100% Recycled Polyester",
     weight: product.specifications?.weight || "450g",
     care: product.specifications?.care || "Machine Washable",
-    activityType:
-      product.specifications?.activityType || "Running, Training, Outdoor",
+    activityType: product.specifications?.activityType || "Running, Training, Outdoor",
     bestFor: product.specifications?.bestFor || "All weather conditions",
   };
 
@@ -479,15 +449,15 @@ const ProductInfo = () => {
   ];
 
   return (
+    <>
     <div className="pt-20 bg-white min-h-screen">
       {/* Main Product Section */}
       <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 py-8">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Left Column - Product Gallery */}
           <div
-            className={`space-y-4 lg:sticky lg:top-24 lg:h-fit lg:pb-8 ${
-              isSticky ? "lg:max-h-screen lg:overflow-y-auto" : ""
-            }`}
+            className={`space-y-4 lg:sticky lg:top-24 lg:h-fit lg:pb-8 ${isSticky ? "lg:max-h-screen lg:overflow-y-auto" : ""
+              }`}
           >
             <ProductGallery
               images={galleryImages}
@@ -534,11 +504,10 @@ const ProductInfo = () => {
                     <Star
                       key={star}
                       size={16}
-                      className={`${
-                        star <= Math.floor(SportsWear9Product.rating)
+                      className={`${star <= Math.floor(SportsWear9Product.rating)
                           ? "text-yellow-400 fill-yellow-400"
                           : "text-gray-300"
-                      }`}
+                        }`}
                     />
                   ))}
                 </div>
@@ -619,11 +588,10 @@ const ProductInfo = () => {
                     <button
                       key={color.key}
                       onClick={() => setSelectedColor(color.key)}
-                      className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 flex items-center justify-center transition-all ${
-                        selectedColor === color.key
+                      className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 flex items-center justify-center transition-all ${selectedColor === color.key
                           ? "border-blue-600 ring-2 ring-blue-200"
                           : "border-gray-300 hover:border-gray-400"
-                      }`}
+                        }`}
                     >
                       <div
                         className="w-6 h-6 sm:w-8 sm:h-8 rounded-full"
@@ -652,11 +620,10 @@ const ProductInfo = () => {
                     <button
                       key={size.value}
                       onClick={() => setSelectedSize(size.value)}
-                      className={`py-2 sm:py-3 rounded-lg border font-medium transition-all text-sm sm:text-base ${
-                        selectedSize === size.value
+                      className={`py-2 sm:py-3 rounded-lg border font-medium transition-all text-sm sm:text-base ${selectedSize === size.value
                           ? "bg-blue-600 text-white border-blue-600 shadow-sm"
                           : "border-gray-300 text-gray-700 hover:border-blue-300 hover:bg-blue-50"
-                      }`}
+                        }`}
                     >
                       {size.value}
                     </button>
@@ -709,31 +676,30 @@ const ProductInfo = () => {
                 <button
                   onClick={handleAddToCart}
                   disabled={
-                    cartState.loading ||
                     !selectedColor ||
                     !selectedSize ||
                     !SportsWear9Product.inStock
                   }
-                  className={`flex-1 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2
-    ${cartState.loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"}
-    text-white`}
+                  className={`flex-1 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-sm sm:text-base ${!selectedColor ||
+                      !selectedSize ||
+                      !SportsWear9Product.inStock
+                      ? "bg-gray-400 cursor-not-allowed text-white"
+                      : "bg-blue-600 hover:bg-blue-700 text-white"
+                    }`}
                 >
-                  {cartState.loading ? "Adding..." : "Add to Cart"}
+                  <ShoppingCart size={18} />
+                  {!SportsWear9Product.inStock ? "Out of Stock" : "Add to Cart"}
                 </button>
                 <button
                   onClick={handleWishlistToggle}
-                  className={`p-3 border-2 rounded-lg transition-colors flex-shrink-0 ${
-                    isWishlisted
+                  className={`p-3 border-2 rounded-lg transition-colors flex-shrink-0 ${isWishlisted
                       ? "border-red-500 bg-red-50"
                       : "border-gray-300 hover:border-blue-300"
-                  }`}
+                    }`}
                 >
                   <Heart
-                    className={`w-5 h-5 sm:w-6 sm:h-6 ${
-                      isWishlisted
-                        ? "text-red-500 fill-red-500"
-                        : "text-gray-600"
-                    }`}
+                    className={`w-5 h-5 sm:w-6 sm:h-6 ${isWishlisted ? "text-red-500 fill-red-500" : "text-gray-600"
+                      }`}
                   />
                 </button>
               </div>
@@ -741,9 +707,8 @@ const ProductInfo = () => {
               {/* Stock Status */}
               <div className="flex items-center gap-2 text-sm">
                 <div
-                  className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                    SportsWear9Product.inStock ? "bg-green-500" : "bg-red-500"
-                  }`}
+                  className={`w-2 h-2 rounded-full flex-shrink-0 ${SportsWear9Product.inStock ? "bg-green-500" : "bg-red-500"
+                    }`}
                 ></div>
                 <span
                   className={
@@ -811,9 +776,8 @@ const ProductInfo = () => {
                 ];
 
                 const totalPrice =
-                  parseInt(
-                    SportsWear9Product.price.replace("₹", "").replace(/,/g, "")
-                  ) + comboProducts.reduce((acc, p) => acc + p.price, 0);
+                  parseInt(SportsWear9Product.price.replace('₹', '').replace(/,/g, '')) +
+                  comboProducts.reduce((acc, p) => acc + p.price, 0);
 
                 return (
                   <div className="flex flex-col">
@@ -876,7 +840,7 @@ const ProductInfo = () => {
                         Total price:
                       </p>
                       <p className="text-xl font-bold text-gray-900 mb-4">
-                        ₹{totalPrice.toLocaleString("en-IN")}
+                        ₹{totalPrice.toLocaleString('en-IN')}
                       </p>
                       <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-full transition">
                         Add all to Cart
@@ -905,11 +869,10 @@ const ProductInfo = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-shrink-0 px-4 sm:px-6 py-4 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
-                  activeTab === tab.id
+                className={`flex-shrink-0 px-4 sm:px-6 py-4 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${activeTab === tab.id
                     ? "border-blue-600 text-blue-600"
                     : "border-transparent text-gray-500 hover:text-gray-700"
-                }`}
+                  }`}
               >
                 {tab.label}
               </button>
@@ -1039,11 +1002,10 @@ const ProductInfo = () => {
                               <Star
                                 key={star}
                                 size={16}
-                                className={`${
-                                  star <= (review.rating || 5)
+                                className={`${star <= (review.rating || 5)
                                     ? "text-yellow-400 fill-yellow-400"
                                     : "text-gray-300"
-                                }`}
+                                  }`}
                               />
                             ))}
                           </div>
@@ -1116,6 +1078,7 @@ const ProductInfo = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

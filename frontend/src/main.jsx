@@ -6,6 +6,7 @@ import { store } from './store/store';
 import { AuthProvider } from './context/AuthContext';
 import './index.css';
 import App from './App.jsx';
+import { HelmetProvider } from '@dr.pogodin/react-helmet';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
@@ -14,7 +15,9 @@ createRoot(document.getElementById('root')).render(
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <Provider store={store}>
         <AuthProvider>
-          <App />
+          <HelmetProvider>
+            <App />
+          </HelmetProvider>
         </AuthProvider>
       </Provider>
     </GoogleOAuthProvider>

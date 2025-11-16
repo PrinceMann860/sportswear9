@@ -15,15 +15,52 @@ from inventory.models import Inventory
 from .serializers import ProductListSerializer, ProductDetailUnifiedSerializer
 from .pagination import ProductCursorPagination
 from .tasks import cache_product_list, cache_product_detail, cache_product_variants
+import django_filters
+from categories.models import Category
 
 
 # -----------------------
 # FILTER LOGIC
 # -----------------------
 class ProductFilter(FilterSet):
-    category = CharFilter(field_name="category__slug", lookup_expr="iexact")
+    category = django_filters.CharFilter(method="filter_by_category")
+
+    class Meta:
+        model = Product
+        fields = []
+
+    def filter_by_category(self, queryset, name, value):
+        # 1️⃣ Try UUID
+        category = Category.objects.filter(category_uuid=value).first()
+
+        # 2️⃣ If not UUID, try name/slugs
+        if not category:
+            category = Category.objects.filter(name__iexact=value).first()
+
+        if not category:
+            return queryset.none()
+
+        # 3️⃣ Fetch all children categories (MPTT)
+        category_ids = category.get_descendants_ids()
+
+        return queryset.filter(category_id__in=category_ids)
+    
+    gender = django_filters.CharFilter(method="filter_by_gender")
+
+    def filter_by_gender(self, queryset, name, value):
+        value = value.capitalize()  # men → Men, women → Women
+        root = Category.objects.filter(name=value).first()
+
+        if not root:
+            return queryset.none()
+
+        gender_ids = list(
+            root.get_descendants(include_self=True).values_list("id", flat=True)
+        )
+
+        return queryset.filter(category_id__in=gender_ids)
+        
     brand = CharFilter(field_name="brand__name", lookup_expr="icontains")
-    gender = CharFilter(field_name="gender", lookup_expr="iexact")
     is_featured = BooleanFilter(field_name="is_featured")
     is_new = BooleanFilter(field_name="is_new")
     is_popular = BooleanFilter(field_name="is_popular")
@@ -75,8 +112,14 @@ class ProductListAPIView(generics.ListAPIView):
         """
         Hybrid cached + async updated product list
         """
-        cache_key = "cached_product_list"
+        params = request.query_params
+
+        if params:
+            cache_key = "product_list_" + "_".join([f"{k}:{v}" for k, v in params.items()])
+        else:
+            cache_key = "product_list_default"
         data = cache.get(cache_key)
+
         if data:
             return Response(data)
 
