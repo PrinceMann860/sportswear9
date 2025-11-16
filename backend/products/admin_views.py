@@ -1,4 +1,4 @@
-# products/admin_views.py
+# products/admin_views.cache
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser

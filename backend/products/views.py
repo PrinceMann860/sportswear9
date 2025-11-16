@@ -128,7 +128,7 @@ class ProductListAPIView(generics.ListAPIView):
         serializer = self.get_serializer(page, many=True)
         data = serializer.data
 
-        cache.set(cache_key, data, timeout=60 * 5)
+        cache.set(cache_key, data, timeout=6 * 5)
         cache_product_list.delay()  # refresh async
         return self.get_paginated_response(data)
 
@@ -159,16 +159,16 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         product_uuid = kwargs.get("product_uuid")
-        cache_key = f"product_detail_{product_uuid}"
+        # cache_key = f"product_detail_{product_uuid}"
 
-        data = cache.get(cache_key)
-        if data:
-            return Response(data)
+        # data = cache.get(cache_key)
+        # if data:
+        #     return Response(data)
 
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         data = serializer.data
-        cache.set(cache_key, data, timeout=60 * 10)
+        # cache.set(cache_key, data, timeout=60 * 10)
         cache_product_detail.delay(product_uuid)
         return Response(data)
 

@@ -195,7 +195,7 @@ const ProductList = () => {
                       <div className="flex items-center">
                         {product.img ? (
                           <img
-                            src={`http://127.0.0.1:8000${product.img}`}
+                            src={product.img.startsWith('http') ? product.img : `http://127.0.0.1:8000${product.img}`}
                             alt={product.title}
                             className="h-12 w-12 object-cover rounded-lg mr-4 shadow-sm"
                             onError={(e) => {
@@ -212,7 +212,7 @@ const ProductList = () => {
                         </div>
                         <div>
                           <div className="text-sm font-medium text-gray-900">
-                            {product.title || product.name}
+                            {product.title}
                           </div>
                           <div className="text-xs text-gray-500 mt-1">
                             ID: {product.product_uuid.slice(-8)}
@@ -233,20 +233,20 @@ const ProductList = () => {
                           />
                         )}
                         <span className="text-sm text-gray-900">
-                          {product.brand?.name || product.brand}
+                          {product.brand?.name}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {product.category?.name || product.category}
+                      {product.category?.name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {formatPrice(product.net || product.price)}
+                        {product.price}
                       </div>
-                      {product.discount && (
+                      {product.discount && product.original && (
                         <div className="text-xs text-gray-500 line-through">
-                          {formatPrice(product.original)}
+                          {product.original}
                         </div>
                       )}
                       {product.discount && (
@@ -258,15 +258,25 @@ const ProductList = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-col space-y-1">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          product.is_active !== false
+                          product.is_active !== false && !product.hasOwnProperty('is_active') || product.is_active
                             ? 'bg-green-100 text-green-800'
                             : 'bg-red-100 text-red-800'
                         }`}>
-                          {product.is_active !== false ? 'Active' : 'Inactive'}
+                          {product.is_active !== false && !product.hasOwnProperty('is_active') || product.is_active ? 'Active' : 'Inactive'}
                         </span>
                         {product.is_featured && (
                           <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                             Featured
+                          </span>
+                        )}
+                        {product.is_new && (
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                            New
+                          </span>
+                        )}
+                        {product.is_popular && (
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                            Popular
                           </span>
                         )}
                       </div>
@@ -291,7 +301,7 @@ const ProductList = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDelete(product.product_uuid, product.title || product.name);
+                            handleDelete(product.product_uuid, product.title);
                           }}
                           disabled={deleteLoading}
                           className="text-red-600 hover:text-red-900 transition-colors duration-150 disabled:opacity-50"

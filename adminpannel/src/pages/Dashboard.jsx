@@ -113,8 +113,8 @@ const Dashboard = () => {
                   <div className="flex items-center">
                     {product.img ? (
                       <img
-                        src={product.img}
-                        alt={product.name}
+                        src={product.img.startsWith('http') ? product.img : `http://127.0.0.1:8000${product.img}`}
+                        alt={product.title || product.name}
                         className="w-10 h-10 object-cover rounded-lg mr-3"
                         onError={(e) => {
                           e.target.style.display = 'none';
@@ -126,16 +126,16 @@ const Dashboard = () => {
                       No Img
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">{product.name || product.title}</p>
+                      <p className="font-medium text-gray-900">{product.title || product.name}</p>
                       <p className="text-sm text-gray-500">
                         {product.created_at ? new Date(product.created_at).toLocaleDateString() : 'Recently added'}
                       </p>
                     </div>
                   </div>
                   <span className={`text-sm font-medium ${
-                    product.is_active !== false ? 'text-green-600' : 'text-red-600'
+                    product.is_active !== false && !product.hasOwnProperty('is_active') || product.is_active ? 'text-green-600' : 'text-red-600'
                   }`}>
-                    {product.is_active !== false ? 'Active' : 'Inactive'}
+                    {product.is_active !== false && !product.hasOwnProperty('is_active') || product.is_active ? 'Active' : 'Inactive'}
                   </span>
                 </Link>
               ))}

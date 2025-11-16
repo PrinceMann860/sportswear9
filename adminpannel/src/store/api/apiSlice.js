@@ -19,19 +19,22 @@ export const apiSlice = createApi({
   endpoints: (builder) => ({
     // Dashboard endpoints
     getDashboardStats: builder.query({
-      query: () => '/api/products/',
+      query: () => ({
+        url: '/api/products/',
+        params: { page_size: 1000 }
+      }),
       transformResponse: (response) => {
         // Transform products data into dashboard stats
         const products = response?.results || [];
-        const totalProducts = products.length;
+        const totalProducts = response?.count || products.length;
         const activeProducts = products.filter(p => p.is_active !== false).length;
         const featuredProducts = products.filter(p => p.is_featured).length;
-        
+
         return {
           total_products: totalProducts,
-          total_revenue: totalProducts * 1500, // Mock revenue calculation
-          total_orders: Math.floor(totalProducts * 0.8), // Mock orders
-          growth_rate: 12.5, // Mock growth rate
+          total_revenue: totalProducts * 1500,
+          total_orders: Math.floor(totalProducts * 0.8),
+          growth_rate: 12.5,
           products_growth: '+8%',
           revenue_growth: '+15%',
           orders_growth: '+12%',
@@ -41,11 +44,14 @@ export const apiSlice = createApi({
       providesTags: ['Dashboard'],
     }),
     getRecentProducts: builder.query({
-      query: () => '/api/products/',
+      query: () => ({
+        url: '/api/products/',
+        params: { page_size: 10 }
+      }),
       transformResponse: (response) => {
-        // Return the most recent products (limit to 10)
+        // Return the most recent products (first 10 from API)
         const products = response?.results || [];
-        return products.slice(0, 10);
+        return products;
       },
       providesTags: ['Dashboard', 'Product'],
     }),
@@ -60,14 +66,22 @@ export const apiSlice = createApi({
             cleanParams[key] = params[key];
           }
         });
-        
+
+        // Add a large page_size to get all products (or use pagination properly)
+        cleanParams.page_size = 1000; // Adjust based on your needs
+
         return {
-        url: '/api/products/',
+          url: '/api/products/',
           params: cleanParams,
         };
       },
       transformResponse: (response) => {
-        return response?.results || [];
+        // Handle paginated response
+        if (response && typeof response === 'object' && 'results' in response) {
+          return response.results || [];
+        }
+        // Handle non-paginated response (array)
+        return Array.isArray(response) ? response : [];
       },
       providesTags: ['Product'],
     }),

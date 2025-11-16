@@ -21,7 +21,7 @@ const VariantManager = ({ productUuid, product }) => {
   const [variantFormData, setVariantFormData] = useState({
     price: '',
     is_default: false,
-    variantType: 'price-color', // 'price-color' or 'size'
+    variantType: 'color-sizes', // 'color-sizes', 'price-color', or 'size'
     selectedColor: '',
     selectedSizes: []
   });
@@ -61,11 +61,19 @@ const VariantManager = ({ productUuid, product }) => {
     try {
       let attributeIds = [];
       
-      if (variantFormData.variantType === 'price-color') {
+      if (variantFormData.variantType === 'color-sizes') {
+        // One color + multiple sizes
+        if (variantFormData.selectedColor) {
+          attributeIds.push(variantFormData.selectedColor);
+        }
+        attributeIds = [...attributeIds, ...variantFormData.selectedSizes];
+      } else if (variantFormData.variantType === 'price-color') {
+        // Single color variant
         if (variantFormData.selectedColor) {
           attributeIds = [variantFormData.selectedColor];
         }
       } else if (variantFormData.variantType === 'size') {
+        // Multiple sizes only
         attributeIds = variantFormData.selectedSizes;
       }
       
@@ -102,9 +110,17 @@ const VariantManager = ({ productUuid, product }) => {
       setVariantFormData({
         price: variant.price,
         is_default: variant.is_default,
-        variantType: 'price-color',
+        variantType: hasSizes.length === 0 ? 'price-color' : 'color-sizes',
         selectedColor: variant.attributes.find(attr => attr.name.toLowerCase() === 'color')?.id || '',
-        selectedSizes: []
+        selectedSizes: hasSizes.map(attr => attr.id)
+      });
+    } else if (hasColor && hasSizes.length > 1) {
+      setVariantFormData({
+        price: variant.price,
+        is_default: variant.is_default,
+        variantType: 'color-sizes',
+        selectedColor: variant.attributes.find(attr => attr.name.toLowerCase() === 'color')?.id || '',
+        selectedSizes: hasSizes.map(attr => attr.id)
       });
     } else if (hasSizes.length > 1) {
       setVariantFormData({
@@ -141,7 +157,7 @@ const VariantManager = ({ productUuid, product }) => {
     setVariantFormData({
       price: '',
       is_default: false,
-      variantType: 'price-color',
+      variantType: 'color-sizes',
       selectedColor: '',
       selectedSizes: []
     });
@@ -152,13 +168,19 @@ const VariantManager = ({ productUuid, product }) => {
     return `₹${parseFloat(price || 0).toFixed(2)}`;
   };
 
-  const openImageManager = (attributeValue, variant) => {
-    setSelectedAttributeValue({
-      ...attributeValue,
-      variantId: variant.id,
-      productUuid
-    });
-    setShowImageManager(true);
+  const openImageManager = (color, variant) => {
+    if (color && variant) {
+      setSelectedAttributeValue({
+        id: color.color_id,
+        name: 'Color',
+        value: color.color,
+        meta: { hex: color.color_code },
+        variantId: variant.variant_ids?.[0] || 'unknown',
+        productUuid,
+        images: color.images || []
+      });
+      setShowImageManager(true);
+    }
   };
 
   const getColorAttributes = () => {
@@ -212,15 +234,15 @@ const VariantManager = ({ productUuid, product }) => {
           </div>
         ) : (
           <div className="space-y-4">
-            {product.variants.map((variant) => (
-              <div key={variant.id} className="border border-gray-200 rounded-lg">
+            {product.variants?.map((variant, variantIndex) => (
+              <div key={variant.color_id || variantIndex} className="border border-gray-200 rounded-lg">
                 <div className="p-4 bg-gray-50 flex items-center justify-between">
                   <div className="flex items-center">
                     <button
-                      onClick={() => toggleVariant(variant.id)}
+                      onClick={() => toggleVariant(variant.color_id || variantIndex)}
                       className="mr-3 text-gray-400 hover:text-gray-600"
                     >
-                      {expandedVariants.has(variant.id) ? (
+                      {expandedVariants.has(variant.color_id || variantIndex) ? (
                         <ChevronDown className="h-4 w-4" />
                       ) : (
                         <ChevronRight className="h-4 w-4" />
@@ -228,128 +250,138 @@ const VariantManager = ({ productUuid, product }) => {
                     </button>
                     <div>
                       <div className="flex items-center space-x-3">
-                        <span className="font-medium text-gray-900">SKU: {variant.sku}</span>
-                        {variant.is_default && (
+                        <span className="font-medium text-gray-900">Color: {variant.color}</span>
+                        {variant.is_active && (
                           <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                            Default
+                            Active
                           </span>
                         )}
                       </div>
                       <div className="text-lg font-semibold text-gray-900 mt-1">
-                        {parseFloat(variant.price) > 0 ? formatPrice(variant.price) : 'No price set'}
-                        {variant.net !== variant.price && parseFloat(variant.net) > 0 && (
-                          <span className="text-sm text-gray-500 ml-2">
-                            Net: {formatPrice(variant.net)}
-                          </span>
-                        )}
+                        {variant.sizes?.[0]?.price ? formatPrice(variant.sizes[0].price) : 'No price set'}
+                        <span className="text-sm text-gray-500 ml-2">
+                          {variant.sizes?.length || 0} size{(variant.sizes?.length || 0) !== 1 ? 's' : ''}
+                        </span>
                       </div>
                       <div className="flex items-center space-x-2 mt-2">
-                        {variant.attributes.map((attr, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs"
-                          >
-                            {attr.meta?.hex && (
-                              <div
-                                className="w-3 h-3 rounded-full mr-1 border border-gray-300"
-                                style={{ backgroundColor: attr.meta.hex }}
-                              ></div>
-                            )}
-                            <span className="font-medium">{attr.name}:</span>
-                            <span className="ml-1">{attr.value}</span>
+                        <div className="flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                          {variant.color_code && (
+                            <div
+                              className="w-3 h-3 rounded-full mr-1 border border-gray-300"
+                              style={{ backgroundColor: variant.color_code }}
+                            ></div>
+                          )}
+                          <span className="font-medium">Color:</span>
+                          <span className="ml-1">{variant.color}</span>
+                        </div>
+                        {variant.sizes?.map((size, sizeIndex) => (
+                          <div key={size.variant_id || sizeIndex} className="flex items-center px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                            <span className="font-medium">Size:</span>
+                            <span className="ml-1">{size.value}</span>
+                            <span className="ml-1">({size.stock_quantity} in stock)</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => handleEditVariant(variant)}
-                      className="text-blue-600 hover:text-blue-900"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteVariant(variant.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    <span className="text-sm text-gray-500">
+                      {variant.variant_ids?.length || 0} variant{(variant.variant_ids?.length || 0) !== 1 ? 's' : ''}
+                    </span>
                   </div>
                 </div>
 
-                {expandedVariants.has(variant.id) && (
+                {expandedVariants.has(variant.color_id || variantIndex) && (
                   <div className="p-4 border-t border-gray-200">
                     <div className="space-y-4">
-                      {/* Variant Attribute Manager */}
-                      <VariantAttributeManager
-                        productUuid={productUuid}
-                        variant={variant}
-                        allAttributes={allAttributes}
-                        onUpdate={handleVariantUpdate}
-                      />
-                      
-                      {/* Image Management Section */}
-                      {variant.attributes.length > 0 && (
+                      {/* Size Variants */}
+                      {variant.sizes && variant.sizes.length > 0 && (
                         <div>
-                          <h5 className="text-sm font-medium text-gray-700 mb-3">Attribute Images:</h5>
+                          <h5 className="text-sm font-medium text-gray-700 mb-3">Size Variants:</h5>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            {variant.attributes.map((attr, index) => (
+                            {variant.sizes.map((size, sizeIndex) => (
                               <div
-                                key={index}
-                                className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
-                                onClick={() => openImageManager(attr, variant)}
+                                key={size.variant_id || sizeIndex}
+                                className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg"
                               >
-                                <div className="flex items-center">
-                                  {attr.meta?.hex && (
-                                    <div
-                                      className="w-4 h-4 rounded-full mr-2 border border-gray-300"
-                                      style={{ backgroundColor: attr.meta.hex }}
-                                    ></div>
-                                  )}
-                                  <div>
-                                    <span className="font-medium text-gray-900">{attr.name}:</span>
-                                    <span className="ml-1 text-gray-700">{attr.value}</span>
-                                    <div className="text-xs text-gray-500 mt-1">
-                                      {attr.images?.length || 0} image{(attr.images?.length || 0) !== 1 ? 's' : ''}
-                                    </div>
+                                <div>
+                                  <div className="font-medium text-gray-900">Size: {size.value}</div>
+                                  <div className="text-sm text-gray-600">
+                                    Price: {formatPrice(size.price)}
+                                  </div>
+                                  <div className="text-sm text-gray-600">
+                                    Stock: {size.stock_quantity}
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    ID: {size.variant_id}
                                   </div>
                                 </div>
-                                <ImageIcon className="h-5 w-5 text-blue-600" />
+                                <div className="flex items-center">
+                                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                    size.is_available && size.stock_quantity > 0
+                                      ? 'bg-green-100 text-green-800'
+                                      : 'bg-red-100 text-red-800'
+                                  }`}>
+                                    {size.is_available && size.stock_quantity > 0 ? 'Available' : 'Out of Stock'}
+                                  </span>
+                                </div>
                               </div>
                             ))}
                           </div>
-                          <p className="text-xs text-gray-500 mt-2">Click on an attribute to manage its images</p>
                         </div>
                       )}
+                      
+                      {/* Image Management Section */}
+                      <div>
+                        <h5 className="text-sm font-medium text-gray-700 mb-3">Color Images:</h5>
+                        <div className="grid grid-cols-1 gap-3">
+                          <div
+                            className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                            onClick={() => openImageManager(variant, variant)}
+                          >
+                            <div className="flex items-center">
+                              {variant.color_code && (
+                                <div
+                                  className="w-4 h-4 rounded-full mr-2 border border-gray-300"
+                                  style={{ backgroundColor: variant.color_code }}
+                                ></div>
+                              )}
+                              <div>
+                                <span className="font-medium text-gray-900">Color:</span>
+                                <span className="ml-1 text-gray-700">{variant.color}</span>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  {variant.images?.length || 0} image{(variant.images?.length || 0) !== 1 ? 's' : ''}
+                                </div>
+                              </div>
+                            </div>
+                            <ImageIcon className="h-5 w-5 text-blue-600" />
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">Click to manage color images</p>
+                      </div>
                       
                       {/* Display existing images */}
                       {variant.images && variant.images.length > 0 && (
                         <div>
-                          <h5 className="text-sm font-medium text-gray-700 mb-3">Variant Images:</h5>
+                          <h5 className="text-sm font-medium text-gray-700 mb-3">Color Images:</h5>
                           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                             {variant.images.map((image, imgIndex) => (
                               <div
-                                key={image.image_uuid || imgIndex}
+                                key={imgIndex}
                                 className="relative group"
                               >
                                 <img
-                                  src={image.image_url}
-                                  alt={image.alt_text || `Variant image ${imgIndex + 1}`}
+                                  src={typeof image === 'string' ? image : image.url || image.image_url}
+                                  alt={`${variant.color} variant image ${imgIndex + 1}`}
                                   className="w-full h-16 object-cover rounded border border-gray-200"
                                   onError={(e) => {
-                                    console.error('Image failed to load:', image.image_url);
+                                    console.error('Image failed to load:', image);
                                     e.target.style.display = 'none';
                                   }}
                                 />
-                                {image.is_main && (
-                                  <div className="absolute top-1 left-1 bg-yellow-500 text-white text-xs px-1 rounded">
-                                    Main
-                                  </div>
-                                )}
                                 <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center">
                                   <span className="text-white text-xs font-medium text-center px-1">
-                                    {image.alt_text || 'No description'}
+                                    {variant.color}
                                   </span>
                                 </div>
                               </div>
@@ -366,196 +398,31 @@ const VariantManager = ({ productUuid, product }) => {
         )}
       </div>
 
-      {/* Create/Edit Variant Modal */}
+      {/* Create/Edit Variant Modal - Keep existing modal code but disable for this data structure */}
       {showVariantForm && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-semibold mb-4">
-              {editingVariant ? 'Edit Variant' : 'Create New Variant'}
+              Variant Management Not Available
             </h3>
-            <form onSubmit={handleCreateVariant} className="space-y-6">
-              {/* Variant Type Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Variant Type *
-                </label>
-                <div className="grid grid-cols-2 gap-4">
-                  <label className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
-                    variantFormData.variantType === 'price-color'
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:bg-gray-50'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="variantType"
-                      value="price-color"
-                      checked={variantFormData.variantType === 'price-color'}
-                      onChange={(e) => setVariantFormData({ ...variantFormData, variantType: e.target.value })}
-                      className="sr-only"
-                    />
-                    <div className="flex items-center">
-                      <Palette className="h-5 w-5 mr-2 text-blue-600" />
-                      <div>
-                        <div className="font-medium">Price & Color</div>
-                        <div className="text-sm text-gray-500">Single color variant with price</div>
-                      </div>
-                    </div>
-                  </label>
-                  
-                  <label className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
-                    variantFormData.variantType === 'size'
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:bg-gray-50'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="variantType"
-                      value="size"
-                      checked={variantFormData.variantType === 'size'}
-                      onChange={(e) => setVariantFormData({ ...variantFormData, variantType: e.target.value })}
-                      className="sr-only"
-                    />
-                    <div className="flex items-center">
-                      <Package className="h-5 w-5 mr-2 text-green-600" />
-                      <div>
-                        <div className="font-medium">Size Variant</div>
-                        <div className="text-sm text-gray-500">Multiple sizes, no price</div>
-                      </div>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
-              {/* Price & Color Variant */}
-              {variantFormData.variantType === 'price-color' && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Price (Optional)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={variantFormData.price}
-                        onChange={(e) => setVariantFormData({ ...variantFormData, price: e.target.value })}
-                        className="input-field"
-                        placeholder="0.00"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">Leave empty or 0 to use product price</p>
-                    </div>
-                    
-                    <div className="flex items-center">
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={variantFormData.is_default}
-                          onChange={(e) => setVariantFormData({ ...variantFormData, is_default: e.target.checked })}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">Set as default variant</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
-                      Select Color
-                    </label>
-                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                      {getColorAttributes().map((color) => (
-                        <label
-                          key={color.id}
-                          className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                            variantFormData.selectedColor === color.id
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-200 hover:bg-gray-50'
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="color"
-                            value={color.id}
-                            checked={variantFormData.selectedColor === color.id}
-                            onChange={(e) => setVariantFormData({ ...variantFormData, selectedColor: e.target.value })}
-                            className="sr-only"
-                          />
-                          {color.meta?.hex && (
-                            <div
-                              className="w-8 h-8 rounded-full border-2 border-gray-300 mb-2"
-                              style={{ backgroundColor: color.meta.hex }}
-                            ></div>
-                          )}
-                          <span className="text-sm font-medium text-center">{color.value}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Size Variant */}
-              {variantFormData.variantType === 'size' && (
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={variantFormData.is_default}
-                        onChange={(e) => setVariantFormData({ ...variantFormData, is_default: e.target.checked })}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">Set as default variant</span>
-                    </label>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
-                      Select Sizes (Multiple allowed)
-                    </label>
-                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                      {getSizeAttributes().map((size) => (
-                        <label
-                          key={size.id}
-                          className={`flex items-center justify-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                            variantFormData.selectedSizes.includes(size.id)
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-200 hover:bg-gray-50'
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={variantFormData.selectedSizes.includes(size.id)}
-                            onChange={() => handleSizeSelection(size.id)}
-                            className="sr-only"
-                          />
-                          <span className="text-sm font-medium">{size.value}</span>
-                        </label>
-                      ))}
-                    </div>
-                    <p className="text-xs text-gray-500 mt-2">
-                      Selected: {variantFormData.selectedSizes.length} size{variantFormData.selectedSizes.length !== 1 ? 's' : ''}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowVariantForm(false);
-                    resetForm();
-                  }}
-                  className="btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="btn-primary">
-                  {editingVariant ? 'Update Variant' : 'Create Variant'}
-                </button>
-              </div>
-            </form>
+            <div className="text-center py-8">
+              <Package className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <p className="text-gray-600 mb-4">
+                This product uses a different variant structure that cannot be edited through this interface.
+              </p>
+              <p className="text-sm text-gray-500 mb-6">
+                The variants are managed through a different system. Please use the appropriate management tools for this product type.
+              </p>
+              <button
+                onClick={() => {
+                  setShowVariantForm(false);
+                  resetForm();
+                }}
+                className="btn-primary"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

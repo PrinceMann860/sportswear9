@@ -4,8 +4,17 @@ export const productService = {
   // Get all products
   async getProducts(params = {}) {
     try {
-      const response = await api.get('/api/products/', { params });
-      return response.data?.results || response.data;
+      // Add large page_size to get all products in one request
+      const queryParams = { ...params, page_size: 1000 };
+      const response = await api.get('/api/products/', { params: queryParams });
+
+      // Handle paginated response
+      if (response.data && typeof response.data === 'object' && 'results' in response.data) {
+        return response.data.results || [];
+      }
+
+      // Handle non-paginated response
+      return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch products' };
     }

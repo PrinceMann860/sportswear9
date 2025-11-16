@@ -88,7 +88,7 @@ const ProductDetails = () => {
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {product.name || product.title}
+              {product.title || product.name}
             </h1>
             <p className="text-gray-600">Product ID: {product.product_uuid}</p>
           </div>
@@ -120,7 +120,17 @@ const ProductDetails = () => {
             {product.default_images && product.default_images.length > 0 ? (
               <img
                 src={`http://127.0.0.1:8000${product.default_images[0].url}`}
-                alt={product.name || product.title}
+                alt={product.title || product.name}
+                className="w-full h-64 object-cover rounded-lg"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
+            ) : product.img ? (
+              <img
+                src={product.img.startsWith('http') ? product.img : `http://127.0.0.1:8000${product.img}`}
+                alt={product.title || product.name}
                 className="w-full h-64 object-cover rounded-lg"
                 onError={(e) => {
                   e.target.style.display = 'none';
@@ -129,10 +139,11 @@ const ProductDetails = () => {
               />
             ) : null}
             <div 
-              className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400"
-              style={{ display: (product.default_images && product.default_images.length > 0) ? 'none' : 'flex' }}
+              className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 flex-col"
+              style={{ display: (product.default_images && product.default_images.length > 0) || product.img ? 'none' : 'flex' }}
             >
               <Package className="h-16 w-16" />
+              <span className="mt-2 text-sm">No Image Available</span>
             </div>
           </div>
         </div>
@@ -145,7 +156,7 @@ const ProductDetails = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                <p className="text-gray-900">{product.name || product.title}</p>
+                <p className="text-gray-900">{product.title || product.name}</p>
               </div>
               
               <div>
@@ -153,11 +164,16 @@ const ProductDetails = () => {
                 <div className="flex items-center space-x-2">
                   <DollarSign className="h-4 w-4 text-gray-400" />
                   <p className="text-lg font-semibold text-gray-900">
-                    {formatPrice(product.net || product.price)}
+                    {product.price}
                   </p>
-                  {product.disc && parseFloat(product.disc) > 0 && (
+                  {product.discount && (
                     <span className="text-sm text-green-600 bg-green-100 px-2 py-1 rounded">
-                      {product.disc}% off
+                      {product.discount}
+                    </span>
+                  )}
+                  {product.original && product.original !== product.price && (
+                    <span className="text-sm text-gray-500 line-through">
+                      {product.original}
                     </span>
                   )}
                 </div>
@@ -176,7 +192,7 @@ const ProductDetails = () => {
                       }}
                     />
                   )}
-                  <p className="text-gray-900">{product.brand?.name || product.brand}</p>
+                  <p className="text-gray-900">{product.brand?.name}</p>
                 </div>
               </div>
 
@@ -184,7 +200,33 @@ const ProductDetails = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                 <div className="flex items-center">
                   <Tag className="h-4 w-4 text-gray-400 mr-2" />
-                  <p className="text-gray-900">{product.category?.name || product.category}</p>
+                  <p className="text-gray-900">{product.category?.name}</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                <p className="text-gray-900">{product.gender || 'Not specified'}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <div className="flex flex-wrap gap-2">
+                  {product.is_featured && (
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                      Featured
+                    </span>
+                  )}
+                  {product.is_new && (
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                      New
+                    </span>
+                  )}
+                  {product.is_popular && (
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                      Popular
+                    </span>
+                  )}
                 </div>
               </div>
 
