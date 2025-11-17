@@ -372,6 +372,9 @@ class ProductDetailUnifiedSerializer(serializers.ModelSerializer):
     # -------------------
     #  Variants grouped by color
     # -------------------
+        # -------------------------
+    # Variants grouped by color
+    # -------------------------
     def get_variants(self, obj):
         variants_by_color = defaultdict(lambda: {
             "color": None,
@@ -383,49 +386,64 @@ class ProductDetailUnifiedSerializer(serializers.ModelSerializer):
             "is_active": False,
         })
 
-        for variant in obj.variants.prefetch_related("attributes", "images").all():
-            # Extract color & size attributes
-            color_attr = next(
-                (a for a in variant.attributes.all() if getattr(a.attribute, "name", "").lower() == "color"),
-                None
-            )
-            size_attr = next(
-                (a for a in variant.attributes.all() if getattr(a.attribute, "name", "").lower() == "size"),
-                None
-            )
+        variants = obj.variants.prefetch_related(
+            "attributes__attribute",
+            "images",
+            "inventory",
+        )
+
+        for variant in variants:
+
+            color_attr = None
+            size_attr = None
+
+            for attribute_value in variant.attributes.all():
+                name = attribute_value.attribute.name.lower()
+
+                if name == "color":
+                    color_attr = attribute_value
+                elif name == "size":
+                    size_attr = attribute_value
 
             color_name = color_attr.value if color_attr else "Default"
             color_id = color_attr.id if color_attr else None
-            color_code = color_attr.meta.get("hex") if color_attr and "hex" in color_attr.meta else None
+            color_code = color_attr.meta.get("hex") if color_attr else None
 
             group = variants_by_color[color_name]
-            group["color"] = color_name
-            group["color_id"] = color_id
-            group["color_code"] = color_code
-            group["is_active"] = group["is_active"] or getattr(variant, "is_available", False)
+
+            # Set basic color metadata once
+            if group["color"] is None:
+                group["color"] = color_name
+                group["color_id"] = color_id
+                group["color_code"] = color_code
+
             group["variant_ids"].append(variant.id)
+            # group["is_active"] |= variant.is_available
 
-            # ---- Add images ----
+            # Add all images from variant (no duplication)
             for img in variant.images.all():
-                group["images"].append({
+                img_data = {
                     "id": img.image_uuid,
-                    "url": getattr(img, "medium_url", None) or getattr(img, "image", None),
-                    "alt_text": getattr(img, "alt_text", ""),
-                    "is_primary": getattr(img, "is_main", False),
-                })
+                    "url": img.medium_url if hasattr(img, "medium_url") else img.image.url,
+                    "alt_text": img.alt_text,
+                    "is_primary": img.is_main,
+                }
 
-            # ---- Add size info ----
-            inventory = Inventory.objects.filter(variant=variant).first()
-            stock_qty = getattr(inventory, "stock", 0)
-            is_available = getattr(inventory, "is_available", False)
+                if img_data not in group["images"]:
+                    group["images"].append(img_data)
 
-            group["sizes"].append({
+            # Add all SIZES under same color
+            inventory = getattr(variant, "inventory", None)
+
+            size_data = {
                 "variant_id": variant.id,
                 "size_id": size_attr.id if size_attr else None,
                 "value": size_attr.value if size_attr else None,
-                "stock_quantity": stock_qty,
+                "stock_quantity": getattr(inventory, "stock", 0),
                 "price": float(variant.net),
-                "is_available": is_available,
-            })
+                "is_available": getattr(inventory, "is_available", False),
+            }
+
+            group["sizes"].append(size_data)
 
         return list(variants_by_color.values())

@@ -6,6 +6,7 @@ from assets.models import ProductImage
 from products.models import Product
 
 from assets.serializers import ProductImageSerializer
+from django.db.models import Prefetch
 
 # ─────────────────────────────
 # Attribute serializers
@@ -80,14 +81,16 @@ class AttributeValueNestedSerializer(serializers.ModelSerializer):
 class ProductVariantSerializer(serializers.ModelSerializer):
     stock = serializers.SerializerMethodField()
     is_available = serializers.SerializerMethodField()
-    images = ProductImageSerializer(many=True, read_only=True)  # ✅ Add this line
+    images = ProductImageSerializer(many=True, read_only=True)
 
     product_uuid = serializers.SlugRelatedField(
         slug_field="product_uuid",
         queryset=Product.objects.all(),
         source="product"
     )
+
     attributes = AttributeValueNestedSerializer(many=True, read_only=True)
+
     attribute_ids = serializers.PrimaryKeyRelatedField(
         many=True,
         source="attributes",
@@ -95,46 +98,89 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         write_only=True
     )
 
+    color = serializers.SerializerMethodField()
+    size = serializers.SerializerMethodField()
+
     class Meta:
         model = ProductVariant
         fields = [
-            "id", "product_uuid", "sku", "price", "net", "is_default",
-            "attributes", "attribute_ids", "stock", "is_available", "images"  # ✅ added images
+            "id",
+            "product_uuid",
+            "sku",
+            "price",
+            "net",
+            "is_default",
+            "attributes",
+            "attribute_ids",
+            "color",
+            "size",
+            "stock",
+            "is_available",
+            "images"
         ]
 
+    # -----------------------------
+    # GET COLOR
+    # -----------------------------
+    def get_color(self, obj):
+        color_attr = obj.attributes.filter(attribute__name__iexact="Color").first()
+        if not color_attr:
+            return None
+
+        return {
+            "id": color_attr.id,
+            "value": color_attr.value,
+            "code": color_attr.meta.get("hex"),
+        }
+
+    # -----------------------------
+    # GET SIZE
+    # -----------------------------
+    def get_size(self, obj):
+        size_attr = obj.attributes.filter(attribute__name__iexact="Size").first()
+        if not size_attr:
+            return None
+
+        return {
+            "id": size_attr.id,
+            "value": size_attr.value,
+        }
+
+    # -----------------------------
+    # STOCK
+    # -----------------------------
     def get_stock(self, obj):
         user = self.context["request"].user
-        if hasattr(obj, "inventory"):
-            # Show real numbers to admin only
-            if user.is_staff:
-                return obj.inventory.stock
+        if hasattr(obj, "inventory") and user.is_staff:
+            return obj.inventory.stock
         return None
 
+    # -----------------------------
+    # AVAILABILITY
+    # -----------------------------
     def get_is_available(self, obj):
         if hasattr(obj, "inventory"):
             return obj.inventory.is_available
         return False
-    
-    def get_product_uuid(self, obj):
-        return obj.product.product_uuid
 
-    def get_images(self, obj):
-        request = self.context.get("request")
-        if not hasattr(obj, "images"):
-            return []
-        return [
-            request.build_absolute_uri(img.image.url)
-            for img in obj.images.all() if img.image
-        ]
-
+    # -----------------------------
+    # CUSTOM REPRESENTATION
+    # -----------------------------
     def to_representation(self, instance):
         context = self.context.copy()
         context["variant"] = instance
+
         rep = super().to_representation(instance)
+
+        # only the attribute values assigned to this variant
         rep["attributes"] = AttributeValueNestedSerializer(
-            instance.attributes.all(), many=True, context=context
+            instance.attributes.all(),
+            many=True,
+            context=context
         ).data
+
         return rep
+
 
 class ProductVariantAttributeMediaUploadSerializer(serializers.ModelSerializer):
     images = serializers.ListField(child=serializers.ImageField(), write_only=True)

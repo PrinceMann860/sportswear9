@@ -56,13 +56,6 @@ class ProductAttributeAdminView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAdminUser]
 
 
-class ProductVariantAdminView(generics.ListCreateAPIView):
-    queryset = ProductVariant.objects.all()
-    serializer_class = ProductVariantSerializer
-    permission_classes = [permissions.IsAdminUser]
-
-
-
 # ---------------------- Public (User) Views ----------------------
 
 # attributes/views.py

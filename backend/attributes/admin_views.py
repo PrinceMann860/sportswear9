@@ -50,15 +50,62 @@ class ProductAttributeAdminView(generics.ListCreateAPIView):
 
 
 class ProductVariantAdminView(generics.ListCreateAPIView):
-    queryset = ProductVariant.objects.all()
+    """
+    Ultra-optimized admin variant list/create view.
+    Returns variants ONLY when product_uuid is provided.
+    """
     serializer_class = ProductVariantSerializer
     permission_classes = [permissions.IsAdminUser]
 
     def get_queryset(self):
         product_uuid = self.request.query_params.get("product_uuid")
-        qs = super().get_queryset()
+
+        # ❗ Don't allow full-table query — protects speed + server load
+        if not product_uuid:
+            return ProductVariant.objects.none()
+
+        # ⚡ Best performance: single JOIN + batched prefetches
+        return (
+            ProductVariant.objects
+            .filter(product__product_uuid=product_uuid)
+            .select_related("product")         # 1 JOIN only
+            .prefetch_related(
+                "attributes",                  # ManyToMany
+                "images",                      # ProductImage → images
+                "attribute_media__images",     # media → images
+                "inventory",                   # ensures fast stock fetch
+            )
+            .only(
+                "id", "sku", "price", "net", "is_default",
+                "product__product_uuid", "product__name",
+            )  # 🚀 minimizes column loading for maximum speed
+        )
+
+class ProductVariantDetailAdminView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = ProductVariant.objects.all()
+    serializer_class = ProductVariantSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+    def get_queryset(self):
+        """
+        Ensures the admin can only update/delete variants that belong to 
+        the product passed in the query params (optional but recommended).
+        """
+        product_uuid = self.request.query_params.get("product_uuid")
+
+        qs = (
+            ProductVariant.objects
+            .select_related("product")
+            .prefetch_related(
+                "attributes",
+                "images",
+                "attribute_media__images",
+            )
+        )
+
         if product_uuid:
             qs = qs.filter(product__product_uuid=product_uuid)
+
         return qs
 
 class ProductVariantAttributeMediaViewSet(viewsets.ModelViewSet):
@@ -123,3 +170,4 @@ class ProductVariantAttributeMediaViewSet(viewsets.ModelViewSet):
 
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    

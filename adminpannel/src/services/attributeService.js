@@ -74,7 +74,7 @@ export const attributeService = {
   // Admin - Update attribute value
   async updateAttributeValue(valueId, valueData) {
     try {
-      const response = await api.put(`/api/attributes/admin/values/${valueId}/`, valueData);
+      const response = await api.patch(`/api/attributes/admin/values/${valueId}/`, valueData);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to update attribute value' };
@@ -138,7 +138,7 @@ export const attributeService = {
   },
 
   // Public - Get product variants
-  async getProductVariants(productUuid) {
+  async getPublicProductVariants(productUuid) {
     try {
       const response = await api.get(`/api/attributes/${productUuid}/variants/`);
       return response.data?.results || response.data;
@@ -207,6 +207,16 @@ export const attributeService = {
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to delete variant' };
+    }
+  },
+
+  // Admin - Get product variants (using the correct endpoint)
+  async getProductVariants(productUuid) {
+    try {
+      const response = await api.get(`/api/attributes/admin/variants/?product_uuid=${productUuid}`);
+      return response.data?.results || response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch product variants' };
     }
   },
 
