@@ -2,6 +2,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useAuth } from "../../context/AuthContext";
+import AuthModal from "../Auth/AuthModal";
 import { addToCart } from "../Cart/Cartslice";
 import SEO from "../Common/SEO.jsx"; 
 
@@ -33,6 +35,9 @@ const ProductInfo = () => {
   const { id, product_uuid } = useParams();
   const productId = id || product_uuid;
   const dispatch = useDispatch();
+  const { isAuthenticated, profile } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState("signup");
 
   const productFromState = useSelector((state) => state.productdetail?.data);
   const loading = useSelector((state) => state.productdetail?.loading);
@@ -56,18 +61,6 @@ const ProductInfo = () => {
   }, [dispatch, productId]);
 
   // Sticky sidebar effect for desktop
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.innerWidth >= 1024) {
-        setIsSticky(window.scrollY > 100);
-      } else {
-        setIsSticky(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const product = useMemo(() => {
     if (!productFromState) return null;
@@ -453,7 +446,7 @@ const ProductInfo = () => {
     <div className="pt-20 bg-white min-h-screen">
       {/* Main Product Section */}
       <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+        <div className="lg:flex lg:items-start lg:gap-12">
           {/* Left Column - Product Gallery */}
           <div
             className={`space-y-4 lg:sticky lg:top-24 lg:h-fit lg:pb-8 ${isSticky ? "lg:max-h-screen lg:overflow-y-auto" : ""
@@ -485,7 +478,7 @@ const ProductInfo = () => {
           </div>
 
           {/* Right Column - Product Info */}
-          <div className="space-y-6 overflow-hidden px-4">
+          <div className="lg:w-1/2 space-y-6 px-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto scrollbar-hide">
             {/* Brand and Title */}
             <div>
               <span className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
@@ -674,7 +667,14 @@ const ProductInfo = () => {
 
               <div className="flex gap-3">
                 <button
-                  onClick={handleAddToCart}
+                  onClick={
+                    isAuthenticated
+                      ? handleAddToCart
+                      : () => {
+                          setAuthMode("login");
+                          setAuthOpen(true);
+                        }
+                  }
                   disabled={
                     !selectedColor ||
                     !selectedSize ||
@@ -690,6 +690,7 @@ const ProductInfo = () => {
                   <ShoppingCart size={18} />
                   {!SportsWear9Product.inStock ? "Out of Stock" : "Add to Cart"}
                 </button>
+
                 <button
                   onClick={handleWishlistToggle}
                   className={`p-3 border-2 rounded-lg transition-colors flex-shrink-0 ${isWishlisted
@@ -1077,6 +1078,15 @@ const ProductInfo = () => {
           <RecommendedProducts />
         </div>
       </div>
+      {/* Auth Modal */}
+      {authOpen && (
+        <AuthModal
+          isOpen={authOpen}
+          onClose={() => setAuthOpen(false)}
+          mode={authMode}
+          setMode={setAuthMode}
+        />
+      )}
     </div>
     </>
   );

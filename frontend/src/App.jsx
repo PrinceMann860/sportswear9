@@ -9,9 +9,8 @@ import ProductInfo from "./Components/Product/ProductInfo";
 import PrivacyPolicy from "./Components/Terms&Policy/PrivacyPolicy";
 import TermsOfUse from "./Components/Terms&Policy/TermsOfUse";
 import ContactUs  from "./Components/Pages/ContactUs";
-import SearchPage from "./Components/Pages/SearchPage";
 import CartPage from "./Components/Cart/CartPage";
-import CategoriesPage from "./Components/Categories/CategoriesPage";
+import CategoriesPage from "./Components/Search/CategoriesPage";
 import OrdersPage from "./Components/Orders/OrdersPage";
 import BrandPage from "./Components/Brands/BrandPage";
 import ProfilePage from "./Components/Profile/ProfilePage";
@@ -80,10 +79,6 @@ export default function App() {
         {
           path: '/contactus',
           element: <ContactUs />
-        },
-        {
-          path: '/search',
-          element: <SearchPage />
         },
        
         {

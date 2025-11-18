@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { setSearchQuery, fetchSearchResults } from "../Search/Searchslice";
 import { useAuth } from "../../context/AuthContext";
 import { logout } from "../../store/slices/auth/authSlice";
 import logo from "../../assets/blacklogo.png";
@@ -27,7 +28,7 @@ function Navbar() {
   const [authMode, setAuthMode] = useState("signup");
   const [open, setOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [localSearch, setLocalSearch] = useState("");
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [hoveredLink, setHoveredLink] = useState(null);
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
@@ -95,27 +96,35 @@ function Navbar() {
     setHoveredLink(null);
   };
 
+  // navbar search handler
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/categories?q=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery("");
-      setShowSearch(false);
-    }
+    const q = (localSearch || "").trim();
+    if (!q) return;
+
+    dispatch(setSearchQuery(q));
+    dispatch(fetchSearchResults(q));
+    navigate(`/categories?q=${encodeURIComponent(q)}`);
+
+    setShowSearch(false);
+    setLocalSearch("");
   };
 
   const handleSuggestionClick = (suggestion) => {
-    setSearchQuery(suggestion);
-    navigate(`/categories?q=${encodeURIComponent(suggestion)}`);
-    setSearchQuery("");
+    const q = String(suggestion || "").trim();
+    if (!q) return;
+
+    dispatch(setSearchQuery(q));
+    dispatch(fetchSearchResults(q));
+    navigate(`/categories?q=${encodeURIComponent(q)}`);
+
     setShowSearch(false);
+    setLocalSearch("");
   };
 
   const clearSearch = () => {
-    setSearchQuery("");
-    if (searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
+    setLocalSearch("");
+    if (searchInputRef.current) searchInputRef.current.focus();
   };
 
   return (
@@ -637,12 +646,15 @@ function Navbar() {
             {/* Apple-style Search Dropdown */}
             <div className="search-container relative" ref={searchContainerRef}>
               <button
-                onClick={() => setShowSearch(!showSearch)}
+                onClick={() => {
+                  setShowSearch(!showSearch);
+                  setTimeout(() => searchInputRef.current?.focus(), 150);
+                }}
                 className="flex items-center hover:bg-blue-100 px-2 py-2 rounded-full transition-all duration-200 group"
                 aria-label="Search"
               >
                 <FiSearch
-                  className="text-gray-500 hover:text-blue-500 transition-colors"
+                  className="text-gray-500 group-hover:text-blue-500"
                   size={16}
                 />
               </button>
@@ -650,99 +662,90 @@ function Navbar() {
               {/* Search Dropdown */}
               {showSearch && (
                 <div className="transition-all duration-300 ease-out fixed left-0 right-0 top-[60px] lg:top-[80px] z-40 bg-white border-t border-gray-200 shadow-2xl">
-                  {/* Search Input */}
-                  <div className="p-3 border-b border-gray-100 max-w-6xl mx-auto">
-                    <div className="relative">
-                      <FiSearch
-                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                        size={18}
-                      />
+                  {/* 🔵 ALWAYS Visible Search Input */}
+                  <div className="px-4 py-4 border-2 w-full max-w-6xl mx-auto border-blue-500 rounded-lg flex items-center gap-3">
+                    <FiSearch size={18} className="text-gray-500" />
+
+                    <form onSubmit={handleSearch} className="flex-1">
                       <input
                         ref={searchInputRef}
                         type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder={`Search for ${placeholders[currentPlaceholder]}`}
-                        className="w-full pl-10 pr-10 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
-                        onKeyDown={(e) => {
-                          if (e.key === "Escape") setShowSearch(false);
-                          if (e.key === "Enter") handleSearch(e);
-                        }}
+                        value={localSearch}
+                        onChange={(e) => setLocalSearch(e.target.value)}
+                        placeholder={`Search for ${placeholders[currentPlaceholder]}...`}
+                        className="w-full  text-lg outline-none"
                       />
-                      {searchQuery && (
-                        <button
-                          onClick={clearSearch}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-200 rounded-full transition-colors"
-                        >
-                          <FiX
-                            className="text-gray-400 hover:text-gray-600"
-                            size={16}
-                          />
-                        </button>
-                      )}
-                    </div>
+                    </form>
+
+                    {localSearch && (
+                      <button onClick={() => setLocalSearch("")}>
+                        <FiX
+                          size={18}
+                          className="text-gray-500 hover:text-gray-700 transition-colors"
+                        />
+                      </button>
+                    )}
                   </div>
 
-                  {/* Suggestions */}
+                  {/* Suggestions + Quick Links */}
                   <div className="max-h-80 overflow-y-auto max-w-6xl mx-auto">
-                    {/* Search Suggestions */}
-                    {searchQuery && (
+                    {/* 🔵 SUGGESTIONS */}
+                    {localSearch && (
                       <div className="p-2">
                         <div className="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
                           Suggestions
                         </div>
+
                         {suggestions
-                          .filter((suggestion) =>
-                            suggestion
-                              .toLowerCase()
-                              .includes(searchQuery.toLowerCase())
+                          .filter((s) =>
+                            s.toLowerCase().includes(localSearch.toLowerCase())
                           )
                           .slice(0, 6)
                           .map((suggestion, index) => (
                             <button
                               key={index}
                               onClick={() => handleSuggestionClick(suggestion)}
-                              className="w-full text-left px-3 py-2.5 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3 group"
+                              className="w-full text-left px-3 py-2.5 hover:bg-gray-50 rounded-lg flex items-center gap-3 group"
                             >
                               <FiSearch
-                                className="text-gray-400 group-hover:text-blue-600 transition-colors"
+                                className="text-gray-400 group-hover:text-blue-600"
                                 size={16}
                               />
-                              <span className="text-gray-700 group-hover:text-blue-600 transition-colors">
+                              <span className="text-gray-700 group-hover:text-blue-600">
                                 {suggestion}
                               </span>
                             </button>
                           ))}
 
                         {/* No Results */}
-                        {suggestions.filter((suggestion) =>
-                          suggestion
-                            .toLowerCase()
-                            .includes(searchQuery.toLowerCase())
+                        {suggestions.filter((s) =>
+                          s.toLowerCase().includes(localSearch.toLowerCase())
                         ).length === 0 && (
                           <div className="px-3 py-8 text-center text-gray-500">
                             <FiSearch
                               className="mx-auto mb-2 text-gray-300"
                               size={24}
                             />
-                            <p>No results found for "{searchQuery}"</p>
+                            <p>No results found for "{localSearch}"</p>
                           </div>
                         )}
                       </div>
                     )}
 
-                    {/* Quick Actions */}
-                    {!searchQuery && (
+                    {/* 🔵 QUICK LINKS WHEN EMPTY */}
+                    {!localSearch && (
                       <div className="p-2 border-t border-gray-100">
                         <div className="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
                           Quick Links
                         </div>
+
                         <button
                           onClick={() => handleSuggestionClick("New Arrivals")}
                           className="w-full text-left px-3 py-2.5 hover:bg-gray-50 rounded-lg transition-colors"
                         >
                           🆕 New Arrivals
                         </button>
+
                         <button
                           onClick={() =>
                             handleSuggestionClick("Clearance Sale")
@@ -751,6 +754,7 @@ function Navbar() {
                         >
                           🔥 Clearance Sale
                         </button>
+
                         <button
                           onClick={() => handleSuggestionClick("Best Sellers")}
                           className="w-full text-left px-3 py-2.5 hover:bg-gray-50 rounded-lg transition-colors"

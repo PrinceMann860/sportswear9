@@ -3,38 +3,78 @@ import axios from "axios";
 
 const BASE_URL = "http://127.0.0.1:8000/api/products/";
 
-// ✅ Fetch Products (with pagination & filters)
+// ----------------------------------------------------
+// ✅ Fetch Products — Supports ALL Backend Filters
+// ----------------------------------------------------
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
-  async (params = {}, { rejectWithValue }) => {
+  async (filters = {}, { rejectWithValue }) => {
     try {
-      const query = new URLSearchParams(params).toString();
-      const url = query ? `${BASE_URL}?${query}` : BASE_URL;
+      // Allowed filter keys (search excluded)
+      const allowedFilters = [
+        "category",
+        "gender",
+        "brand",
+        "min_price",
+        "max_price",
+        "min_disc",
+        "max_disc",
+        "is_new",
+        "is_featured",
+        "is_popular",
+        "is_in_cart",
+        "ordering",
+        "cursor",
+        "page",
+      ];
+
+      const params = new URLSearchParams();
+
+      Object.entries(filters).forEach(([key, value]) => {
+        if (
+          value !== undefined &&
+          value !== null &&
+          value !== "" &&
+          allowedFilters.includes(key)
+        ) {
+          params.append(key, value);
+        }
+      });
+
+      const url = params.toString()
+        ? `${BASE_URL}?${params.toString()}`
+        : BASE_URL;
+
+      console.log("📌 Fetching products:", url);
+
       const response = await axios.get(url);
       return response.data;
-    } catch (error) {
-      return rejectWithValue(
-        error.response?.data || "Failed to fetch products"
-      );
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Failed to fetch products");
     }
   }
 );
 
-// ✅ Fetch Single Product
+// ----------------------------------------------------
+// ✅ Fetch Single Product Detail
+// ----------------------------------------------------
 export const fetchProductDetail = createAsyncThunk(
   "products/fetchProductDetail",
   async (uuid, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${BASE_URL}${uuid}/`);
       return response.data;
-    } catch (error) {
+    } catch (err) {
       return rejectWithValue(
-        error.response?.data || "Failed to fetch product detail"
+        err.response?.data || "Failed to fetch product detail"
       );
     }
   }
 );
 
+// ----------------------------------------------------
+// INITIAL STATE
+// ----------------------------------------------------
 const initialState = {
   products: [],
   count: 0,
@@ -45,6 +85,9 @@ const initialState = {
   error: null,
 };
 
+// ----------------------------------------------------
+// SLICE
+// ----------------------------------------------------
 const productsSlice = createSlice({
   name: "products",
   initialState,
@@ -56,69 +99,66 @@ const productsSlice = createSlice({
       state.previous = null;
       state.error = null;
     },
-    appendProducts: (state, action) => {
-      const newProducts = Array.isArray(action.payload)
-        ? action.payload
-        : [];
-      state.products = [...state.products, ...newProducts];
-    },
   },
   extraReducers: (builder) => {
     builder
-      // ✅ Fetch All Products
+      // ------------------------
+      // FETCH PRODUCTS
+      // ------------------------
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
+
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
+
         const data = action.payload;
 
+        // Django-style paginated response
         if (data && Array.isArray(data.results)) {
-          // Paginated (Django-style)
           state.products = data.results;
           state.count = data.count || 0;
           state.next = data.next || null;
           state.previous = data.previous || null;
-        } else if (Array.isArray(data)) {
-          // Plain list
+          return;
+        }
+
+        // Non-paginated array
+        if (Array.isArray(data)) {
           state.products = data;
           state.count = data.length;
           state.next = null;
           state.previous = null;
-        } else if (typeof data === "object" && data !== null) {
-          // Possibly nested
-          const arr = Array.isArray(data.data)
-            ? data.data
-            : Array.isArray(data.items)
-            ? data.items
-            : [];
-          state.products = arr;
-          state.count = arr.length;
-          state.next = null;
-          state.previous = null;
-        } else {
-          state.products = [];
-          state.count = 0;
-          state.next = null;
-          state.previous = null;
+          return;
         }
+
+        // Fallback empty
+        state.products = [];
+        state.count = 0;
+        state.next = null;
+        state.previous = null;
       })
+
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to load products";
       })
 
-      // ✅ Fetch Product Detail
+      // ------------------------
+      // FETCH PRODUCT DETAIL
+      // ------------------------
       .addCase(fetchProductDetail.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.productDetail = null;
       })
+
       .addCase(fetchProductDetail.fulfilled, (state, action) => {
         state.loading = false;
         state.productDetail = action.payload;
       })
+
       .addCase(fetchProductDetail.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to load product detail";
@@ -126,13 +166,19 @@ const productsSlice = createSlice({
   },
 });
 
-export const { clearProducts, appendProducts } = productsSlice.actions;
+// ----------------------------------------------------
+// EXPORTS
+// ----------------------------------------------------
+export const { clearProducts } = productsSlice.actions;
+
 export default productsSlice.reducer;
 
-// ✅ Selectors (fixed: should use state.products)
+// ----------------------------------------------------
+// SELECTORS (Correct & Working)
+// ----------------------------------------------------
 export const selectAllProducts = (state) => state.product.products;
-export const selectProductsCount = (state) => state.product.count;
 export const selectProductsLoading = (state) => state.product.loading;
-export const selectProductDetail = (state) => state.product.productDetail;
 export const selectProductsError = (state) => state.product.error;
-
+export const selectProductsNext = (state) => state.product.next;
+export const selectProductsPrevious = (state) => state.product.previous;
+export const selectProductDetail = (state) => state.product.productDetail;

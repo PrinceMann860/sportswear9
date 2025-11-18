@@ -21,7 +21,7 @@ const ProductGallery = ({ images = [], brandLogo }) => {
       ? images
           .map((img) => {
             if (typeof img === "string") {
-              return img.startsWith('http') ? img : `${BASE_URL}${img}`;
+              return img.startsWith("http") ? img : `${BASE_URL}${img}`;
             }
             return img?.url ? `${BASE_URL}${img.url}` : null;
           })
@@ -33,6 +33,7 @@ const ProductGallery = ({ images = [], brandLogo }) => {
 
   const nextImage = () =>
     setSelectedIndex((prev) => (prev + 1) % displayImages.length);
+
   const prevImage = () =>
     setSelectedIndex(
       (prev) => (prev - 1 + displayImages.length) % displayImages.length
@@ -74,6 +75,7 @@ const ProductGallery = ({ images = [], brandLogo }) => {
               </div>
             )}
 
+            {/* Zoom button only for mobile */}
             <button
               onClick={() => setShowZoomModal(true)}
               className="absolute top-2 right-2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition-all z-10"
@@ -82,6 +84,7 @@ const ProductGallery = ({ images = [], brandLogo }) => {
             </button>
           </div>
 
+          {/* Thumbnails */}
           {displayImages.length > 1 && (
             <div className="w-full overflow-x-auto scrollbar-hide">
               <div className="flex gap-2 justify-start min-w-max px-1">
@@ -95,10 +98,10 @@ const ProductGallery = ({ images = [], brandLogo }) => {
                         : "border-gray-300 hover:border-gray-400"
                     }`}
                   >
-                    <img 
-                      src={img} 
-                      alt={`Thumbnail ${i + 1}`} 
-                      className="w-full h-full object-cover" 
+                    <img
+                      src={img}
+                      alt={`Thumbnail ${i + 1}`}
+                      className="w-full h-full object-cover"
                     />
                   </div>
                 ))}
@@ -122,27 +125,30 @@ const ProductGallery = ({ images = [], brandLogo }) => {
                       : "border-gray-300 hover:border-gray-400"
                   }`}
                 >
-                  <img 
-                    src={img} 
-                    alt={`Thumbnail ${i + 1}`} 
-                    className="w-full h-full object-cover" 
+                  <img
+                    src={img}
+                    alt={`Thumbnail ${i + 1}`}
+                    className="w-full h-full object-cover"
                   />
                 </div>
               ))}
             </div>
           )}
 
-          {/* Main Image Container */}
+          {/* Main Image - NO ZOOM ON DESKTOP */}
           <div className="flex-1 relative bg-gray-50 rounded-xl border border-gray-200 overflow-hidden group">
             <div className="w-full h-full flex items-center justify-center p-4">
               <img
                 src={displayImages[selectedIndex] || "https://via.placeholder.com/500"}
                 alt="Main product"
-                className="object-contain w-full h-full max-h-[450px] transition-transform duration-300 group-hover:scale-105 cursor-zoom-in"
-                onClick={() => setShowZoomModal(true)}
+                className={`object-contain w-full h-full max-h-[450px] transition-transform duration-300 ${
+                  isMobile ? "cursor-zoom-in" : "cursor-default"
+                }`}
+                onClick={() => isMobile && setShowZoomModal(true)}
               />
             </div>
 
+            {/* Desktop navigation arrows still allowed */}
             {displayImages.length > 1 && (
               <>
                 <button
@@ -166,20 +172,12 @@ const ProductGallery = ({ images = [], brandLogo }) => {
                 {selectedIndex + 1} / {displayImages.length}
               </div>
             )}
-
-            {/* Zoom Button */}
-            <button
-              onClick={() => setShowZoomModal(true)}
-              className="absolute top-4 right-4 bg-white/90 hover:bg-white rounded-full p-2 shadow-lg border border-gray-200 transition-all opacity-0 group-hover:opacity-100 hover:scale-110 z-10"
-            >
-              <Maximize2 size={20} className="text-gray-700" />
-            </button>
           </div>
         </div>
       )}
 
-      {/* Zoom Modal */}
-      {showZoomModal && (
+      {/* Zoom Modal ONLY FOR MOBILE */}
+      {isMobile && showZoomModal && (
         <div
           className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
           onClick={() => setShowZoomModal(false)}
@@ -193,7 +191,7 @@ const ProductGallery = ({ images = [], brandLogo }) => {
               alt="Zoomed product"
               className="max-w-full max-h-full object-contain"
             />
-            
+
             {displayImages.length > 1 && (
               <>
                 <button
@@ -202,19 +200,20 @@ const ProductGallery = ({ images = [], brandLogo }) => {
                 >
                   <ChevronLeft size={24} className="text-gray-700" />
                 </button>
+
                 <button
                   onClick={nextImage}
                   className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg border border-gray-200 transition-all z-20"
                 >
                   <ChevronRight size={24} className="text-gray-700" />
                 </button>
-                
+
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm">
                   {selectedIndex + 1} / {displayImages.length}
                 </div>
               </>
             )}
-            
+
             <button
               onClick={() => setShowZoomModal(false)}
               className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white rounded-full p-3 transition-all hover:scale-110"
