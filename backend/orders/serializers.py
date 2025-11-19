@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Order, OrderItem
-from attributes.user_serializers import ProductVariantListSerializer
+from attributes.serializers import ProductVariantListSerializer
+from decimal import Decimal
 
 class OrderItemSerializer(serializers.ModelSerializer):
     variant = ProductVariantListSerializer(read_only=True)
