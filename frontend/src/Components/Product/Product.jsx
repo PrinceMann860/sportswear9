@@ -1,10 +1,9 @@
-// Product.jsx (listing page) — fixed-filters + server-filtered version
+// FULL UPDATED PRODUCT.JSX WITH SKELETON LOADERS
 import React, { useState, useEffect, useMemo } from "react";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchProducts,
-  // selectors not used here because we directly read state.product
 } from "./productslice";
 import {
   fetchHomepageLevels,
@@ -12,33 +11,18 @@ import {
   selectHomepageLoading,
   selectHomepageError,
 } from "../Home/HomePageSlice";
-import { Filter, SlidersHorizontal, X } from "lucide-react";
+import { Filter, X, Search, ChevronDown, ChevronUp } from "lucide-react";
 import banner from "../../assets/productbanner.png";
 import LandscapeCarousel from "../Banner&Carousels/LandscapeCarousel";
 
-// fallback banners/homepage (unchanged)
+// fallback banners (unchanged)
 const fallbackBanners = [
-  {
-    id: 1,
-    image:
-      "https://contents.mediadecathlon.com/s1320107/k$c54604171dd875f3b0ea65cd781b3827/defaut.jpg?format=auto&quality=70&f=1920x0",
-  },
-  {
-    id: 2,
-    image:
-      "https://contents.mediadecathlon.com/s1319184/k$8f796bb36f174a5def19954deb82ea21/defaut.jpg?format=auto&quality=70&f=1920x0",
-  },
-  {
-    id: 3,
-    image:
-      "https://contents.mediadecathlon.com/s1319183/k$49524bae0ca31288ebeece35e8592f5d/defaut.jpg?format=auto&quality=70&f=1920x0",
-  },
-];
-const fallbackHomepageData = [
-  /* omitted for brevity — keep your existing fallback data if used */
+  { id: 1, image: "https://contents.mediadecathlon.com/s1320107/k$c54604171dd875f3b0ea65cd781b3827/defaut.jpg?format=auto&quality=70&f=1920x0" },
+  { id: 2, image: "https://contents.mediadecathlon.com/s1319184/k$8f796bb36f174a5def19954deb82ea21/defaut.jpg?format=auto&quality=70&f=1920x0" },
+  { id: 3, image: "https://contents.mediadecathlon.com/s1319183/k$49524bae0ca31288ebeece35e8592f5d/defaut.jpg?format=auto&quality=70&f=1920x0" },
 ];
 
-// ProductCard and skeleton (unchanged, exactly as you had)
+// Product Card
 function ProductCard({ product }) {
   const rating = product.rating?.rate || 4.5;
   const count = product.rating?.count || 100;
@@ -48,15 +32,17 @@ function ProductCard({ product }) {
       <div className="relative max-w-[300px] bg-white overflow-hidden border border-gray-200 hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col rounded-lg">
         <div className="group relative w-full h-46 md:h-54 lg:h-70 flex items-center justify-center bg-gray-50">
           {product.isFeatured && (
-            <div className="absolute bg-yellow-400 text-black text-xs font-bold px-2 py-1 top-0 left-0 shadow">
+            <div className="absolute bg-yellow-400 text-black text-xs font-bold px-2 py-1 top-0 left-0 shadow z-10">
               FEATURED
             </div>
           )}
+
           <img
             src={product.img}
             alt={product.title}
             className="absolute w-full h-full object-fill transition-opacity duration-500 group-hover:opacity-0"
           />
+
           {product.img2 && (
             <img
               src={product.img2}
@@ -76,9 +62,8 @@ function ProductCard({ product }) {
           <p className="font-bold text-gray-900 uppercase">
             {typeof product.brand === "object" ? product.brand?.name : product.brand}
           </p>
-          <h3 className="font-semibold text-gray-900 line-clamp-2 mt-1">
-            {product.title}
-          </h3>
+          <h3 className="font-semibold text-gray-900 line-clamp-2 mt-1">{product.title}</h3>
+
           <div className="mt-1 flex items-center gap-2">
             <p className="text-lg font-bold text-gray-900">{product.price}</p>
             <p className="text-sm text-gray-500">
@@ -96,77 +81,375 @@ function ProductCard({ product }) {
   );
 }
 
-function ProductCardSkeleton() {
+// Skeleton Product Card
+function SkeletonProductCard() {
   return (
     <div className="relative max-w-[300px] bg-white overflow-hidden border border-gray-200 flex flex-col rounded-lg animate-pulse">
-      <div className="w-full h-46 md:h-54 lg:h-70 bg-gray-300 flex items-center justify-center"></div>
-      <div className="flex justify-between px-4 pt-3">
-        <div className="h-4 w-20 bg-gray-300 rounded"></div>
-        <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
+      <div className="w-full h-46 md:h-54 lg:h-70 bg-gray-300 flex items-center justify-center">
+        <div className="w-full h-full bg-gray-300"></div>
       </div>
-      <div className="px-4 text-start flex flex-col flex-grow min-h-[120px] space-y-2 pt-2">
-        <div className="h-3 w-16 bg-gray-300 rounded"></div>
-        <div className="h-4 w-32 bg-gray-300 rounded"></div>
-        <div className="space-y-1">
-          <div className="h-5 w-20 bg-gray-300 rounded"></div>
-          <div className="h-3 w-24 bg-gray-300 rounded"></div>
+
+      <div className="relative bottom-11 left-2">
+        <div className="flex p-2 text-sm font-semibold bg-gray-300 w-16 h-6 rounded"></div>
+      </div>
+
+      <div className="mt-[-22px] px-4 text-start flex flex-col flex-grow min-h-[120px] space-y-2 py-2">
+        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+        <div className="h-4 bg-gray-300 rounded w-full"></div>
+        <div className="h-4 bg-gray-300 rounded w-2/3"></div>
+        
+        <div className="mt-2 flex items-center gap-2">
+          <div className="h-6 bg-gray-300 rounded w-1/3"></div>
+          <div className="h-4 bg-gray-300 rounded w-1/4"></div>
         </div>
       </div>
-      <div className="w-[95%] mx-auto py-2 my-2 bg-gray-300 rounded"></div>
+
+      <div className="w-[95%] mx-auto py-2 my-2 bg-gray-300 rounded h-10"></div>
     </div>
   );
 }
 
-// Transform API → UI product (keeps your mapping)
+// Skeleton Banner
+function SkeletonBanner() {
+  return (
+    <div className="mb-10 animate-pulse">
+      <div className="w-full h-64 bg-gray-300 rounded-xl"></div>
+    </div>
+  );
+}
+
+// Skeleton Filter Section
+function SkeletonFilterSection() {
+  return (
+    <div className="w-full lg:w-64 bg-white p-4 rounded-lg border border-gray-200 h-fit sticky top-4 animate-pulse">
+      <div className="flex justify-between items-center mb-4">
+        <div className="h-6 bg-gray-300 rounded w-20"></div>
+        <div className="h-4 bg-gray-300 rounded w-16"></div>
+      </div>
+
+      {/* Search Skeleton */}
+      <div className="mb-6">
+        <div className="w-full h-10 bg-gray-300 rounded-lg"></div>
+      </div>
+
+      {/* Brand Filter Skeleton */}
+      <div className="mb-6 border-b border-gray-200 pb-4">
+        <div className="h-5 bg-gray-300 rounded w-16 mb-2"></div>
+        <div className="w-full h-8 bg-gray-300 rounded"></div>
+      </div>
+
+      {/* Price Range Skeleton */}
+      <div className="mb-6 border-b border-gray-200 pb-4">
+        <div className="h-5 bg-gray-300 rounded w-24 mb-2"></div>
+        <div className="flex gap-2">
+          <div className="w-1/2 h-8 bg-gray-300 rounded"></div>
+          <div className="w-1/2 h-8 bg-gray-300 rounded"></div>
+        </div>
+      </div>
+
+      {/* Discount Range Skeleton */}
+      <div className="mb-6 border-b border-gray-200 pb-4">
+        <div className="h-5 bg-gray-300 rounded w-28 mb-2"></div>
+        <div className="flex gap-2">
+          <div className="w-1/2 h-8 bg-gray-300 rounded"></div>
+          <div className="w-1/2 h-8 bg-gray-300 rounded"></div>
+        </div>
+      </div>
+
+      {/* Product Status Skeleton */}
+      <div className="mb-6 border-b border-gray-200 pb-4">
+        <div className="h-5 bg-gray-300 rounded w-24 mb-2"></div>
+        <div className="space-y-3">
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-gray-300 rounded mr-3"></div>
+            <div className="h-4 bg-gray-300 rounded w-24"></div>
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-gray-300 rounded mr-3"></div>
+            <div className="h-4 bg-gray-300 rounded w-20"></div>
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-gray-300 rounded mr-3"></div>
+            <div className="h-4 bg-gray-300 rounded w-16"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sorting Skeleton */}
+      <div className="mb-6">
+        <div className="h-5 bg-gray-300 rounded w-16 mb-2"></div>
+        <div className="w-full h-8 bg-gray-300 rounded"></div>
+      </div>
+
+      {/* Apply Button Skeleton */}
+      <div className="w-full h-12 bg-gray-300 rounded-lg"></div>
+    </div>
+  );
+}
+
+// transform API → UI
 const transformProductData = (apiProduct) => ({
   id: apiProduct.product_uuid,
   product_uuid: apiProduct.product_uuid,
   title: apiProduct.name,
-  price: apiProduct.price ? String(apiProduct.price) : `₹${apiProduct.net || apiProduct.price}`,
+  price: apiProduct.price || `₹${apiProduct.net}`,
   original: apiProduct.original || "",
   discount: apiProduct.discount || "",
   brand: apiProduct.brand,
   category: apiProduct.category?.name || "Uncategorized",
-  img:
-    
-       `http://127.0.0.1:8000${apiProduct.img}`
-      || "https://static.nike.com/a/images/t_PDP_936_v1/f_auto,q_auto:eco/022814da-3098-4c8e-b6f9-3692dc1b4207/W+FLEX+EXPERIENCE+RN+12.png",
-  img2:
-     `http://127.0.0.1:8000${apiProduct.img2}`
-    || "https://acrossports.s3.amazonaws.com/productPhotos/NIKE/DV0746004/DV0746004_6.jpg",
-  rating: {
-    rate: apiProduct.average_rating || 4.5,
-    count: 120,
-  },
+  img: apiProduct.img ? `http://127.0.0.1:8000${apiProduct.img}` : "",
+  img2: apiProduct.img2 ? `http://127.0.0.1:8000${apiProduct.img2}` : "",
+  rating: { rate: apiProduct.average_rating || 4.5, count: 120 },
   isFeatured: apiProduct.is_featured,
 });
 
-// -----------------------
-// FIXED FILTER LISTS (from you)
-// -----------------------
-const FIXED_BRANDS = [
-  "All",
-  "Gymific",
-  "KyK",
-  "NeverLose",
-  "Ninq",
-  "Sportsinger",
-  "Train Hard",
-  "U",
-  "WMX",
-  "Work for it",
-];
+const FIXED_BRANDS = ["All", "Gymific", "KyK", "NeverLose", "Ninq", "Sportsinger", "Train Hard", "U", "WMX", "Work for it"];
 
+// Filter Section Component
+function FilterSection({ 
+  searchTerm, 
+  setSearchTerm, 
+  selectedBrand, 
+  setSelectedBrand, 
+  priceRange, 
+  setPriceRange, 
+  discountRange, 
+  setDiscountRange, 
+  filters, 
+  setFilters, 
+  sortBy, 
+  setSortBy, 
+  applyFilters, 
+  clearFilters,
+  showMobileFilters,
+  setShowMobileFilters 
+}) {
+  const [expandedSections, setExpandedSections] = useState({
+    brand: true,
+    price: true,
+    discount: true,
+    status: true,
+    sort: true
+  });
 
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
 
+  return (
+    <>
+      {/* Mobile Filter Toggle */}
+      <div className="lg:hidden mb-4">
+        <button
+          onClick={() => setShowMobileFilters(!showMobileFilters)}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition w-full justify-center"
+        >
+          <Filter className="w-4 h-4" />
+          {showMobileFilters ? "Hide Filters" : "Show Filters"}
+        </button>
+      </div>
 
+      {/* Filter Sidebar */}
+      <div className={`
+        ${showMobileFilters ? 'block' : 'hidden'} 
+        lg:block w-full lg:w-64 bg-white p-4 rounded-lg border border-gray-200 h-fit sticky top-4
+      `}>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-bold">Filters</h2>
+          <button
+            onClick={clearFilters}
+            className="text-sm text-blue-600 hover:text-blue-800"
+          >
+            Clear All
+          </button>
+        </div>
+
+        {/* Search */}
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        {/* Brand Filter */}
+        <div className="mb-6 border-b border-gray-200 pb-4">
+          <button
+            onClick={() => toggleSection('brand')}
+            className="flex justify-between items-center w-full mb-2 font-semibold text-gray-900"
+          >
+            <span>Brand</span>
+            {expandedSections.brand ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+          {expandedSections.brand && (
+            <select
+              value={selectedBrand}
+              onChange={(e) => setSelectedBrand(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded text-sm"
+            >
+              {FIXED_BRANDS.map(brand => (
+                <option key={brand} value={brand}>{brand}</option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        {/* Price Range */}
+        <div className="mb-6 border-b border-gray-200 pb-4">
+          <button
+            onClick={() => toggleSection('price')}
+            className="flex justify-between items-center w-full mb-2 font-semibold text-gray-900"
+          >
+            <span>Price Range</span>
+            {expandedSections.price ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+          {expandedSections.price && (
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  placeholder="Min ₹"
+                  value={priceRange.min}
+                  onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
+                  className="w-1/2 p-2 border border-gray-300 rounded text-sm"
+                />
+                <input
+                  type="number"
+                  placeholder="Max ₹"
+                  value={priceRange.max}
+                  onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
+                  className="w-1/2 p-2 border border-gray-300 rounded text-sm"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Discount Range */}
+        <div className="mb-6 border-b border-gray-200 pb-4">
+          <button
+            onClick={() => toggleSection('discount')}
+            className="flex justify-between items-center w-full mb-2 font-semibold text-gray-900"
+          >
+            <span>Discount Range</span>
+            {expandedSections.discount ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+          {expandedSections.discount && (
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  placeholder="Min %"
+                  value={discountRange.min}
+                  onChange={(e) => setDiscountRange(prev => ({ ...prev, min: e.target.value }))}
+                  className="w-1/2 p-2 border border-gray-300 rounded text-sm"
+                />
+                <input
+                  type="number"
+                  placeholder="Max %"
+                  value={discountRange.max}
+                  onChange={(e) => setDiscountRange(prev => ({ ...prev, max: e.target.value }))}
+                  className="w-1/2 p-2 border border-gray-300 rounded text-sm"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Product Status */}
+        <div className="mb-6 border-b border-gray-200 pb-4">
+          <button
+            onClick={() => toggleSection('status')}
+            className="flex justify-between items-center w-full mb-2 font-semibold text-gray-900"
+          >
+            <span>Product Status</span>
+            {expandedSections.status ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+          {expandedSections.status && (
+            <div className="space-y-3">
+              <label className="flex items-center text-sm">
+                <input
+                  type="checkbox"
+                  checked={filters.is_new}
+                  onChange={(e) => setFilters(prev => ({ ...prev, is_new: e.target.checked }))}
+                  className="mr-3 w-4 h-4 text-blue-600"
+                />
+                New Arrivals
+              </label>
+              <label className="flex items-center text-sm">
+                <input
+                  type="checkbox"
+                  checked={filters.is_featured}
+                  onChange={(e) => setFilters(prev => ({ ...prev, is_featured: e.target.checked }))}
+                  className="mr-3 w-4 h-4 text-blue-600"
+                />
+                Featured
+              </label>
+              <label className="flex items-center text-sm">
+                <input
+                  type="checkbox"
+                  checked={filters.is_popular}
+                  onChange={(e) => setFilters(prev => ({ ...prev, is_popular: e.target.checked }))}
+                  className="mr-3 w-4 h-4 text-blue-600"
+                />
+                Popular
+              </label>
+            </div>
+          )}
+        </div>
+
+        {/* Sorting */}
+        <div className="mb-6">
+          <button
+            onClick={() => toggleSection('sort')}
+            className="flex justify-between items-center w-full mb-2 font-semibold text-gray-900"
+          >
+            <span>Sort By</span>
+            {expandedSections.sort ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+          {expandedSections.sort && (
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded text-sm"
+            >
+              <option value="">Default</option>
+              <option value="price">Price: Low to High</option>
+              <option value="-price">Price: High to Low</option>
+              <option value="-created_at">Newest First</option>
+              <option value="created_at">Oldest First</option>
+            </select>
+          )}
+        </div>
+
+        {/* Apply Filters Button */}
+        <button
+          onClick={applyFilters}
+          className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+        >
+          Apply Filters
+        </button>
+      </div>
+    </>
+  );
+}
+
+// ⬇️ MAIN COMPONENT WITH SKELETON LOADERS
 function Product() {
   const dispatch = useDispatch();
   const { "*": path } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
-  // selectors from slice (state key is `product`)
   const apiProductsState = useSelector((state) => state.product?.products ?? []);
   const loading = useSelector((state) => state.product?.loading ?? false);
   const error = useSelector((state) => state.product?.error ?? null);
@@ -175,301 +458,291 @@ function Product() {
   const homepageLoading = useSelector(selectHomepageLoading);
   const homepageError = useSelector(selectHomepageError);
 
-  // UI state
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  // Filter states
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedBrand, setSelectedBrand] = useState("All");
+  const [priceRange, setPriceRange] = useState({ min: "", max: "" });
+  const [discountRange, setDiscountRange] = useState({ min: "", max: "" });
+  const [filters, setFilters] = useState({
+    is_new: false,
+    is_featured: false,
+    is_popular: false,
+  });
+  const [sortBy, setSortBy] = useState("");
 
-  // initialize from URL params if present
   const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
-  const initialCategory = params.get("category") || "All";
-  const initialBrand = params.get("brand") || "All";
-  const initialMaxPrice = params.get("max_price") ? Number(params.get("max_price")) : 5000;
-  const initialOrdering = params.get("ordering") || "relevance";
 
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [selectedBrand, setSelectedBrand] = useState(initialBrand);
-  const [priceRange, setPriceRange] = useState(initialMaxPrice);
-  const [sortOption, setSortOption] = useState(
-    initialOrdering === "price"
-      ? "priceLowToHigh"
-      : initialOrdering === "-price"
-      ? "priceHighToLow"
-      : "relevance"
-  );
-
-  // Build activePath (your original logic)
   const activePath = useMemo(() => {
-    if (location.pathname === "/sports") return "sports";
     if (!path) return "all";
     return path.toLowerCase();
-  }, [path, location.pathname]);
+  }, [path]);
 
-  // When filters / sort / path change -> dispatch fetchProducts with backend params
-  useEffect(() => {
-    const filters = {};
+  // Apply filters and fetch products
+  const applyFilters = () => {
+    const filterParams = {};
 
-    // category: send name only (or keep 'All' to not send)
-    if (selectedCategory && selectedCategory !== "All") {
-      filters.category = selectedCategory;
-    }
+    // Gender filter from URL path
+    if (activePath.includes("men")) filterParams.gender = "men";
+    else if (activePath.includes("women")) filterParams.gender = "women";
+    else if (activePath.includes("kids")) filterParams.gender = "kids";
 
-    // brand: send brand name
+    // Search filter
+    if (searchTerm) filterParams.search = searchTerm;
+
+    // Brand filter
     if (selectedBrand && selectedBrand !== "All") {
-      filters.brand = selectedBrand;
+      filterParams.brand = selectedBrand;
     }
 
-    // price: send max_price
-    if (priceRange !== undefined && priceRange !== null) {
-      filters.max_price = Number(priceRange);
-    }
+    // Price range
+    if (priceRange.min) filterParams.min_price = priceRange.min;
+    if (priceRange.max) filterParams.max_price = priceRange.max;
 
-    // sort mapping to ordering param
-    if (sortOption === "priceLowToHigh") filters.ordering = "price";
-    else if (sortOption === "priceHighToLow") filters.ordering = "-price";
-    else filters.ordering = "-created_at"; // relevance => latest
+    // Discount range
+    if (discountRange.min) filterParams.min_disc = discountRange.min;
+    if (discountRange.max) filterParams.max_disc = discountRange.max;
 
-    // path special cases: new-drops -> is_new
-    if (
-      activePath.includes("new-drops") ||
-      activePath.includes("new-arrivals") ||
-      activePath.includes("new-in")
-    ) {
-      filters.is_new = true;
-    }
-
-    // If path appears to be a category slug (not 'all' or 'sports'), send as category too (only if user hasn't explicitly selected)
-    if (
-      activePath !== "all" &&
-      activePath !== "sports" &&
-      !activePath.includes("new") &&
-      (!selectedCategory || selectedCategory === "All")
-    ) {
-      filters.category = activePath;
-    }
-
-    // Update URL search params (reflect current filters)
-    const paramsObj = new URLSearchParams();
-    Object.entries(filters).forEach(([k, v]) => {
-      paramsObj.set(k, String(v));
+    // Boolean filters
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value) filterParams[key] = "true";
     });
-    // Keep the pathname same and update only search
-    navigate({ pathname: location.pathname, search: paramsObj.toString() }, { replace: true });
 
-    // Dispatch fetch
-    dispatch(fetchProducts(filters));
-  }, [
-    dispatch,
-    selectedCategory,
-    selectedBrand,
-    priceRange,
-    sortOption,
-    activePath,
-    navigate,
-    location.pathname,
-  ]);
+    // Sorting
+    if (sortBy) filterParams.ordering = sortBy;
 
-  // Transform server products into UI product objects safely
+    console.log("🔄 Applying filters:", filterParams);
+    dispatch(fetchProducts(filterParams));
+    
+    // Close mobile filters after applying
+    setShowMobileFilters(false);
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSelectedBrand("All");
+    setPriceRange({ min: "", max: "" });
+    setDiscountRange({ min: "", max: "" });
+    setFilters({
+      is_new: false,
+      is_featured: false,
+      is_popular: false,
+    });
+    setSortBy("");
+    
+    // Fetch all products without filters
+    const genderFilter = activePath.includes("men") ? { gender: "men" } 
+      : activePath.includes("women") ? { gender: "women" } 
+      : activePath.includes("kids") ? { gender: "kids" } 
+      : {};
+    
+    dispatch(fetchProducts(genderFilter));
+  };
+
+  // Fetch products when component mounts or path changes
+  useEffect(() => {
+    const genderFilter = activePath.includes("men") ? { gender: "men" } 
+      : activePath.includes("women") ? { gender: "women" } 
+      : activePath.includes("kids") ? { gender: "kids" } 
+      : {};
+    
+    dispatch(fetchProducts(genderFilter));
+    dispatch(fetchHomepageLevels());
+  }, [dispatch, activePath]);
+
   const products = useMemo(() => {
-    const arr = Array.isArray(apiProductsState) ? apiProductsState : [];
-    return arr.map(transformProductData);
+    return Array.isArray(apiProductsState)
+      ? apiProductsState.map(transformProductData)
+      : [];
   }, [apiProductsState]);
 
-  // extract banners from homepageData (unchanged from your code)
-  const getBannerData = () => {
-    const dataToUse = homepageData && homepageData.length > 0 ? homepageData : fallbackHomepageData;
-    if (!dataToUse || !dataToUse[0]?.sections) return fallbackBanners;
-    const level = dataToUse[0];
-    const carouselSections = level.sections.filter((sec) => sec.section_type === "floor-1");
-    if (carouselSections.length > 0) {
-      const carouselSection = carouselSections[0];
-      return carouselSection.items.map((item) => ({ id: item.item_uuid, image: item.image, title: item.title, link: item.link }));
+  // --- DEBUG: Check homepage data structure ---
+  useEffect(() => {
+    console.log("🏠 Homepage Data:", homepageData);
+    console.log("🔍 Active Path:", activePath);
+  }, [homepageData, activePath]);
+
+  // --- FIXED BANNER FILTERING LOGIC ---
+  const getProductSection = () => {
+    if (!homepageData || homepageData.length === 0) {
+      console.log("❌ No homepage data found");
+      return [];
     }
-    return fallbackBanners;
+
+    // Find the level with name "product section" (case insensitive)
+    const level = homepageData.find(
+      (lvl) => lvl.name?.toLowerCase().includes("product section")
+    );
+    
+    if (!level) {
+      console.log("❌ No 'product section' level found in homepage data");
+      console.log("Available levels:", homepageData.map(l => l.name));
+      return [];
+    }
+
+    console.log("✅ Found product section:", level);
+    return level.sections || [];
   };
-  const bannerItems = getBannerData();
 
-  // Use fixed filters instead of deriving from products
-  const categories = useMemo(() => {
-  const arr = Array.isArray(apiProductsState) ? apiProductsState : [];
+  const productSections = getProductSection();
 
-  const unique = [
-    ...new Set(
-      arr
-        .map((p) => p?.category?.name || p?.category || null)
-        .filter(Boolean)
-    ),
-  ];
+  // --- IMPROVED GENDER HANDLING LOGIC ---
+  const genderKey = useMemo(() => {
+  const segments = activePath.split("/");
 
-  return ["All", ...unique];
-}, [apiProductsState]);
+  if (segments.includes("men")) return "men";
+  if (segments.includes("women")) return "women";
+  if (segments.includes("kids")) return "kids";
 
-  const brands = useMemo(() => FIXED_BRANDS, []);
+  return null;
+}, [activePath]);
 
-  // displayedProducts is server filtered
-  const displayedProducts = products;
 
-  if (loading || homepageLoading)
-    return (
-      <div className="mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-16 lg:py-20 bg-gray-50 animate-pulse">
-        {/* skeletons unchanged */}
-        <div className="mb-10">
-          <div className="w-full h-48 md:h-64 lg:h-80 bg-gray-300 rounded-xl"></div>
-        </div>
-        <div className="mb-6">
-          <div className="h-8 w-64 bg-gray-300 rounded mb-2"></div>
-          <div className="h-4 w-32 bg-gray-300 rounded"></div>
-        </div>
-        <div className="flex flex-col md:flex-row gap-8">
-          <aside className="hidden md:block md:w-1/4 lg:w-1/5 border border-gray-200 rounded-xl p-4">
-            <div className="h-6 w-20 bg-gray-300 rounded mb-4"></div>
-          </aside>
-          <main className="flex-1">
-            <div className="flex items-center justify-between mb-4 border-b pb-3">
-              <div className="md:hidden h-8 w-20 bg-gray-300 rounded"></div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-gray-300 rounded"></div>
-                <div className="h-8 w-40 bg-gray-300 rounded"></div>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {[1,2,3,4,5,6,7,8,9,10].map(i => <ProductCardSkeleton key={i} />)}
-            </div>
-          </main>
-        </div>
-      </div>
-    );
+  const genderBannerItems = useMemo(() => {
+    if (!productSections || productSections.length === 0) {
+      console.log("❌ No product sections found, using fallback banners");
+      return fallbackBanners;
+    }
 
+    console.log("📋 Available sections:", productSections.map(s => s.title));
+
+    // If gender is present → return only that section
+    if (genderKey) {
+      // Try exact match first
+      let match = productSections.find(
+        (sec) => sec.title?.toLowerCase() === genderKey
+      );
+
+      // If no exact match, try partial match
+      if (!match) {
+        match = productSections.find(
+          (sec) => sec.title?.toLowerCase().includes(genderKey)
+        );
+      }
+
+      // If still no match, try with 's' suffix
+      if (!match) {
+        match = productSections.find(
+          (sec) => sec.title?.toLowerCase().includes(genderKey + 's')
+        );
+      }
+
+      console.log(`🎯 Gender '${genderKey}' match:`, match);
+      return match ? match.items : [];
+    }
+
+    // No gender → return ALL banners from product section
+    console.log("🌐 No gender filter, showing all banners");
+    const allItems = productSections.flatMap((sec) => sec.items || []);
+    return allItems.length > 0 ? allItems : fallbackBanners;
+  }, [productSections, genderKey]);
+
+  // Debug banner items
+  useEffect(() => {
+    console.log("🖼️ Final banner items to display:", genderBannerItems);
+  }, [genderBannerItems]);
+
+  // Show loading state
   if (error)
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center">
-        <p className="text-red-500 mb-4">Error: {error}</p>
-        <button onClick={() => dispatch(fetchProducts())} className="px-4 py-2 bg-blue-600 text-white rounded-lg">
-          Retry
-        </button>
-      </div>
-    );
+    return <div className="p-10 text-red-500 text-center">Error: {error}</div>;
 
   return (
-    <div className="mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-16 lg:py-20 bg-gray-50">
-      {/* Hero Carousel */}
-      <div className="mb-10">
-        <LandscapeCarousel items={bannerItems} />
-      </div>
-
-      {/* Page Title */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          {activePath === "sports" ? "Sports & Lifestyle" : activePath === "all" ? "All Products" : activePath.split("/").map(part => part.split("-").map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(" ")).join(" → ")}
-        </h1>
-        <p className="text-gray-600">
-          Showing {displayedProducts.length} products
-          {(activePath.includes("new-drops") || activePath.includes("new-arrivals") || activePath.includes("new-in")) && (
-            <span className="text-blue-600 font-medium"> {" • Latest Arrivals"}</span>
-          )}
-        </p>
-      </div>
-
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Sidebar Filters */}
-        <aside className={`${filtersOpen ? "fixed inset-0 bg-white z-50 p-6 overflow-y-auto" : "hidden md:block md:w-1/4 lg:w-1/5"} border border-gray-200 rounded-xl md:p-4`}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg">Filters</h3>
-            <button className="md:hidden text-gray-500" onClick={() => setFiltersOpen(false)}>
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Category Filter */}
-          <div className="mb-6">
-            <h4 className="font-medium text-gray-700 mb-2">Category</h4>
-            <div className="space-y-1">
-              {categories.map((cat) => (
-                <label key={cat} className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input
-                    type="radio"
-                    name="category"
-                    value={cat}
-                    checked={selectedCategory === cat}
-                    onChange={() => setSelectedCategory(cat)}
-                    className="accent-blue-600"
-                  />
-                  {cat}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Brand Filter */}
-          <div className="mb-6">
-            <h4 className="font-medium text-gray-700 mb-2">Brand</h4>
-            <div className="space-y-1">
-              {brands.map((b) => (
-                <label key={b} className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input
-                    type="radio"
-                    name="brand"
-                    value={b}
-                    checked={selectedBrand === b}
-                    onChange={() => setSelectedBrand(b)}
-                    className="accent-blue-600"
-                  />
-                  {b}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Price Filter */}
-          <div>
-            <h4 className="font-medium text-gray-700 mb-2">Price Range</h4>
-            <input
-              type="range"
-              min="0"
-              max="5000"
-              value={priceRange}
-              onChange={(e) => setPriceRange(Number(e.target.value))}
-              className="w-full accent-blue-600"
+    <div className="mx-auto mt-10 px-4 sm:px-8 md:px-12 lg:px-16 py-16 bg-gray-50">
+      {/* Skeleton Banner or Actual Banner */}
+      {homepageLoading ? (
+        <SkeletonBanner />
+      ) : (
+        genderBannerItems && genderBannerItems.length > 0 && (
+          <div className="mb-10">
+            <LandscapeCarousel
+              items={genderBannerItems.map((i) => ({ 
+                id: i.item_uuid || i.id, 
+                image: i.image 
+              }))}
             />
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>₹0</span>
-              <span>₹{priceRange}</span>
-            </div>
           </div>
-        </aside>
+        )
+      )}
 
-        {/* Main Product Grid */}
-        <main className="flex-1">
-          <div className="flex items-center justify-between mb-4 border-b pb-3">
-            <button className="md:hidden flex items-center gap-2 text-sm font-medium border border-gray-300 px-3 py-1.5 rounded-lg" onClick={() => setFiltersOpen(true)}>
-              <Filter className="w-4 h-4" /> Filters
-            </button>
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">
+          {genderKey ? `${genderKey.toUpperCase()} PRODUCTS` : "ALL PRODUCTS"}
+        </h1>
+        {!loading && (
+          <p className="text-gray-600">Showing {products.length} products</p>
+        )}
+      </div>
 
-            <div className="flex items-center gap-2 text-sm">
-              <SlidersHorizontal className="w-4 h-4 text-gray-500" />
-              <select value={sortOption} onChange={(e) => setSortOption(e.target.value)} className="border border-gray-300 rounded-lg px-2 py-1 focus:outline-none">
-                <option value="relevance">Sort by Relevance</option>
-                <option value="priceLowToHigh">Price: Low to High</option>
-                <option value="priceHighToLow">Price: High to Low</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Product Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {displayedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-
-          {displayedProducts.length === 0 && (
-            <div className="text-center py-20 text-gray-500">No products found matching your filters.</div>
+      {/* Main Content with Sidebar Layout */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Left Sidebar - Filters */}
+        <div className="lg:w-64 flex-shrink-0">
+          {loading ? (
+            <SkeletonFilterSection />
+          ) : (
+            <FilterSection
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              selectedBrand={selectedBrand}
+              setSelectedBrand={setSelectedBrand}
+              priceRange={priceRange}
+              setPriceRange={setPriceRange}
+              discountRange={discountRange}
+              setDiscountRange={setDiscountRange}
+              filters={filters}
+              setFilters={setFilters}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+              applyFilters={applyFilters}
+              clearFilters={clearFilters}
+              showMobileFilters={showMobileFilters}
+              setShowMobileFilters={setShowMobileFilters}
+            />
           )}
-        </main>
+        </div>
+
+        {/* Right Content - Products */}
+        <div className="flex-1">
+          {/* Skeleton Product Grid or Actual Product Grid */}
+          {loading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <SkeletonProductCard key={index} />
+              ))}
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {products.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+
+              {/* No Products Message */}
+              {products.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 text-lg">No products found matching your filters.</p>
+                  <button
+                    onClick={clearFilters}
+                    className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       {/* Bottom Banner */}
-      <div className="mt-14 rounded-2xl overflow-hidden">
-        <img src={banner} alt="Promo Banner" className="w-full object-cover" />
-      </div>
+      {!loading && (
+        <div className="mt-14 rounded-2xl overflow-hidden">
+          <img src={banner} alt="Promo Banner" className="w-full object-cover" />
+        </div>
+      )}
     </div>
   );
 }

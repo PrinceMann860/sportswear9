@@ -221,7 +221,7 @@ const MobileSidebar = ({ isOpen, onClose, openAuthModal }) => {
                           key={sub}
                           onClick={() =>
                             handleNavigation(
-                              `/category/${category.id}/${sub.toLowerCase()}`
+                              `/product/${category.id}/${sub.toLowerCase()}`
                             )
                           }
                           className="w-full text-left px-8 py-2 text-sm text-gray-700 hover:text-blue-500 hover:bg-white transition-colors"
