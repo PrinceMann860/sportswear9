@@ -1,47 +1,40 @@
-// src/redux/slices/orderSlice.js
-
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 
-// API endpoint
 const PLACE_ORDER_URL = "http://127.0.0.1:8000/api/v1/orders/place_order/";
 
-// -----------------------------
-// Async Thunk
-// -----------------------------
 export const placeOrder = createAsyncThunk(
   "orders/placeOrder",
   async (address_id, { getState, rejectWithValue }) => {
     try {
-      // Get access token from profile slice
-      const token = getState().profile?.accessToken;
+      const token = getState().profile?.accessToken || localStorage.getItem("access_token");
 
       if (!token) {
         return rejectWithValue("User is not authenticated");
       }
 
-      const response = await axios.post(
-        PLACE_ORDER_URL,
-        { address_id },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(PLACE_ORDER_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ address_id }),
+      });
 
-      return response.data; // { message, task_id }
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      return await response.json();
     } catch (error) {
       return rejectWithValue(
-        error.response?.data || error.message || "Something went wrong"
+        error.message || "Something went wrong"
       );
     }
   }
 );
 
-// -----------------------------
-// Slice
-// -----------------------------
 const orderSlice = createSlice({
   name: "orders",
   initialState: {
@@ -64,7 +57,6 @@ const orderSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      // ---- Pending ----
       .addCase(placeOrder.pending, (state) => {
         state.loading = true;
         state.success = false;
@@ -73,7 +65,6 @@ const orderSlice = createSlice({
         state.message = null;
       })
 
-      // ---- Fulfilled ----
       .addCase(placeOrder.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
@@ -81,7 +72,6 @@ const orderSlice = createSlice({
         state.taskId = action.payload?.task_id || null;
       })
 
-      // ---- Rejected ----
       .addCase(placeOrder.rejected, (state, action) => {
         state.loading = false;
         state.success = false;

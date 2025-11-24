@@ -49,7 +49,6 @@ const ProductInfo = () => {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
   const [isSticky, setIsSticky] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
   useEffect(() => {
     if (productId) {
@@ -273,16 +272,7 @@ const ProductInfo = () => {
       });
   };
 
-  const handleWishlistToggle = () => {
-    setIsWishlisted(!isWishlisted);
-    const event = new CustomEvent('showToast', {
-      detail: {
-        message: !isWishlisted ? '❤️ Added to wishlist' : '💔 Removed from wishlist',
-        type: 'success'
-      }
-    });
-    window.dispatchEvent(event);
-  };
+  
 
   // Reference model data based on product type
   const referenceModel = useMemo(() => {
@@ -691,18 +681,7 @@ const ProductInfo = () => {
                   {!SportsWear9Product.inStock ? "Out of Stock" : "Add to Cart"}
                 </button>
 
-                <button
-                  onClick={handleWishlistToggle}
-                  className={`p-3 border-2 rounded-lg transition-colors flex-shrink-0 ${isWishlisted
-                      ? "border-red-500 bg-red-50"
-                      : "border-gray-300 hover:border-blue-300"
-                    }`}
-                >
-                  <Heart
-                    className={`w-5 h-5 sm:w-6 sm:h-6 ${isWishlisted ? "text-red-500 fill-red-500" : "text-gray-600"
-                      }`}
-                  />
-                </button>
+                
               </div>
 
               {/* Stock Status */}

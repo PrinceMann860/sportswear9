@@ -17,7 +17,8 @@ const PopularProductsGrid = ({
     original: product.original,
     discount: product.discount,
     rating: { rate: product.rating, count: product.reviews },
-    category: product.category || ""
+    category: product.category || "",
+    isFeatured: product.is_featured,
   }));
 
   return (

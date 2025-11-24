@@ -1,61 +1,110 @@
-import React, { useState } from 'react';
-import { ArrowLeft, CreditCard, Truck, Shield, MapPin, User, Phone, Mail, Check, Package, RefreshCw } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, CreditCard, Truck, Shield, MapPin, Check, Plus, Trash2, Edit2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAddresses, addAddress, deleteAddress } from '../Profile/Profileslice';
+import { placeOrder, resetOrderState } from './orderSlice';
+import { fetchCartItems } from '../Cart/Cartslice';
 
 const CheckoutPage = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { addresses, loading: addressLoading } = useSelector(state => state.profile);
+  const { loading: orderLoading, success: orderSuccess, error: orderError, message: orderMessage } = useSelector(state => state.order);
+  const { items: cartItems, total_price, subtotal: cartSubtotal, total_items, loading: cartLoading } = useSelector(state => state.cart);
+
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
-    // Shipping Information
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    address: '',
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [showAddAddressForm, setShowAddAddressForm] = useState(false);
+
+  const [newAddress, setNewAddress] = useState({
+    street_address: '',
     city: '',
     state: '',
-    pincode: '',
+    postal_code: '',
     country: 'India',
-    
-    // Payment Information
+    address_type: 'home',
+    is_default: false
+  });
+
+  const [formData, setFormData] = useState({
     paymentMethod: 'card',
     cardNumber: '',
     expiryDate: '',
     cvv: '',
     cardName: '',
-    
-    // UPI
     upiId: '',
-    
-    // Delivery Options
     deliveryOption: 'standard'
   });
 
-  const [orderItems] = useState([
-    {
-      id: 1,
-      name: 'Duramo 10 Running Shoes',
-      image: 'https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/2025/FEBRUARY/3/L7GEjRDH_b510caa934e949b78484e8cfb577804d.jpg',
-      price: 2499,
-      quantity: 1,
-      size: 'UK 9',
-      category: 'Running'
-    },
-    {
-      id: 2,
-      name: 'Compression T-shirt',
-      image: 'https://www.cyclop.in/cdn/shop/files/1_d5b00990-6b2a-4365-849b-084d14380580_1080x.jpg?v=1689009277',
-      price: 1999,
-      quantity: 2,
-      size: 'L',
-      category: 'Training'
-    }
-  ]);
+  // Transform cart items for display - updated to handle nested variant structure
+  const orderItems = cartItems.map(item => {
+    const variant = item.variant || {};
+    const mainImage = variant.images?.find(img => img.is_main) || variant.images?.[0];
+    const sizeAttribute = variant.attributes?.find(attr => 
+      attr.attribute === 'MZ2aiek9kr' || attr.value === 'XS' || attr.value === 'S' || attr.value === 'M' || 
+      attr.value === 'L' || attr.value === 'XL' || attr.value === 'XXL'
+    );
+    const colorAttribute = variant.attributes?.find(attr => 
+      attr.attribute === 'NpPQsJrWak' || attr.meta?.hex
+    );
 
-  const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    return {
+      id: item.cart_item_id,
+      name: mainImage?.alt_text || `Product ${item.cart_name}`,
+      image: mainImage?.image_url || 'https://via.placeholder.com/200x200?text=No+Image',
+      price: Number(variant.effective_price) || Number(variant.price) || 0,
+      quantity: Number(item.quantity),
+      size: sizeAttribute?.value || 'Standard',
+      color: colorAttribute?.value || '',
+      colorHex: colorAttribute?.meta?.hex,
+      subtotal: Number(item.subtotal) || 0
+    };
+  });
+
+  // Calculate prices based on actual cart data
+  const subtotal = Number(cartSubtotal) || orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = subtotal > 2000 ? 0 : 99;
   const tax = Math.round(subtotal * 0.18);
-  const total = subtotal + shipping + tax;
-  const savings = orderItems.reduce((sum, item) => sum + ((item.price * 0.3) * item.quantity), 0); // Estimated savings
+  const total = Number(total_price) || (subtotal + shipping + tax);
+  
+  // Calculate savings based on the difference between price and effective_price
+  const savings = orderItems.reduce((sum, item) => {
+    const variant = cartItems.find(cartItem => cartItem.cart_item_id === item.id)?.variant;
+    if (variant && variant.price && variant.effective_price) {
+      const originalPrice = Number(variant.price);
+      const discountedPrice = Number(variant.effective_price);
+      return sum + ((originalPrice - discountedPrice) * item.quantity);
+    }
+    return sum;
+  }, 0);
+
+  useEffect(() => {
+    dispatch(fetchAddresses());
+    dispatch(fetchCartItems());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (addresses && addresses.length > 0 && !selectedAddressId) {
+      const defaultAddress = addresses.find(addr => addr.is_default);
+      setSelectedAddressId(defaultAddress?.address_id || addresses[0].address_id);
+    }
+  }, [addresses, selectedAddressId]);
+
+  useEffect(() => {
+    if (orderSuccess) {
+      alert(`Order placed successfully! ${orderMessage || ''}`);
+      dispatch(resetOrderState());
+      navigate('/orders');
+    }
+  }, [orderSuccess, orderMessage, dispatch, navigate]);
+
+  useEffect(() => {
+    if (orderError) {
+      alert(`Order failed: ${typeof orderError === 'string' ? orderError : JSON.stringify(orderError)}`);
+    }
+  }, [orderError]);
 
   const handleInputChange = (e) => {
     setFormData({
@@ -64,7 +113,51 @@ const CheckoutPage = () => {
     });
   };
 
+  const handleNewAddressChange = (e) => {
+    setNewAddress({
+      ...newAddress,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleAddAddress = async (e) => {
+    e.preventDefault();
+    try {
+      await dispatch(addAddress(newAddress)).unwrap();
+      setShowAddAddressForm(false);
+      setNewAddress({
+        street_address: '',
+        city: '',
+        state: '',
+        postal_code: '',
+        country: 'India',
+        address_type: 'home',
+        is_default: false
+      });
+      dispatch(fetchAddresses());
+    } catch (error) {
+      alert('Failed to add address: ' + error);
+    }
+  };
+
+  const handleDeleteAddress = async (addressId) => {
+    if (window.confirm('Are you sure you want to delete this address?')) {
+      try {
+        await dispatch(deleteAddress(addressId)).unwrap();
+        if (selectedAddressId === addressId) {
+          setSelectedAddressId(null);
+        }
+      } catch (error) {
+        alert('Failed to delete address: ' + error);
+      }
+    }
+  };
+
   const handleNextStep = () => {
+    if (currentStep === 1 && !selectedAddressId) {
+      alert('Please select or add a delivery address');
+      return;
+    }
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
@@ -76,9 +169,22 @@ const CheckoutPage = () => {
     }
   };
 
-  const handlePlaceOrder = () => {
-    // Handle order placement
-    alert('Order placed successfully!');
+  const handlePlaceOrder = async () => {
+    if (!selectedAddressId) {
+      alert('Please select a delivery address');
+      return;
+    }
+
+    if (orderItems.length === 0) {
+      alert('Your cart is empty');
+      return;
+    }
+
+    try {
+      await dispatch(placeOrder(selectedAddressId)).unwrap();
+    } catch (error) {
+      console.error('Order placement failed:', error);
+    }
   };
 
   const steps = [
@@ -87,10 +193,22 @@ const CheckoutPage = () => {
     { number: 3, title: 'Review', icon: Shield }
   ];
 
+  const selectedAddress = addresses?.find(addr => addr.address_id === selectedAddressId);
+
+  if (cartLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading your cart...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 pt-16 md:pt-20 pb-16 md:pb-0">
       <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
-        {/* Header */}
         <div className="flex items-center gap-3 mb-6 md:mb-8">
           <Link to="/cart" className="p-2 hover:bg-gray-200 rounded-full transition-colors">
             <ArrowLeft size={20} />
@@ -98,7 +216,6 @@ const CheckoutPage = () => {
           <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">Checkout</h1>
         </div>
 
-        {/* Progress Steps - Improved Design */}
         <div className="mb-6 md:mb-8">
           <div className="flex items-center justify-center">
             {steps.map((step, index) => (
@@ -132,180 +249,247 @@ const CheckoutPage = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
-          {/* Main Content */}
           <div className="flex-1">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              {/* Step Headers */}
               <div className="bg-blue-50 px-4 md:px-6 py-4 border-b border-blue-100">
                 <h2 className="text-lg md:text-xl font-bold text-blue-900 flex items-center gap-2">
-                  {currentStep === 1 && <><Truck size={20} /> Shipping Information</>}
+                  {currentStep === 1 && <><Truck size={20} /> Delivery Address</>}
                   {currentStep === 2 && <><CreditCard size={20} /> Payment Method</>}
                   {currentStep === 3 && <><Shield size={20} /> Review Order</>}
                 </h2>
               </div>
-              
+
               <div className="p-4 md:p-6">
-                {/* Step 1: Shipping Information */}
                 {currentStep === 1 && (
                   <div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
-                        <input
-                          type="text"
-                          name="firstName"
-                          value={formData.firstName}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
-                        <input
-                          type="text"
-                          name="lastName"
-                          value={formData.lastName}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-                        <input
-                          type="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
-                        <input
-                          type="tel"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                          required
-                        />
-                      </div>
-
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Address *</label>
-                        <input
-                          type="text"
-                          name="address"
-                          value={formData.address}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
-                        <input
-                          type="text"
-                          name="city"
-                          value={formData.city}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
-                        <input
-                          type="text"
-                          name="state"
-                          value={formData.state}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">PIN Code *</label>
-                        <input
-                          type="text"
-                          name="pincode"
-                          value={formData.pincode}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
-                        <select
-                          name="country"
-                          value={formData.country}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                        >
-                          <option value="India">India</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    {/* Delivery Options */}
-                    <div className="mt-6 md:mt-8">
-                      <h3 className="text-base md:text-lg font-semibold mb-4">Delivery Options</h3>
-                      <div className="space-y-3">
-                        <label className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
-                          <input
-                            type="radio"
-                            name="deliveryOption"
-                            value="standard"
-                            checked={formData.deliveryOption === 'standard'}
-                            onChange={handleInputChange}
-                            className="mr-4 text-blue-600 focus:ring-blue-500"
-                          />
-                          <div className="flex-1">
-                            <div className="flex justify-between items-center">
-                              <span className="font-medium text-sm md:text-base">Standard Delivery</span>
-                              <span className="text-sm md:text-base font-semibold">{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
+                    {addressLoading ? (
+                      <div className="text-center py-8">Loading addresses...</div>
+                    ) : (
+                      <>
+                        <div className="space-y-3 mb-6">
+                          {addresses && addresses.length > 0 ? (
+                            addresses.map((address) => (
+                              <label
+                                key={address.address_id}
+                                className={`flex items-start p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                  selectedAddressId === address.address_id
+                                    ? 'border-blue-600 bg-blue-50'
+                                    : 'border-gray-300 hover:bg-gray-50'
+                                }`}
+                              >
+                                <input
+                                  type="radio"
+                                  name="selectedAddress"
+                                  value={address.address_id}
+                                  checked={selectedAddressId === address.address_id}
+                                  onChange={() => setSelectedAddressId(address.address_id)}
+                                  className="mt-1 mr-4 text-blue-600 focus:ring-blue-500"
+                                />
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <span className="font-medium text-sm md:text-base capitalize">
+                                      {address.address_type || 'Home'}
+                                    </span>
+                                    {address.is_default && (
+                                      <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded">
+                                        Default
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-sm text-gray-700">
+                                    {address.street_address}
+                                  </p>
+                                  <p className="text-sm text-gray-700">
+                                    {address.city}, {address.state} {address.postal_code}
+                                  </p>
+                                  <p className="text-sm text-gray-700">{address.country}</p>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleDeleteAddress(address.address_id);
+                                  }}
+                                  className="ml-2 p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </label>
+                            ))
+                          ) : (
+                            <div className="text-center py-8 text-gray-600">
+                              No saved addresses. Please add a new address.
                             </div>
-                            <p className="text-xs md:text-sm text-gray-600 mt-1">5-7 business days</p>
-                          </div>
-                        </label>
+                          )}
+                        </div>
 
-                        <label className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
-                          <input
-                            type="radio"
-                            name="deliveryOption"
-                            value="express"
-                            checked={formData.deliveryOption === 'express'}
-                            onChange={handleInputChange}
-                            className="mr-4 text-blue-600 focus:ring-blue-500"
-                          />
-                          <div className="flex-1">
-                            <div className="flex justify-between items-center">
-                              <span className="font-medium text-sm md:text-base">Express Delivery</span>
-                              <span className="text-sm md:text-base font-semibold">₹199</span>
+                        {!showAddAddressForm ? (
+                          <button
+                            onClick={() => setShowAddAddressForm(true)}
+                            className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 font-medium"
+                          >
+                            <Plus size={20} />
+                            Add New Address
+                          </button>
+                        ) : (
+                          <form onSubmit={handleAddAddress} className="border-2 border-blue-200 rounded-lg p-4 bg-blue-50">
+                            <h3 className="font-semibold mb-4 text-lg">Add New Address</h3>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                              <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Street Address *
+                                </label>
+                                <input
+                                  type="text"
+                                  name="street_address"
+                                  value={newAddress.street_address}
+                                  onChange={handleNewAddressChange}
+                                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  required
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                                <input
+                                  type="text"
+                                  name="city"
+                                  value={newAddress.city}
+                                  onChange={handleNewAddressChange}
+                                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  required
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
+                                <input
+                                  type="text"
+                                  name="state"
+                                  value={newAddress.state}
+                                  onChange={handleNewAddressChange}
+                                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  required
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">PIN Code *</label>
+                                <input
+                                  type="text"
+                                  name="postal_code"
+                                  value={newAddress.postal_code}
+                                  onChange={handleNewAddressChange}
+                                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  required
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                                <input
+                                  type="text"
+                                  name="country"
+                                  value={newAddress.country}
+                                  onChange={handleNewAddressChange}
+                                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Address Type</label>
+                                <select
+                                  name="address_type"
+                                  value={newAddress.address_type}
+                                  onChange={handleNewAddressChange}
+                                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                  <option value="home">Home</option>
+                                  <option value="work">Work</option>
+                                  <option value="other">Other</option>
+                                </select>
+                              </div>
+
+                              <div className="md:col-span-2">
+                                <label className="flex items-center gap-2">
+                                  <input
+                                    type="checkbox"
+                                    name="is_default"
+                                    checked={newAddress.is_default}
+                                    onChange={(e) => setNewAddress({...newAddress, is_default: e.target.checked})}
+                                    className="text-blue-600 focus:ring-blue-500"
+                                  />
+                                  <span className="text-sm">Set as default address</span>
+                                </label>
+                              </div>
                             </div>
-                            <p className="text-xs md:text-sm text-gray-600 mt-1">2-3 business days</p>
+
+                            <div className="flex gap-3">
+                              <button
+                                type="submit"
+                                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+                              >
+                                Save Address
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setShowAddAddressForm(false)}
+                                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </form>
+                        )}
+
+                        <div className="mt-6">
+                          <h3 className="text-base md:text-lg font-semibold mb-4">Delivery Options</h3>
+                          <div className="space-y-3">
+                            <label className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
+                              <input
+                                type="radio"
+                                name="deliveryOption"
+                                value="standard"
+                                checked={formData.deliveryOption === 'standard'}
+                                onChange={handleInputChange}
+                                className="mr-4 text-blue-600 focus:ring-blue-500"
+                              />
+                              <div className="flex-1">
+                                <div className="flex justify-between items-center">
+                                  <span className="font-medium text-sm md:text-base">Standard Delivery</span>
+                                  <span className="text-sm md:text-base font-semibold">{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
+                                </div>
+                                <p className="text-xs md:text-sm text-gray-600 mt-1">5-7 business days</p>
+                              </div>
+                            </label>
+
+                            <label className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
+                              <input
+                                type="radio"
+                                name="deliveryOption"
+                                value="express"
+                                checked={formData.deliveryOption === 'express'}
+                                onChange={handleInputChange}
+                                className="mr-4 text-blue-600 focus:ring-blue-500"
+                              />
+                              <div className="flex-1">
+                                <div className="flex justify-between items-center">
+                                  <span className="font-medium text-sm md:text-base">Express Delivery</span>
+                                  <span className="text-sm md:text-base font-semibold">₹199</span>
+                                </div>
+                                <p className="text-xs md:text-sm text-gray-600 mt-1">2-3 business days</p>
+                              </div>
+                            </label>
                           </div>
-                        </label>
-                      </div>
-                    </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
 
-                {/* Step 2: Payment Information */}
                 {currentStep === 2 && (
                   <div>
-                    {/* Payment Method Selection */}
                     <div className="mb-6">
                       <h3 className="text-base md:text-lg font-medium mb-4">Payment Method</h3>
                       <div className="space-y-3">
@@ -352,7 +536,6 @@ const CheckoutPage = () => {
                       </div>
                     </div>
 
-                    {/* Card Details */}
                     {formData.paymentMethod === 'card' && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                         <div className="md:col-span-2">
@@ -364,7 +547,6 @@ const CheckoutPage = () => {
                             onChange={handleInputChange}
                             placeholder="1234 5678 9012 3456"
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                            required
                           />
                         </div>
 
@@ -377,7 +559,6 @@ const CheckoutPage = () => {
                             onChange={handleInputChange}
                             placeholder="MM/YY"
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                            required
                           />
                         </div>
 
@@ -390,7 +571,6 @@ const CheckoutPage = () => {
                             onChange={handleInputChange}
                             placeholder="123"
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                            required
                           />
                         </div>
 
@@ -402,13 +582,11 @@ const CheckoutPage = () => {
                             value={formData.cardName}
                             onChange={handleInputChange}
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                            required
                           />
                         </div>
                       </div>
                     )}
 
-                    {/* UPI Details */}
                     {formData.paymentMethod === 'upi' && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">UPI ID *</label>
@@ -419,12 +597,10 @@ const CheckoutPage = () => {
                           onChange={handleInputChange}
                           placeholder="yourname@upi"
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                          required
                         />
                       </div>
                     )}
 
-                    {/* COD Message */}
                     {formData.paymentMethod === 'cod' && (
                       <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                         <p className="text-sm md:text-base text-yellow-800">
@@ -435,38 +611,40 @@ const CheckoutPage = () => {
                   </div>
                 )}
 
-                {/* Step 3: Review Order */}
                 {currentStep === 3 && (
                   <div>
-                    {/* Shipping Address */}
-                    <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-blue-50">
-                      <h3 className="font-medium text-base md:text-lg mb-2 flex items-center gap-2">
-                        <MapPin className="w-4 h-4" />
-                        Shipping Address
-                      </h3>
-                      <p className="text-sm md:text-base text-gray-700">
-                        {formData.firstName} {formData.lastName}<br />
-                        {formData.address}<br />
-                        {formData.city}, {formData.state} {formData.pincode}<br />
-                        {formData.country}
-                      </p>
-                    </div>
+                    {selectedAddress && (
+                      <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-blue-50">
+                        <h3 className="font-medium text-base md:text-lg mb-2 flex items-center gap-2">
+                          <MapPin className="w-4 h-4" />
+                          Shipping Address
+                        </h3>
+                        <p className="text-sm md:text-base text-gray-700 capitalize">
+                          {selectedAddress.address_type || 'Home'}
+                        </p>
+                        <p className="text-sm md:text-base text-gray-700">
+                          {selectedAddress.street_address}
+                        </p>
+                        <p className="text-sm md:text-base text-gray-700">
+                          {selectedAddress.city}, {selectedAddress.state} {selectedAddress.postal_code}
+                        </p>
+                        <p className="text-sm md:text-base text-gray-700">{selectedAddress.country}</p>
+                      </div>
+                    )}
 
-                    {/* Payment Method */}
                     <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-blue-50">
                       <h3 className="font-medium text-base md:text-lg mb-2 flex items-center gap-2">
                         <CreditCard className="w-4 h-4" />
                         Payment Method
                       </h3>
                       <p className="text-sm md:text-base text-gray-700 capitalize">
-                        {formData.paymentMethod === 'card' ? 'Credit/Debit Card' : 
+                        {formData.paymentMethod === 'card' ? 'Credit/Debit Card' :
                          formData.paymentMethod === 'upi' ? 'UPI' : 'Cash on Delivery'}
                       </p>
                     </div>
 
-                    {/* Order Items */}
                     <div className="mb-6">
-                      <h3 className="font-medium text-base md:text-lg mb-4">Order Items</h3>
+                      <h3 className="font-medium text-base md:text-lg mb-4">Order Items ({total_items})</h3>
                       <div className="space-y-4">
                         {orderItems.map((item) => (
                           <div key={item.id} className="flex gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
@@ -474,12 +652,17 @@ const CheckoutPage = () => {
                               src={item.image}
                               alt={item.name}
                               className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg"
+                              onError={(e) => {
+                                e.target.src = 'https://via.placeholder.com/80x80?text=No+Image';
+                              }}
                             />
                             <div className="flex-1">
                               <h4 className="font-medium text-sm md:text-base">{item.name}</h4>
                               <p className="text-xs md:text-sm text-gray-600">Size: {item.size}</p>
                               <p className="text-xs md:text-sm text-gray-600">Quantity: {item.quantity}</p>
-                              <p className="font-medium text-sm md:text-base">₹{item.price.toLocaleString()}</p>
+                              <p className="font-medium text-sm md:text-base">
+                                ₹{item.price.toLocaleString()} × {item.quantity} = ₹{(item.price * item.quantity).toLocaleString()}
+                              </p>
                             </div>
                           </div>
                         ))}
@@ -488,30 +671,32 @@ const CheckoutPage = () => {
                   </div>
                 )}
 
-                {/* Navigation Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 mt-6 md:mt-8">
                   {currentStep > 1 && (
                     <button
                       onClick={handlePrevStep}
                       className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium text-sm md:text-base"
+                      disabled={orderLoading}
                     >
                       Previous
                     </button>
                   )}
-                  
+
                   {currentStep < 3 ? (
                     <button
                       onClick={handleNextStep}
                       className="flex-1 sm:flex-none px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm md:text-base shadow-md hover:shadow-lg"
+                      disabled={orderLoading || orderItems.length === 0}
                     >
                       Continue
                     </button>
                   ) : (
                     <button
                       onClick={handlePlaceOrder}
-                      className="flex-1 sm:flex-none px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm md:text-base shadow-md hover:shadow-lg"
+                      className="flex-1 sm:flex-none px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm md:text-base shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      disabled={orderLoading || !selectedAddressId || orderItems.length === 0}
                     >
-                      Place Order
+                      {orderLoading ? 'Placing Order...' : 'Place Order'}
                     </button>
                   )}
                 </div>
@@ -519,60 +704,74 @@ const CheckoutPage = () => {
             </div>
           </div>
 
-          {/* Order Summary - Sticky Sidebar */}
           <div className="w-full lg:w-96">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-24">
               <h3 className="font-bold text-xl text-gray-900 mb-6">Order Summary</h3>
-              
-              <div className="space-y-4 mb-4">
-                {orderItems.map((item) => (
-                  <div key={item.id} className="flex gap-3">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-sm md:text-base line-clamp-2">{item.name}</h4>
-                      <p className="text-xs md:text-sm text-gray-600">Qty: {item.quantity}</p>
-                      <p className="font-medium text-sm md:text-base">₹{item.price.toLocaleString()}</p>
+
+              {orderItems.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  Your cart is empty
+                  <Link to="/products" className="block mt-4 text-blue-600 hover:text-blue-700 font-medium">
+                    Continue Shopping
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-4 mb-4 max-h-80 overflow-y-auto">
+                    {orderItems.map((item) => (
+                      <div key={item.id} className="flex gap-3">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg"
+                          onError={(e) => {
+                            e.target.src = 'https://via.placeholder.com/80x80?text=No+Image';
+                          }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm md:text-base line-clamp-2">{item.name}</h4>
+                          <p className="text-xs md:text-sm text-gray-600">Qty: {item.quantity}</p>
+                          <p className="text-xs md:text-sm text-gray-600">Size: {item.size}</p>
+                          <p className="font-medium text-sm md:text-base">₹{(item.price * item.quantity).toLocaleString()}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="border-t border-gray-200 pt-4 space-y-2 mb-4">
+                    <div className="flex justify-between text-sm md:text-base">
+                      <span>Subtotal ({total_items} items)</span>
+                      <span>₹{subtotal.toLocaleString()}</span>
+                    </div>
+
+                    {savings > 0 && (
+                      <div className="flex justify-between text-sm md:text-base">
+                        <span className="text-green-600">You Save</span>
+                        <span className="font-semibold text-green-600">-₹{Math.round(savings).toLocaleString()}</span>
+                      </div>
+                    )}
+
+                    <div className="flex justify-between text-sm md:text-base">
+                      <span>Shipping</span>
+                      <span className={shipping === 0 ? 'text-green-600 font-semibold' : ''}>
+                        {shipping === 0 ? 'FREE' : `₹${shipping}`}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between text-sm md:text-base">
+                      <span>Tax (GST)</span>
+                      <span>₹{tax.toLocaleString()}</span>
                     </div>
                   </div>
-                ))}
-              </div>
 
-              <div className="border-t border-gray-200 pt-4 space-y-2 mb-4">
-                <div className="flex justify-between text-sm md:text-base">
-                  <span>Subtotal</span>
-                  <span>₹{subtotal.toLocaleString()}</span>
-                </div>
-                
-                {savings > 0 && (
-                  <div className="flex justify-between text-sm md:text-base">
-                    <span className="text-green-600">Discount</span>
-                    <span className="font-semibold text-green-600">-₹{savings.toLocaleString()}</span>
+                  <div className="border-t border-gray-200 pt-4">
+                    <div className="flex justify-between font-semibold text-base md:text-lg">
+                      <span>Total</span>
+                      <span className="text-blue-600">₹{total.toLocaleString()}</span>
+                    </div>
                   </div>
-                )}
-                
-                <div className="flex justify-between text-sm md:text-base">
-                  <span>Shipping</span>
-                  <span className={shipping === 0 ? 'text-green-600 font-semibold' : ''}>
-                    {shipping === 0 ? 'FREE' : `₹${shipping}`}
-                  </span>
-                </div>
-                
-                <div className="flex justify-between text-sm md:text-base">
-                  <span>Tax (GST)</span>
-                  <span>₹{tax.toLocaleString()}</span>
-                </div>
-              </div>
-
-              <div className="border-t border-gray-200 pt-4">
-                <div className="flex justify-between font-semibold text-base md:text-lg">
-                  <span>Total</span>
-                  <span className="text-blue-600">₹{total.toLocaleString()}</span>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           </div>
         </div>

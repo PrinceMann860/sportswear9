@@ -800,14 +800,7 @@ function Navbar() {
                       <span className="font-medium">My Profile</span>
                     </Link>
 
-                    <Link
-                      to="/wishlist"
-                      onClick={() => setShowUserMenu(false)}
-                      className="w-full px-4 py-3 text-left hover:bg-blue-50 flex items-center gap-3 text-gray-700 hover:text-blue-600 transition-colors rounded-lg mx-1"
-                    >
-                      <FiHeart size={18} className="text-pink-500" />
-                      <span className="font-medium">Wishlist</span>
-                    </Link>
+                    
 
                     <Link
                       to="/orders"
@@ -846,13 +839,7 @@ function Navbar() {
               </button>
             )}
 
-            <Link
-              to="/wishlist"
-              className="p-2 rounded-full hover:bg-blue-50 transition-colors"
-              aria-label="Wishlist"
-            >
-              <FiHeart className="text-lg cursor-pointer hover:text-blue-600 transition-colors" />
-            </Link>
+            
             <Link
               to="/cart"
               className="p-2 rounded-full hover:bg-blue-50 transition-colors"

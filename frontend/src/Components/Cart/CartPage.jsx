@@ -76,13 +76,7 @@ const CartPage = () => {
       .then(() => dispatch(fetchCartItems()));
   };
 
-  const moveToWishlist = () => {
-    window.dispatchEvent(
-      new CustomEvent("showToast", {
-        detail: { message: "Wishlist feature coming soon!", type: "info" },
-      })
-    );
-  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20 pb-20 md:pb-0">
@@ -227,12 +221,7 @@ const CartPage = () => {
                               </button>
                             </div>
 
-                            <button
-                              onClick={moveToWishlist}
-                              className="p-2.5 text-gray-600 hover:text-pink-500 hover:bg-pink-50 rounded-lg"
-                            >
-                              <Heart size={20} />
-                            </button>
+                            
                           </div>
 
                         </div>
