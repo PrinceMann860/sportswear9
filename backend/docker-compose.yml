@@ -16,10 +16,12 @@ services:
     depends_on:
       - redis
       - rabbitmq
+      - postgres
     environment:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - REDIS_URL=redis://redis:6379/1
+      - DATABASE_URL=postgres://postgres:your_password@postgres:5432/your_dbname  # Add PostgreSQL URL
 
   redis:
     image: redis:alpine
@@ -46,6 +48,7 @@ services:
     depends_on:
       - redis
       - rabbitmq
+      - postgres
     env_file:
       - .env
     environment:
@@ -61,18 +64,26 @@ services:
     depends_on:
       - redis
       - rabbitmq
+      - postgres
     env_file:
       - .env
     environment:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
 
-  # imgproxy:
-  #   image: darthsim/imgproxy:latest
-  #   container_name: sportswear_imgproxy
-  #   ports:
-  #     - "8080:8080"
+  postgres:
+    image: postgres:15-alpine
+    container_name: sportswear_postgres
+    environment:
+      - POSTGRES_DB=sportsdb
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=adminpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
   static_volume:
   media_volume:
+  postgres_data:

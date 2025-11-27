@@ -78,6 +78,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',  # since you use Google login
 
     'corsheaders',
+    'storages',
 
     "django_countries",
 
@@ -194,18 +195,29 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
+# AWS S3 Configuration
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
 
+# S3 Object Parameters
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+AWS_DEFAULT_ACL = 'public-read'
+AWS_QUERYSTRING_AUTH = False
+
+# Media files configuration (uploaded to S3)
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+DEFAULT_FILE_STORAGE = 'backend.storage_backends.MediaStorage'
+
+# Static files configuration (kept locally)
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # for collectstatic
-
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # include your project-level static folder
-]
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # MEDIA_URL = '/assets/'
 # MEDIA_ROOT = BASE_DIR / 'assets'
@@ -339,3 +351,4 @@ CACHES = {
     }
 }
 THROTTLE_CACHE = "default"
+

@@ -71,4 +71,5 @@ celerybeat.pid
 
 # the uploaded files in help section
 
+!media/
 
