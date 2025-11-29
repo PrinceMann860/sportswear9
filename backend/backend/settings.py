@@ -92,7 +92,7 @@ INSTALLED_APPS = [
     'categories',
     'attributes',
     'inventory',
-    'media',
+    # 'media',
     'reviews',
     'ProductSpecification',
     'products',
@@ -148,19 +148,22 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # }
 
 # postgrace Database
-# Replace the DATABASES section of your settings.py with this
-tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql://postgres.btyflecihicbaybwqqhe:Sportswear9@aws-1-ap-south-1.pooler.supabase.com:6543/postgres"
+)
+
+tmpPostgres = urlparse(DATABASE_URL)
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': tmpPostgres.path.replace('/', ''),
+        'NAME': tmpPostgres.path.lstrip('/'),
         'USER': tmpPostgres.username,
         'PASSWORD': tmpPostgres.password,
         'HOST': tmpPostgres.hostname,
-        'PORT': 5432,
-        'OPTIONS': dict(parse_qsl(tmpPostgres.query)),
-        # 'CONN_MAX_AGE': 60,  # keep connections alive for 1 minute
+        'PORT': tmpPostgres.port or 5432,
+        'OPTIONS': dict(parse_qsl(tmpPostgres.query or "")),
     }
 }
 
