@@ -1,7 +1,31 @@
 import { FaFacebook, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import AuthModal from "../Auth/AuthModal"; 
+import { useState } from "react";
 
 const Footer = () => {
+  // ===== AUTH MODAL STATES (same as Navbar) =====
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState("login");
+
+  const openLogin = () => {
+    setAuthMode("login");
+    setAuthOpen(true);
+  };
+
+  const openRegister = () => {
+    setAuthMode("signup");
+    setAuthOpen(true);
+  };
   return (
+    <>
+      {/* ===== AUTH MODAL ===== */}
+      <AuthModal
+        isOpen={authOpen}
+        onClose={() => setAuthOpen(false)}
+        mode={authMode}
+        setMode={setAuthMode}
+      />
     <footer className="w-full bg-white text-gray-700 text-sm overflow-x-hidden">
       {/* === OUR SPORT COLLECTIONS === */}
       <div className="mx-auto px-4 py-6 border-b overflow-hidden">
@@ -36,13 +60,13 @@ const Footer = () => {
           ].map((row, idx) => (
             <p key={idx} className="w-full break-words overflow-hidden">
               {row.split("|").map((link, i) => (
-                <a
+                <Link
                   key={i}
-                  href="#"
+                  to="#"
                   className="hover:underline inline break-words"
                 >
                   {link.trim()}{" "}
-                </a>
+                </Link>
               ))}
             </p>
           ))}
@@ -75,59 +99,94 @@ const Footer = () => {
           {/* SUPPORT */}
           <div className="ml-2 md:ml-5 lg:ml-10">
             <h3 className="font-bold mb-2">SUPPORT</h3>
-            <a href="#" className="block hover:underline">
+            <Link to="https://wa.me/0000000000?text=Hello%20this%20is%20a%20test" className="block hover:underline">
               Contact our Stores
-            </a>
-            <a href="#" className="block hover:underline">
-              Delivery
-            </a>
+            </Link>
+            <Link to="/contact" className="block hover:underline">
+              Contact
+            </Link>
+            <Link to="/SizeGuide" className="block hover:underline">
+              Size Guide
+            </Link>
+            <Link to="/ShippingDelivery" className="block hover:underline">
+              Shipping & Delivery
+            </Link>
+            <Link to="/privacypolicy" className="block hover:underline">
+              Terms & Conditions
+            </Link>
+            <Link to="/Cancellation" className="block hover:underline">
+              Cancellation, Return & Exchange Policy
+            </Link>
+            <Link to="/ReturnRefund" className="block hover:underline">
+              Refund & Return Policy
+            </Link>
           </div>
 
-          {/* OUR SERVICES */}
+          {/* My Account */}
           <div>
-            <h3 className="font-bold mb-2">OUR SERVICES</h3>
-            {[
-              "sportswear9 for Schools",
-              "sportswear9 for Corporates",
-              "sportswear9 for Sport Clubs",
-              "sportswear9 Gift Cards",
-              "Affiliate Program",
-              "sportswear9 Second Life",
-              "sportswear9 Buy Back",
-              "Installation & Assembly Services",
-            ].map((item, i) => (
-              <a key={i} href="#" className="block hover:underline">
-                {item}
-              </a>
-            ))}
+            <h3 className="font-bold mb-2">My Account</h3>
+            
+              <button
+                onClick={openLogin}
+                className="block text-left hover:underline w-full"
+              >
+                Login
+              </button>
+
+              <button
+                onClick={openRegister}
+                className="block text-left hover:underline w-full"
+              >
+                Register
+              </button>
+
+              <Link to="/orders" className="block hover:underline">
+                Track Your Order
+              </Link>
           </div>
 
           {/* ABOUT US */}
           <div>
             <h3 className="font-bold mb-2">ABOUT US</h3>
-            {[
-              "Careers",
-              "News from sportswear9 India",
-              "Social Initiatives",
-            ].map((item, i) => (
-              <a key={i} href="#" className="block hover:underline">
-                {item}
-              </a>
-            ))}
+            <Link to="/OurStory" className="block hover:underline">
+              Who we are/Our Story
+            </Link>
+            <Link to="/Careers" className="block hover:underline">
+              Careers
+            </Link>
+            Made in India
           </div>
 
-          {/* LEGAL */}
+          {/* Brands */}
           <div>
-            <h3 className="font-bold mb-2">LEGAL</h3>
-            <a href="#" className="block hover:underline">
-              Return Policy
-            </a>
-            <a href="#" className="block hover:underline">
-              Terms and Conditions
-            </a>
-            <a href="#" className="block hover:underline">
-              Privacy Policy
-            </a>
+            <h3 className="font-bold mb-2">Brands</h3>
+            <Link to="/brand/Gymific" className="block hover:underline">
+              Gymfic
+            </Link>
+            <Link to="/brand/KyK" className="block hover:underline">
+              KYK
+            </Link>
+            <Link to="/brand/NeverLose" className="block hover:underline">
+              Never-Lose
+            </Link>
+            <Link to="/brand/Ninq" className="block hover:underline">
+              Ninq
+            </Link>
+            <Link to="/brand/Sportsinger" className="block hover:underline">
+              Sportsinger
+            </Link>
+            <Link to="/brand/Train Hard" className="block hover:underline">
+              Train Hard
+            </Link>
+            <Link to="/brand/U" className="block hover:underline">
+              U
+            </Link>
+            <Link to="/brand/WMX" className="block hover:underline">
+              WMX
+            </Link>
+            <Link to="/brand/Work for it" className="block hover:underline">
+              Work for it
+            </Link>
           </div>
         </div>
 
@@ -138,18 +197,18 @@ const Footer = () => {
             {/* SOCIAL ICONS */}
             <h3 className="font-bold mb-2">FOLLOW US</h3>
             <div className="flex mb-4 w-full justify-evenly">
-              <a href="#" className="bg-gray-700 p-1 rounded-sm">
+              <Link to="#" className="bg-gray-700 p-1 rounded-sm">
                 <FaFacebook size={30} className="text-white" />
-              </a>
-              <a href="#" className="bg-gray-700 p-1 rounded-sm">
+              </Link>
+              <Link to="#" className="bg-gray-700 p-1 rounded-sm">
                 <FaInstagram size={30} className="text-white" />
-              </a>
-              <a href="#" className="bg-gray-700 p-1 rounded-sm">
+              </Link>
+              <Link to="#" className="bg-gray-700 p-1 rounded-sm">
                 <FaTwitter size={30} className="text-white" />
-              </a>
-              <a href="#" className="bg-gray-700 p-1 rounded-sm">
+              </Link>
+              <Link to="#" className="bg-gray-700 p-1 rounded-sm">
                 <FaYoutube size={30} className="text-white" />
-              </a>
+              </Link>
             </div>
 
             {/* INPUT BOXES */}
@@ -214,6 +273,7 @@ const Footer = () => {
         © 2025 Sportswear9. All rights reserved.
       </div>
     </footer>
+    </>
   );
 };
 

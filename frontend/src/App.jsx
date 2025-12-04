@@ -17,6 +17,12 @@ import ProfilePage from "./Components/Profile/ProfilePage";
 import CheckoutPage from "./Components/Checkout/CheckoutPage";
 import Error404 from "./Components/Pages/Error404page";
 import Home2 from "./Components/Home/Home2";
+import ReturnRefund from "./Components/Pages/ReturnRefund";
+import ShippingDelivery from "./Components/Pages/ShippingDelivery";
+import SizeGuide from "./Components/Pages/SizeGuide";
+import CancellationReturnExchange from "./Components/Pages/Cancellation";
+import OurStory from "./Components/Pages/OurStory";
+import Careers from "./Components/Pages/Careers";
 
 export default function App() {
   const router = createBrowserRouter([
@@ -100,6 +106,30 @@ export default function App() {
         {
           path: '/checkout',
           element: <CheckoutPage />
+        },
+        {
+          path: '/ReturnRefund',
+          element: <ReturnRefund />
+        },
+        {
+          path: '/ShippingDelivery',
+          element: <ShippingDelivery />
+        },
+        {
+          path: '/SizeGuide',
+          element: <SizeGuide />
+        },
+        {
+          path: '/Cancellation',
+          element: <CancellationReturnExchange />
+        },
+        {
+          path: '/OurStory',
+          element: <OurStory />
+        },
+        {
+          path: '/Careers',
+          element: <Careers />
         },
       ],
     },
