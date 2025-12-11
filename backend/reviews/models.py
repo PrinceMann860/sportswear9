@@ -5,6 +5,7 @@ from products.models import Product
 from assets.models import ProductImage, ProductVideo
 from django.contrib.contenttypes.fields import GenericRelation
 
+
 class Review(models.Model):
     review_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="reviews")
@@ -19,7 +20,7 @@ class Review(models.Model):
     videos = GenericRelation(ProductVideo, related_query_name="review")
 
     class Meta:
-        unique_together = ("user", "product")
+        # ✅ Remove unique_together constraint
         ordering = ["-created_at"]
 
     def __str__(self):

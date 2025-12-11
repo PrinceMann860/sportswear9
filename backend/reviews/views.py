@@ -6,6 +6,7 @@ from .models import Review
 from .serializers import ReviewSerializer
 from .permissions import IsOwnerOrAdmin
 
+# reviews/views.py
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrAdmin]
@@ -13,7 +14,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         product_id = self.request.query_params.get("product_id")
         if product_id:
-            return Review.objects.filter(product_id=product_id).select_related("user", "product")
+            # Filter by product_uuid instead of pk
+            return Review.objects.filter(product__product_uuid=product_id).select_related("user", "product")
         return Review.objects.all().select_related("user", "product")
 
     def perform_create(self, serializer):
