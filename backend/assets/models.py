@@ -4,7 +4,7 @@ from core.image_service.services import get_imgproxy_url
 from core.image_service.utils import validate_image
 from attributes.models import ProductVariant
 from ProductSpecification.models import ProductSpecificationContent  # ✅ add this import safely (circular-safe if you use app label)
-
+from backend.storage_backends import MediaStorage
 
 class ProductImage(models.Model):
     image_uuid = ShortUUIDField(
@@ -28,7 +28,7 @@ class ProductImage(models.Model):
         null=True,
         blank=True
     )
-    image = models.ImageField(upload_to="uploads/products/", validators=[validate_image])
+    image = models.ImageField(upload_to="products/", storage=MediaStorage(),  validators=[validate_image])
     alt_text = models.CharField(max_length=255, blank=True)
     is_main = models.BooleanField(default=False)
     uploaded_at = models.DateTimeField(auto_now_add=True)
@@ -71,7 +71,7 @@ class ProductVideo(models.Model):
         editable=False
     )
     variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, related_name="videos")
-    video = models.FileField(upload_to="uploads/products/videos/")
+    video = models.FileField(upload_to="uploads/products/videos/", storage=MediaStorage())
     caption = models.CharField(max_length=255, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
