@@ -1,3 +1,4 @@
+# products/serializers.py
 from rest_framework import serializers
 from .models import Product, ProductCoupon
 from categories.models import Category
@@ -15,6 +16,7 @@ from django.utils import timezone
 from django.db import models
 from attributes.serializers import ProductVariantListSerializer
 
+
 class VariantSizeSerializer(serializers.Serializer):
     variant_id = serializers.CharField()
     size_id = serializers.CharField(allow_null=True)
@@ -22,6 +24,7 @@ class VariantSizeSerializer(serializers.Serializer):
     stock_quantity = serializers.IntegerField()
     price = serializers.FloatField()
     is_available = serializers.BooleanField()
+
 
 class VariantColorGroupSerializer(serializers.Serializer):
     color = serializers.CharField(allow_null=True)
@@ -31,6 +34,7 @@ class VariantColorGroupSerializer(serializers.Serializer):
     images = serializers.ListField()
     sizes = VariantSizeSerializer(many=True)
     is_active = serializers.BooleanField()
+
 
 # ---- NESTED SERIALIZERS ----
 
@@ -81,17 +85,15 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ['id', 'user_name', 'rating', 'comment', 'created_at']
-
-
+        fields = ['review_id', 'user_name', 'rating', 'comment', 'created_at']
 
 
 class ProductListSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source="name")
     category = serializers.CharField(source="category.name")
-    gender = serializers.SerializerMethodField()  # ✅ Added
-    is_new = serializers.SerializerMethodField()        # ✅ Added
-    is_popular = serializers.SerializerMethodField()  
+    gender = serializers.SerializerMethodField()
+    is_new = serializers.SerializerMethodField()
+    is_popular = serializers.SerializerMethodField()
     img = serializers.SerializerMethodField()
     img2 = serializers.SerializerMethodField()
     price = serializers.SerializerMethodField()
@@ -99,18 +101,14 @@ class ProductListSerializer(serializers.ModelSerializer):
     discount = serializers.SerializerMethodField()
     brand = BrandSerializer()
     category = CategorySerializer()
-    # variants = ProductVariantListSerializer(many=True, read_only=True)
     is_in_cart = serializers.SerializerMethodField()
-    # thumbnail = serializers.SerializerMethodField()
-    # average_rating = serializers.SerializerMethodField()
-    
 
     class Meta:
         model = Product
         fields = [
             "product_uuid", "title", "img", "img2", "price", "original", "discount",
-            "category", "gender", "is_new", "is_popular",  # for color/size selection 
-            "is_in_cart",  # ✅ New fields
+            "category", "gender", "is_new", "is_popular",
+            "is_in_cart",
             "name", "brand", "is_featured"
         ]
 
@@ -120,10 +118,7 @@ class ProductListSerializer(serializers.ModelSerializer):
             user = request.user
             return obj.cart_items.filter(user=user).exists()
         return False
-       
-    # -------------------
-    #  Detect gender from category hierarchy
-    # -------------------
+
     def get_gender(self, obj):
         category = obj.category
         while category:
@@ -131,28 +126,22 @@ class ProductListSerializer(serializers.ModelSerializer):
             if name in ["men", "women", "unisex"]:
                 return name.capitalize()
             category = category.parent
-        return None  # or "Unisex" as a fallback
+        return None
 
-    # -------------------
-    #  New Arrivals logic
-    # -------------------
     def get_is_new(self, obj):
         """Mark product as new if added in the last 30 days."""
         days_threshold = 30
         return obj.created_at >= timezone.now() - timedelta(days=days_threshold)
 
-    # -------------------
-    #  Most Popular logic
-    # -------------------
     def get_is_popular(self, obj):
         """Mark as popular if reviews > X or average rating > 4.5."""
         total_reviews = obj.reviews.count()
-        avg_rating = obj.reviews.aggregate(models.Avg("rating")).get("rating__avg") or 0
+        # ✅ Fixed: Filter out None ratings
+        avg_rating = obj.reviews.filter(rating__isnull=False).aggregate(
+            models.Avg("rating")
+        ).get("rating__avg") or 0
         return total_reviews >= 5 or avg_rating >= 4.5
 
-    # -------------------
-    #  Image & pricing helpers
-    # -------------------
     def get_img(self, obj):
         variant = (
             obj.variants.filter(is_default=True, images__isnull=False).first()
@@ -186,31 +175,31 @@ class ProductListSerializer(serializers.ModelSerializer):
     def get_discount(self, obj):
         return f"-{int(obj.disc)}%" if obj.disc and obj.disc > 0 else None
 
+
 class ProductDetailSerializer(serializers.ModelSerializer):
     brand = BrandSerializer()
     category = CategorySerializer()
-    inventory = InventorySerializer(read_only=True)  # ✅ fixed
+    inventory = InventorySerializer(read_only=True)
     variants = ProductVariantSerializer(many=True, read_only=True)
-    specifications = ProductSpecificationContentSerializer(many=True, read_only=True)  # ✅ Added here
+    specifications = ProductSpecificationContentSerializer(many=True, read_only=True)
     reviews = ReviewSerializer(many=True, read_only=True)
     average_rating = serializers.SerializerMethodField()
     default_images = serializers.SerializerMethodField()
-    reviews = ReviewSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
         fields = [
-            'product_uuid', 'name', 'description', 'price', 'disc', 'net',  'brand', 'category',
+            'product_uuid', 'name', 'description', 'price', 'disc', 'net', 'brand', 'category',
             'inventory', 'variants', 'specifications', 'reviews',
             'default_images', 'average_rating',
         ]
 
     def get_average_rating(self, obj):
-        ratings = obj.reviews.all().values_list('rating', flat=True)
+        # ✅ Fixed: Filter out None ratings
+        ratings = [r.rating for r in obj.reviews.all() if r.rating is not None]
         return round(sum(ratings) / len(ratings), 1) if ratings else None
 
     def get_default_images(self, obj):
-        # Try default variant with images; if none, pick the first variant that has images
         variant = (
             obj.variants.filter(is_default=True, images__isnull=False).first()
             or obj.variants.filter(images__isnull=False).first()
@@ -232,11 +221,9 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         ]
 
 
-# products/serializers.py
 class ProductCouponSerializer(serializers.ModelSerializer):
     product_name = serializers.ReadOnlyField(source="product.name")
-    cupon_uuid = serializers.ReadOnlyField()# ✅ adds "id" back as alias
-
+    cupon_uuid = serializers.ReadOnlyField()
 
     class Meta:
         model = ProductCoupon
@@ -283,7 +270,6 @@ class ProductDetailGroupedSerializer(serializers.ModelSerializer):
 
     def get_color_groups(self, obj):
         color_groups = []
-        # Group variants by color
         colors = obj.variants.values_list('color__value', flat=True).distinct()
         for color in colors:
             variants = obj.variants.filter(color__value=color)
@@ -297,26 +283,14 @@ class ProductDetailGroupedSerializer(serializers.ModelSerializer):
         return color_groups
 
 
-
-
 class ProductDetailUnifiedSerializer(serializers.ModelSerializer):
     brand = serializers.SerializerMethodField()
     category = serializers.CharField(source="category.name", read_only=True)
     variants = serializers.SerializerMethodField()
-    specifications = ProductSpecificationContentSerializer(many=True, read_only=True)  # ✅ include specifications
+    specifications = ProductSpecificationContentSerializer(many=True, read_only=True)
     reviews = ReviewSerializer(many=True, read_only=True)
-
-    average_rating = serializers.SerializerMethodField()  # ✅ added
-    default_images = serializers.SerializerMethodField()  # ✅ added
-
-    # class Meta:
-    #     model = Product
-    #     fields = [
-    #         "product_uuid", "name", "description",
-    #         "price", "disc", "net", "sku",
-    #         "brand", "category", "variants",
-    #         "created_at", "updated_at"
-    #     ]
+    average_rating = serializers.SerializerMethodField()
+    default_images = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -326,9 +300,6 @@ class ProductDetailUnifiedSerializer(serializers.ModelSerializer):
             'average_rating', 'default_images', 'created_at', 'updated_at'
         ]
 
-    # -------------------
-    #  Brand info
-    # -------------------
     def get_brand(self, obj):
         if not obj.brand:
             return None
@@ -336,13 +307,13 @@ class ProductDetailUnifiedSerializer(serializers.ModelSerializer):
             "name": obj.brand.name,
             "logo": obj.brand.logo.url if obj.brand.logo else None
         }
-    
+
     def get_average_rating(self, obj):
-        ratings = obj.reviews.all().values_list('rating', flat=True)
+        # ✅ Fixed: Filter out None ratings
+        ratings = [r.rating for r in obj.reviews.all() if r.rating is not None]
         return round(sum(ratings) / len(ratings), 1) if ratings else None
-    
+
     def get_default_images(self, obj):
-        # Try default variant with images; if none, pick the first variant that has images
         variant = (
             obj.variants.filter(is_default=True, images__isnull=False).first()
             or obj.variants.filter(images__isnull=False).first()
@@ -362,19 +333,7 @@ class ProductDetailUnifiedSerializer(serializers.ModelSerializer):
             }
             for img in imgs
         ]
-    # # -------------------
-    # #  SKU (from default or first variant)
-    # # -------------------
-    # def get_sku(self, obj):
-    #     variant = obj.variants.filter(is_default=True).first() or obj.variants.first()
-    #     return variant.sku if variant else None
 
-    # -------------------
-    #  Variants grouped by color
-    # -------------------
-        # -------------------------
-    # Variants grouped by color
-    # -------------------------
     def get_variants(self, obj):
         variants_by_color = defaultdict(lambda: {
             "color": None,
@@ -393,7 +352,6 @@ class ProductDetailUnifiedSerializer(serializers.ModelSerializer):
         )
 
         for variant in variants:
-
             color_attr = None
             size_attr = None
 
@@ -411,16 +369,13 @@ class ProductDetailUnifiedSerializer(serializers.ModelSerializer):
 
             group = variants_by_color[color_name]
 
-            # Set basic color metadata once
             if group["color"] is None:
                 group["color"] = color_name
                 group["color_id"] = color_id
                 group["color_code"] = color_code
 
             group["variant_ids"].append(variant.id)
-            # group["is_active"] |= variant.is_available
 
-            # Add all images from variant (no duplication)
             for img in variant.images.all():
                 img_data = {
                     "id": img.image_uuid,
@@ -432,7 +387,6 @@ class ProductDetailUnifiedSerializer(serializers.ModelSerializer):
                 if img_data not in group["images"]:
                     group["images"].append(img_data)
 
-            # Add all SIZES under same color
             inventory = getattr(variant, "inventory", None)
 
             size_data = {
