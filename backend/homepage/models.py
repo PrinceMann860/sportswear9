@@ -1,5 +1,6 @@
 from django.db import models
 from shortuuid.django_fields import ShortUUIDField
+from backend.storage_backends import MediaStorage
 
 # Level of the homepage (e.g., Level 1, Level 2)
 class HomePageLevel(models.Model):
@@ -34,7 +35,7 @@ class HomePageSection(models.Model):
 class SectionItem(models.Model):
     item_uuid = ShortUUIDField(length=14, prefix="ITM-", alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", unique=True, editable=False)
     section = models.ForeignKey(HomePageSection, related_name='items', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='homepage/')
+    image = models.ImageField(upload_to='homepage/', storage=MediaStorage())
     title = models.CharField(max_length=255, blank=True)
     subtitle = models.TextField(blank=True)
     video_url = models.URLField(blank=True)
