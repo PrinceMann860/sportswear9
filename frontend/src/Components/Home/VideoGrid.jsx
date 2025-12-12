@@ -5,42 +5,49 @@ import compression from "../../assets/compression.png";
 import gloves from "../../assets/gloves.png";
 import p1 from '../../assets/p1.png';
 import p2 from '../../assets/p2.png';
+import vid01 from "../../assets/VID-01.mp4"
+import vid02 from "../../assets/VID-02.mp4"
+import vid03 from "../../assets/VID-03.mp4"
+import vid04 from "../../assets/VID-04.mp4"
+import vid05 from "../../assets/VID-05.mp4"
+import vid06 from "../../assets/VID-06.mp4"
+
 
 const videos = [
   {
     id: 1,
     thumbnail: yoga,
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
+    video: vid01,
     link: "/shop/video1"
   },
   {
     id: 2,
     thumbnail: running,
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
+    video: vid02,
     link: "/shop/video2"
   },
   {
     id: 3,
     thumbnail: compression,
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
+    video: vid03,
     link: "/shop/video3"
   },
   {
     id: 4,
     thumbnail: gloves,
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
+    video: vid04,
     link: "/shop/video4"
   },
   {
     id: 5,
     thumbnail: p1,
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
+    video: vid05,
     link: "/shop/video5"
   },
   {
     id: 6,
     thumbnail: p2,
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
+    video: vid06,
     link: "/shop/video6"
   },
 ];
@@ -89,7 +96,7 @@ const HoverVideoCard = ({ item }) => {
         src={item.video}
         muted
         loop
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-0"}`}
+        className={`absolute inset-0 w-full h-full  transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-0"}`}
       />
 
       {/* Shop Now Button */}

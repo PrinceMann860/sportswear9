@@ -26,6 +26,7 @@ import VideoGrid from "./VideoGrid";
 import { DealsOfTheDay } from "../Banner&Carousels/DealsOfTheDay";
 import { fetchBrands } from "../Brands/brandlistslice";
 
+
 import logo1 from "../../assets/1.svg";
 import logo2 from "../../assets/2.svg";
 import logo3 from "../../assets/3.svg";
@@ -494,9 +495,8 @@ function Home2() {
          
 
         {/* ✅ Rest of your existing sections remain the same */}
-         
           <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full">
-            <h2 className="text-2xl font-bold mb-4">Recently Viewed</h2>
+            <h2 className="font-bold uppercase text-base md:text-xl text-foreground mb-6">Recently Viewed</h2>
             {featuredProducts.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                 {featuredProducts.map((p) => (
@@ -574,7 +574,7 @@ function Home2() {
         {/* ✅ Trending Products */}
          
           <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full mt-10">
-            <h2 className="text-2xl font-bold mb-4">TRENDING PRODUCTS</h2>
+            <h2 className="font-bold uppercase text-base md:text-xl text-foreground mb-6">TRENDING PRODUCTS</h2>
             {featuredProducts.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                 {featuredProducts.map((product) => (
@@ -629,7 +629,7 @@ function Home2() {
         {/* ✅ New Arrivals */}
          
           <section className="px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16 max-w-full">
-            <h2 className="text-2xl font-bold mb-4">New Arrivals</h2>
+            <h2 className="font-bold uppercase text-base md:text-xl text-foreground mb-6">New Arrivals</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {newArrivals.map((product) => (
                 <ProductCard key={product.id} product={product} />

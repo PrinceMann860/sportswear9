@@ -29,7 +29,7 @@ const Footer = () => {
     <footer className="w-full bg-white text-gray-700 text-sm overflow-x-hidden">
       {/* === OUR SPORT COLLECTIONS === */}
       <div className="mx-auto px-4 py-6 border-b overflow-hidden">
-        <h2 className="text-lg font-bold mb-2">Our Sport Collections :</h2>
+        <h2 className="font-bold uppercase text-base md:text-xl text-foreground mb-2">Our Sport Collections :</h2>
         <div className="flex flex-wrap gap-x-2 leading-relaxed overflow-hidden">
           {[
             "Badminton : Badminton Racket | Adult Badminton Racket | Junior Badminton Racket | Badminton Shoes | Mens Badminton Shoes | Womens Badminton Shoes | Kids Badminton Shoes | Badminton Jersey | Mens Badminton Jerseys | Womens Badminton Jerseys | Kids Badminton Apparels | Badminton Shorts | Mens Badminton Shorts | Womens Badminton Shorts and Skirts | Shuttlecocks | Plastic Shuttlecocks | Feather Shuttlecocks | Badminton Accessories | Badminton Grips | Badminton Net | Badminton Racket Strings | Badminton Training Bands | Racket Cover Bags |",

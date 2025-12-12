@@ -20,7 +20,7 @@ const CategoryGrid = ({
               </p>
             )}
             {title && (
-              <h2 className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-bold text-text uppercase tracking-tight">
+              <h2 className="font-bold uppercase text-base md:text-xl text-foreground">
                 {title}
               </h2>
             )}

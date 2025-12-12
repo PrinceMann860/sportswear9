@@ -121,7 +121,7 @@ const RecommendedProducts = () => {
 
   return (
     <section className="py-16">
-      <div className="mx-auto px-2 sm:px-4 md:px-6 lg:px-12 xl:px-16">
+      <div className="">
           <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
             Recommended for you
           </h3>

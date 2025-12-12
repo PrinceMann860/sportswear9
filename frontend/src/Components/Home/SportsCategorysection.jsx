@@ -15,7 +15,7 @@ const categories = [
 const SportsCategorySection = () => {
   return (
     <section className="w-full p-4 md:p-8 lg:p-12 xl:px-20">
-      <h2 className="text-xl md:text-3xl lg:text-4xl font-bold mb-6">
+      <h2 className="font-bold uppercase text-base md:text-xl text-foreground mb-6">
         EQUIPPING CHAMPIONS
       </h2>
 

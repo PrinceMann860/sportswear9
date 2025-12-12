@@ -49,7 +49,7 @@ const DealsOfTheDay = ({ title, items }) => {
 
     return (
         <div className="mt-8 relative mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold mb-4">
+            <h2 className="font-bold uppercase text-base md:text-xl text-foreground my-6">
                 {title}
             </h2>
 
