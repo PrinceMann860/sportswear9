@@ -92,4 +92,7 @@ def create_order_from_cart_task(self, user_id, shipping_address):
             return {"order_uuid": str(order.order_uuid), "total": total_amount}
 
     except Exception as e:
-        return {"error": str(e)}
+        return {
+            "success": False,
+            "error": str(e)
+        }

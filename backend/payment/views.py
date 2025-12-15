@@ -40,29 +40,51 @@ class PaymentViewSet(viewsets.ViewSet):
     
     @action(detail=False, methods=['post'], url_path='create-razorpay-order')
     def create_razorpay_order(self, request):
-        """Create Razorpay order"""
         order_uuid = request.data.get('order_uuid')
-        
-        # Optimized order fetch
+
+        # 1️⃣ Fetch order
         order = get_object_or_404(
             Order.objects.only(
-                'order_uuid', 'total_amount', 'status', 'user_id', 'razorpay_order_id'
+                'id', 'order_uuid', 'total_amount', 'status', 'user_id'
             ),
             order_uuid=order_uuid,
             user=request.user
         )
-        
+
         if order.status != 'PENDING':
             return Response(
                 {"error": "Only PENDING orders can initiate payment"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
+        # 🔒 2️⃣ PREVENT DUPLICATE PAYMENT ATTEMPTS (THIS IS WHERE IT GOES)
+        existing = Payment.objects.filter(
+            order=order,
+            status="CREATED"
+        ).first()
+
+        if existing:
+            # Reuse existing Razorpay order
+            return Response({
+                "message": "Razorpay order already exists",
+                "order_uuid": str(order.order_uuid),
+                "razorpay_order_id": existing.razorpay_order_id,
+                "amount": int(existing.amount * 100),
+                "currency": "INR",
+                "key": settings.RAZORPAY_KEY_ID,
+            })
+
+        # 3️⃣ Create new Razorpay order
         rzp_order = RazorpayService.create_order(order.total_amount)
-        
-        order.razorpay_order_id = rzp_order["id"]
-        order.save(update_fields=['razorpay_order_id'])
-        
+
+        # 4️⃣ Create Payment record
+        Payment.objects.create(
+            order=order,
+            razorpay_order_id=rzp_order["id"],
+            amount=order.total_amount,
+            status="CREATED"
+        )
+
         return Response({
             "message": "Razorpay order created",
             "order_uuid": str(order.order_uuid),
@@ -71,65 +93,55 @@ class PaymentViewSet(viewsets.ViewSet):
             "currency": rzp_order["currency"],
             "key": settings.RAZORPAY_KEY_ID,
         })
-    
+
     @action(detail=False, methods=['post'], url_path='verify')
     def verify_payment(self, request):
-        """Verify payment with optimized queries"""
         serializer = PaymentCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
         data = serializer.validated_data
-        
-        # Optimized order fetch
+
         order = get_object_or_404(
-            Order.objects.only(
-                'order_uuid', 'razorpay_order_id', 'status',
-                'total_amount', 'user_id'
-            ),
+            Order,
             order_uuid=data['order_uuid'],
             user=request.user
         )
-        
-        if order.razorpay_order_id != data['razorpay_order_id']:
-            return Response({"error": "Order mismatch"}, status=400)
-        
+
+        payment = get_object_or_404(
+            Payment,
+            order=order,
+            razorpay_order_id=data['razorpay_order_id'],
+            status="CREATED"
+        )
+
         valid = RazorpayService.verify_signature(
             data['razorpay_order_id'],
             data['razorpay_payment_id'],
             data['razorpay_signature']
         )
-        
+
         if not valid:
+            payment.status = "FAILED"
+            payment.save(update_fields=["status"])
             order.status = "FAILED"
             order.save(update_fields=["status"])
-            return Response(
-                {"status": "failed", "error": "Invalid signature"},
-                status=400
-            )
-        
+            return Response({"error": "Invalid signature"}, status=400)
+
+        # Success
+        payment.razorpay_payment_id = data['razorpay_payment_id']
+        payment.razorpay_signature = data['razorpay_signature']
+        payment.method = data.get('method', 'card')
+        payment.status = "CAPTURED"
+        payment.save()
+
         order.status = "PAID"
-        order.razorpay_payment_id = data['razorpay_payment_id']
-        order.razorpay_signature = data['razorpay_signature']
-        order.save(update_fields=["status", "razorpay_payment_id", "razorpay_signature"])
-        
-        payment = Payment.objects.create(
-            order=order,
-            razorpay_payment_id=data['razorpay_payment_id'],
-            razorpay_order_id=data['razorpay_order_id'],
-            amount=order.total_amount,
-            status="CAPTURED",
-            method=data.get('method', 'card')
-        )
-        
-        payment_serializer = PaymentSerializer(payment)
-        
+        order.save(update_fields=["status"])
+
         return Response({
             "status": "paid",
-            "message": "Payment verified successfully",
             "order_uuid": str(order.order_uuid),
-            "payment": payment_serializer.data
+            "payment_id": payment.razorpay_payment_id
         })
-    
+
     @action(detail=False, methods=['post'], url_path='refund', permission_classes=[permissions.IsAdminUser])
     def refund_payment(self, request):
         """Admin refund with optimized queries"""

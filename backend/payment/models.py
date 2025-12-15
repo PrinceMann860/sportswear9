@@ -25,7 +25,15 @@ class Payment(models.Model):
     raw_response = models.JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['order'],
+                condition=models.Q(status='CREATED'),
+                name='one_active_payment_per_order'
+            )
+        ]
+        
     def __str__(self):
         return f"Payment {self.razorpay_payment_id} - {self.status}"
 

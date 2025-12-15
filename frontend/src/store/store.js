@@ -8,7 +8,9 @@ import profileReducer from '../Components/Profile/Profileslice';
 import cartReducer from '../Components/Cart/Cartslice';
 import searchReducer from '../Components/Search/Searchslice';
 import OrdersReducer from "../Components/Checkout/orderSlice";
-import reviewReducer from "../Components/Product/ReviewSlice"
+import reviewReducer from "../Components/Product/ReviewSlice";
+import paymentReducer from "../Components/Checkout/paymentSlice";
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -21,6 +23,7 @@ export const store = configureStore({
     search: searchReducer,
     order: OrdersReducer,
     review: reviewReducer,
+    payment: paymentReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -1,22 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, CreditCard, Truck, Shield, MapPin, Check, Plus, Trash2, Edit2 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ArrowLeft, CreditCard, Truck, Shield, MapPin, Check, Plus, Trash2, Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAddresses, addAddress, deleteAddress } from '../Profile/Profileslice';
-import { placeOrder, resetOrderState } from './orderSlice';
-import { fetchCartItems } from '../Cart/Cartslice';
+import { fetchAddresses, addAddress, deleteAddress, fetchProfile } from '../Profile/Profileslice';
+import { placeOrder, resetOrderState, checkTask } from './orderSlice';
+import { createRazorpayOrder, verifyPayment, resetPaymentState, setPaymentStatus } from './paymentSlice';
+import { fetchCartItems, clearCart } from '../Cart/Cartslice';
+import useRazorpay from '../../hooks/useRazorpay'
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { isLoaded: razorpayLoaded, openCheckout } = useRazorpay();
 
-  const { addresses, loading: addressLoading } = useSelector(state => state.profile);
-  const { loading: orderLoading, success: orderSuccess, error: orderError, message: orderMessage } = useSelector(state => state.order);
+  const { addresses, loading: addressLoading, data: profileData } = useSelector(state => state.profile);
+  const { loading: orderLoading, taskId, error: orderError } = useSelector(state => state.order);
   const { items: cartItems, total_price, subtotal: cartSubtotal, total_items, loading: cartLoading } = useSelector(state => state.cart);
+  const { 
+    razorpayOrder, 
+    razorpayLoading, 
+    razorpayError,
+    verificationLoading,
+    verificationError,
+    paymentStatus 
+  } = useSelector(state => state.payment);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [showAddAddressForm, setShowAddAddressForm] = useState(false);
+  const [processingState, setProcessingState] = useState(null); // 'placing_order' | 'checking_task' | 'creating_payment' | 'processing_payment' | 'verifying' | 'success' | 'failed'
+  const [orderUuid, setOrderUuid] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const [newAddress, setNewAddress] = useState({
     street_address: '',
@@ -29,16 +43,11 @@ const CheckoutPage = () => {
   });
 
   const [formData, setFormData] = useState({
-    paymentMethod: 'card',
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-    cardName: '',
-    upiId: '',
+    paymentMethod: 'razorpay',
     deliveryOption: 'standard'
   });
 
-  // Transform cart items for display - updated to handle nested variant structure
+  // Transform cart items for display
   const orderItems = cartItems.map(item => {
     const variant = item.variant || {};
     const mainImage = variant.images?.find(img => img.is_main) || variant.images?.[0];
@@ -63,26 +72,16 @@ const CheckoutPage = () => {
     };
   });
 
-  // Calculate prices based on actual cart data
+  // Calculate prices
   const subtotal = Number(cartSubtotal) || orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = subtotal > 2000 ? 0 : 99;
   const tax = Math.round(subtotal * 0.18);
   const total = Number(total_price) || (subtotal + shipping + tax);
-  
-  // Calculate savings based on the difference between price and effective_price
-  const savings = orderItems.reduce((sum, item) => {
-    const variant = cartItems.find(cartItem => cartItem.cart_item_id === item.id)?.variant;
-    if (variant && variant.price && variant.effective_price) {
-      const originalPrice = Number(variant.price);
-      const discountedPrice = Number(variant.effective_price);
-      return sum + ((originalPrice - discountedPrice) * item.quantity);
-    }
-    return sum;
-  }, 0);
 
   useEffect(() => {
     dispatch(fetchAddresses());
     dispatch(fetchCartItems());
+    dispatch(fetchProfile());
   }, [dispatch]);
 
   useEffect(() => {
@@ -92,19 +91,117 @@ const CheckoutPage = () => {
     }
   }, [addresses, selectedAddressId]);
 
+  // Poll for task status when we have a taskId
   useEffect(() => {
-    if (orderSuccess) {
-      alert(`Order placed successfully! ${orderMessage || ''}`);
-      dispatch(resetOrderState());
-      navigate('/orders');
+    let pollInterval;
+    
+    if (taskId && processingState === 'checking_task') {
+      pollInterval = setInterval(async () => {
+        try {
+          const result = await dispatch(checkTask(taskId)).unwrap();
+          
+          if (result.status === 'SUCCESS') {
+            clearInterval(pollInterval);
+            const orderUuidFromResult = result.result?.order_uuid;
+            setOrderUuid(orderUuidFromResult);
+            
+            // Create Razorpay order
+            setProcessingState('creating_payment');
+            dispatch(createRazorpayOrder(orderUuidFromResult));
+          } else if (result.status === 'FAILURE') {
+            clearInterval(pollInterval);
+            setProcessingState('failed');
+            setErrorMessage('Order processing failed. Please try again.');
+          }
+        } catch (error) {
+          clearInterval(pollInterval);
+          setProcessingState('failed');
+          setErrorMessage(error.message || 'Failed to check order status');
+        }
+      }, 2000);
     }
-  }, [orderSuccess, orderMessage, dispatch, navigate]);
 
+    return () => {
+      if (pollInterval) clearInterval(pollInterval);
+    };
+  }, [taskId, processingState, dispatch]);
+
+  // Handle Razorpay order creation success
   useEffect(() => {
-    if (orderError) {
-      alert(`Order failed: ${typeof orderError === 'string' ? orderError : JSON.stringify(orderError)}`);
+    if (razorpayOrder && processingState === 'creating_payment') {
+      handleRazorpayCheckout();
     }
-  }, [orderError]);
+  }, [razorpayOrder, processingState]);
+
+  // Handle Razorpay error
+  useEffect(() => {
+    if (razorpayError && processingState === 'creating_payment') {
+      setProcessingState('failed');
+      setErrorMessage(razorpayError);
+    }
+  }, [razorpayError, processingState]);
+
+  // Handle verification success
+  useEffect(() => {
+    if (paymentStatus === 'success') {
+      setProcessingState('success');
+      dispatch(clearCart());
+    }
+  }, [paymentStatus, dispatch]);
+
+  // Handle verification error
+  useEffect(() => {
+    if (verificationError) {
+      setProcessingState('failed');
+      setErrorMessage(verificationError);
+    }
+  }, [verificationError]);
+
+  const handleRazorpayCheckout = async () => {
+    if (!razorpayLoaded) {
+      setErrorMessage('Payment system is loading. Please wait...');
+      return;
+    }
+
+    setProcessingState('processing_payment');
+
+    try {
+      const paymentResponse = await openCheckout({
+        key: razorpayOrder.key,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        order_id: razorpayOrder.razorpay_order_id,
+        name: 'Sportswear9',
+        description: `Order ${razorpayOrder.order_uuid}`,
+        prefill: {
+          email: profileData?.email || '',
+          contact: profileData?.phone_number || '',
+          name: profileData?.full_name || '',
+        },
+        theme: {
+          color: '#2563eb',
+        },
+        notes: {
+          order_uuid: razorpayOrder.order_uuid,
+        },
+      });
+
+      // Payment successful - verify with backend
+      setProcessingState('verifying');
+      
+      await dispatch(verifyPayment({
+        order_uuid: razorpayOrder.order_uuid,
+        razorpay_order_id: paymentResponse.razorpay_order_id,
+        razorpay_payment_id: paymentResponse.razorpay_payment_id,
+        razorpay_signature: paymentResponse.razorpay_signature,
+        method: 'razorpay',
+      })).unwrap();
+
+    } catch (error) {
+      setProcessingState('failed');
+      setErrorMessage(error.message || 'Payment failed or was cancelled');
+    }
+  };
 
   const handleInputChange = (e) => {
     setFormData({
@@ -180,11 +277,35 @@ const CheckoutPage = () => {
       return;
     }
 
+    setProcessingState('placing_order');
+    setErrorMessage(null);
+
     try {
-      await dispatch(placeOrder(selectedAddressId)).unwrap();
+      const result = await dispatch(placeOrder(selectedAddressId)).unwrap();
+      
+      if (result.task_id) {
+        setProcessingState('checking_task');
+      } else {
+        throw new Error('No task ID received');
+      }
     } catch (error) {
-      console.error('Order placement failed:', error);
+      setProcessingState('failed');
+      setErrorMessage(error.message || 'Failed to place order');
     }
+  };
+
+  const handleRetry = () => {
+    setProcessingState(null);
+    setErrorMessage(null);
+    setOrderUuid(null);
+    dispatch(resetOrderState());
+    dispatch(resetPaymentState());
+  };
+
+  const handleGoToOrders = () => {
+    dispatch(resetOrderState());
+    dispatch(resetPaymentState());
+    navigate('/orders');
   };
 
   const steps = [
@@ -194,6 +315,89 @@ const CheckoutPage = () => {
   ];
 
   const selectedAddress = addresses?.find(addr => addr.address_id === selectedAddressId);
+
+  // Processing Modal
+  const renderProcessingModal = () => {
+    if (!processingState) return null;
+
+    const stateConfig = {
+      placing_order: { icon: Loader2, text: 'Placing your order...', spinning: true },
+      checking_task: { icon: Loader2, text: 'Processing your order...', spinning: true },
+      creating_payment: { icon: Loader2, text: 'Setting up payment...', spinning: true },
+      processing_payment: { icon: CreditCard, text: 'Complete payment in Razorpay window...', spinning: false },
+      verifying: { icon: Loader2, text: 'Verifying payment...', spinning: true },
+      success: { icon: CheckCircle, text: 'Payment Successful!', spinning: false },
+      failed: { icon: XCircle, text: 'Payment Failed', spinning: false },
+    };
+
+    const config = stateConfig[processingState];
+    const Icon = config.icon;
+
+    return (
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center">
+          <div className={`mx-auto w-20 h-20 rounded-full flex items-center justify-center mb-6 ${
+            processingState === 'success' ? 'bg-green-100' : 
+            processingState === 'failed' ? 'bg-red-100' : 'bg-blue-100'
+          }`}>
+            <Icon 
+              size={40} 
+              className={`${
+                processingState === 'success' ? 'text-green-600' : 
+                processingState === 'failed' ? 'text-red-600' : 'text-blue-600'
+              } ${config.spinning ? 'animate-spin' : ''}`} 
+            />
+          </div>
+          
+          <h3 className={`text-xl font-bold mb-2 ${
+            processingState === 'success' ? 'text-green-700' : 
+            processingState === 'failed' ? 'text-red-700' : 'text-gray-900'
+          }`}>
+            {config.text}
+          </h3>
+
+          {processingState === 'success' && (
+            <>
+              <p className="text-gray-600 mb-2">Order ID: {orderUuid}</p>
+              <p className="text-gray-600 mb-6">Thank you for your purchase!</p>
+              <button
+                onClick={handleGoToOrders}
+                className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold"
+              >
+                View My Orders
+              </button>
+            </>
+          )}
+
+          {processingState === 'failed' && (
+            <>
+              <p className="text-gray-600 mb-6">{errorMessage || 'Something went wrong. Please try again.'}</p>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleRetry}
+                  className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+                >
+                  Try Again
+                </button>
+                <button
+                  onClick={() => navigate('/cart')}
+                  className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold"
+                >
+                  Back to Cart
+                </button>
+              </div>
+            </>
+          )}
+
+          {processingState === 'processing_payment' && (
+            <p className="text-gray-500 text-sm mt-4">
+              Don't close this window. Complete the payment in the Razorpay popup.
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   if (cartLoading) {
     return (
@@ -208,6 +412,8 @@ const CheckoutPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16 md:pt-20 pb-16 md:pb-0">
+      {renderProcessingModal()}
+      
       <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
         <div className="flex items-center gap-3 mb-6 md:mb-8">
           <Link to="/cart" className="p-2 hover:bg-gray-200 rounded-full transition-colors">
@@ -493,35 +699,27 @@ const CheckoutPage = () => {
                     <div className="mb-6">
                       <h3 className="text-base md:text-lg font-medium mb-4">Payment Method</h3>
                       <div className="space-y-3">
-                        <label className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
+                        <label className="flex items-center p-4 border-2 border-blue-600 bg-blue-50 rounded-lg cursor-pointer">
                           <input
                             type="radio"
                             name="paymentMethod"
-                            value="card"
-                            checked={formData.paymentMethod === 'card'}
+                            value="razorpay"
+                            checked={formData.paymentMethod === 'razorpay'}
                             onChange={handleInputChange}
                             className="mr-4 text-blue-600 focus:ring-blue-500"
                           />
-                          <CreditCard className="w-5 h-5 mr-3 text-gray-600" />
-                          <span className="text-sm md:text-base">Credit/Debit Card</span>
-                        </label>
-
-                        <label className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="upi"
-                            checked={formData.paymentMethod === 'upi'}
-                            onChange={handleInputChange}
-                            className="mr-4 text-blue-600 focus:ring-blue-500"
-                          />
-                          <div className="w-5 h-5 mr-3 bg-orange-500 rounded text-white text-xs flex items-center justify-center font-bold">
-                            U
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                              <CreditCard className="w-5 h-5 text-white" />
+                            </div>
+                            <div>
+                              <span className="font-medium text-sm md:text-base block">Razorpay</span>
+                              <span className="text-xs text-gray-600">Cards, UPI, Netbanking, Wallets</span>
+                            </div>
                           </div>
-                          <span className="text-sm md:text-base">UPI</span>
                         </label>
 
-                        <label className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
+                        <label className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                           <input
                             type="radio"
                             name="paymentMethod"
@@ -536,68 +734,12 @@ const CheckoutPage = () => {
                       </div>
                     </div>
 
-                    {formData.paymentMethod === 'card' && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                        <div className="md:col-span-2">
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Card Number *</label>
-                          <input
-                            type="text"
-                            name="cardNumber"
-                            value={formData.cardNumber}
-                            onChange={handleInputChange}
-                            placeholder="1234 5678 9012 3456"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Expiry Date *</label>
-                          <input
-                            type="text"
-                            name="expiryDate"
-                            value={formData.expiryDate}
-                            onChange={handleInputChange}
-                            placeholder="MM/YY"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">CVV *</label>
-                          <input
-                            type="text"
-                            name="cvv"
-                            value={formData.cvv}
-                            onChange={handleInputChange}
-                            placeholder="123"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                          />
-                        </div>
-
-                        <div className="md:col-span-2">
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Cardholder Name *</label>
-                          <input
-                            type="text"
-                            name="cardName"
-                            value={formData.cardName}
-                            onChange={handleInputChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {formData.paymentMethod === 'upi' && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">UPI ID *</label>
-                        <input
-                          type="text"
-                          name="upiId"
-                          value={formData.upiId}
-                          onChange={handleInputChange}
-                          placeholder="yourname@upi"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base transition"
-                        />
+                    {formData.paymentMethod === 'razorpay' && (
+                      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-sm text-blue-800 flex items-center gap-2">
+                          <Shield className="w-4 h-4" />
+                          Secure payment via Razorpay. You'll be redirected to complete payment.
+                        </p>
                       </div>
                     )}
 
@@ -638,8 +780,7 @@ const CheckoutPage = () => {
                         Payment Method
                       </h3>
                       <p className="text-sm md:text-base text-gray-700 capitalize">
-                        {formData.paymentMethod === 'card' ? 'Credit/Debit Card' :
-                         formData.paymentMethod === 'upi' ? 'UPI' : 'Cash on Delivery'}
+                        {formData.paymentMethod === 'razorpay' ? 'Razorpay (Cards, UPI, Netbanking)' : 'Cash on Delivery'}
                       </p>
                     </div>
 
@@ -696,7 +837,7 @@ const CheckoutPage = () => {
                       className="flex-1 sm:flex-none px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm md:text-base shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
                       disabled={orderLoading || !selectedAddressId || orderItems.length === 0}
                     >
-                      {orderLoading ? 'Placing Order...' : 'Place Order'}
+                      {formData.paymentMethod === 'razorpay' ? 'Pay Now' : 'Place Order'}
                     </button>
                   )}
                 </div>
@@ -738,37 +879,37 @@ const CheckoutPage = () => {
                     ))}
                   </div>
 
-                  <div className="border-t border-gray-200 pt-4 space-y-2 mb-4">
+                  <div className="border-t pt-4 space-y-3">
                     <div className="flex justify-between text-sm md:text-base">
-                      <span>Subtotal ({total_items} items)</span>
+                      <span className="text-gray-600">Subtotal ({total_items} items)</span>
                       <span>₹{subtotal.toLocaleString()}</span>
                     </div>
-
-                    {savings > 0 && (
-                      <div className="flex justify-between text-sm md:text-base">
-                        <span className="text-green-600">You Save</span>
-                        <span className="font-semibold text-green-600">-₹{Math.round(savings).toLocaleString()}</span>
-                      </div>
-                    )}
-
                     <div className="flex justify-between text-sm md:text-base">
-                      <span>Shipping</span>
-                      <span className={shipping === 0 ? 'text-green-600 font-semibold' : ''}>
+                      <span className="text-gray-600">Shipping</span>
+                      <span className={shipping === 0 ? 'text-green-600 font-medium' : ''}>
                         {shipping === 0 ? 'FREE' : `₹${shipping}`}
                       </span>
                     </div>
-
                     <div className="flex justify-between text-sm md:text-base">
-                      <span>Tax (GST)</span>
+                      <span className="text-gray-600">Tax (18% GST)</span>
                       <span>₹{tax.toLocaleString()}</span>
+                    </div>
+                    <div className="border-t pt-3">
+                      <div className="flex justify-between text-lg md:text-xl font-bold">
+                        <span>Total</span>
+                        <span className="text-blue-600">₹{total.toLocaleString()}</span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="border-t border-gray-200 pt-4">
-                    <div className="flex justify-between font-semibold text-base md:text-lg">
-                      <span>Total</span>
-                      <span className="text-blue-600">₹{total.toLocaleString()}</span>
+                  <div className="mt-6 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center gap-2 text-green-700">
+                      <Shield size={16} />
+                      <span className="text-sm font-medium">Secure Checkout</span>
                     </div>
+                    <p className="text-xs text-green-600 mt-1">
+                      Your payment information is encrypted and secure
+                    </p>
                   </div>
                 </>
               )}
