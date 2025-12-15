@@ -16,7 +16,8 @@ export const getAllReviews = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(BASE_URL);
-      return response.data;
+      // support paginated and non-paginated responses
+      return response.data.results ? response.data.results : response.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || "Failed to fetch reviews");
     }
@@ -31,7 +32,8 @@ export const getReviewsByProduct = createAsyncThunk(
   async (product_id, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${BASE_URL}?product_id=${product_id}`);
-      return response.data;
+      // support paginated responses (DRF PageNumberPagination)
+      return response.data.results ? response.data.results : response.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || "Failed to fetch reviews");
     }

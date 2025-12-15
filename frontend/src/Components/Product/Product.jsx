@@ -24,8 +24,7 @@ const fallbackBanners = [
 
 // Product Card
 function ProductCard({ product }) {
-  const rating = product.rating?.rate || 4.5;
-  const count = product.rating?.count || 100;
+  const rating = product.rating?.rate;
 
   return (
     <Link to={`/ProductInfo/${product.product_uuid || product.id}`}>
@@ -197,9 +196,9 @@ const transformProductData = (apiProduct) => ({
   discount: apiProduct.discount || "",
   brand: apiProduct.brand,
   category: apiProduct.category?.name || "Uncategorized",
-  img: apiProduct.img ? `http://127.0.0.1:8000${apiProduct.img}` : "",
-  img2: apiProduct.img2 ? `http://127.0.0.1:8000${apiProduct.img2}` : "",
-  rating: { rate: apiProduct.average_rating || 4.5, count: 120 },
+  img: apiProduct.img ? apiProduct.img : "",
+  img2: apiProduct.img2 ? apiProduct.img2 : "",
+  rating: { rate: apiProduct.average_rating },
   isFeatured: apiProduct.is_featured,
 });
 

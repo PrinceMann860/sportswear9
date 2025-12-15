@@ -6,36 +6,10 @@ import { useAuth } from "../../context/AuthContext";
 import AuthModal from "../Auth/AuthModal";
 import { addToCart } from "../Cart/Cartslice";
 import SEO from "../Common/SEO.jsx";
-import {
-  createReview,
-  updateReview,
-  deleteReview,
-  getReviewsByProduct,
+import { createReview, updateReview, deleteReview, getReviewsByProduct,
 } from "./ReviewSlice";
-import {
-  Star,
-  Heart,
-  Truck,
-  Shield,
-  RefreshCw,
-  MapPin,
-  Check,
-  Ruler,
-  Plus,
-  Minus,
-  ShoppingCart,
-  Clock,
-  Award,
-  Leaf,
-  Users,
-  ArrowRight,
-  Shirt,
-  User,
-  Edit2,
-  Trash2,
-  X,
-  AlertCircle,
-} from "lucide-react";
+import { fetchProfile } from "../Profile/Profileslice.js";
+import {Star, Heart, Truck, Shield, RefreshCw, MapPin, Check, Ruler, Plus, Minus, ShoppingCart, Clock, Award, Leaf, Users, ArrowRight, ChevronLeft, ChevronRight, ZoomIn, Shirt, User, Edit2, Trash2, X, AlertCircle } from "lucide-react";
 import { fetchProductDetail, clearProductDetail } from "./Productdetailslice";
 import RecommendedProducts from "../Home/RecommendedProducts";
 import ProductGallery from "./ProductGallery";
@@ -45,7 +19,7 @@ const ProductInfo = () => {
   const productId = id || product_uuid;
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState("signup");
 
@@ -54,19 +28,22 @@ const ProductInfo = () => {
   const loading = useSelector((state) => state.productdetail?.loading);
   const error = useSelector((state) => state.productdetail?.error);
   const reviewsState = useSelector((state) => state.review);
-  
-  // Get user profile from profile slice (where we store user's email)
-  const profile = useSelector((state) => state.profile?.data);
+
+  const profileData = useSelector((state) => state.profile.data);
 
   // Review states
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
+
+  const [imageFiles, setImageFiles] = useState([]);
+  const [videoFiles, setVideoFiles] = useState([]);
+
   const [editingReview, setEditingReview] = useState(null);
   const [editRating, setEditRating] = useState(0);
   const [editComment, setEditComment] = useState("");
 
   // UI states
-  const [selectedImage, setSelectedImage] = useState(0);
+  // removed unused selectedImage state
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -74,14 +51,15 @@ const ProductInfo = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [hoverRating, setHoverRating] = useState(0);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
+  // Review image modal state
+  const [reviewImageModalOpen, setReviewImageModalOpen] = useState(false);
+  const [modalImages, setModalImages] = useState([]);
+  const [modalIndex, setModalIndex] = useState(0);
 
   useEffect(() => {
     if (productId) {
       dispatch(fetchProductDetail(productId));
     }
-    return () => {
-      dispatch(clearProductDetail());
-    };
   }, [dispatch, productId]);
 
   // Load reviews when product detail loads
@@ -89,7 +67,13 @@ const ProductInfo = () => {
     if (productFromState?.product_uuid) {
       dispatch(getReviewsByProduct(productFromState.product_uuid));
     }
-  }, [dispatch, productFromState]);
+  }, [dispatch, productFromState?.product_uuid]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchProfile());
+    }
+  }, [isAuthenticated, dispatch]);
 
   // Sticky sidebar effect for desktop
   useEffect(() => {
@@ -133,15 +117,11 @@ const ProductInfo = () => {
 
     const specifications =
       productFromState.specifications &&
-      typeof productFromState.specifications === "object"
-        ? productFromState.specifications
-        : {};
+      typeof productFromState.specifications === "object" ? productFromState.specifications : {};
 
     let images =
       Array.isArray(productFromState.default_images) &&
-      productFromState.default_images.length > 0
-        ? productFromState.default_images
-        : [];
+      productFromState.default_images.length > 0 ? productFromState.default_images : [];
 
     if (images.length === 0) {
       const imgs = [];
@@ -176,16 +156,17 @@ const ProductInfo = () => {
 
     const inStock = totalStock > 0;
 
-    // Get reviews from product data
-    const reviews = productFromState.reviews || [];
+    // Get reviews from product data or review state
 
-    // Calculate average rating - handle null ratings
-    const validReviews = reviews.filter((review) => review.rating !== null);
-    const averageRating =
-      validReviews.length > 0
-        ? validReviews.reduce((acc, review) => acc + review.rating, 0) /
-          validReviews.length
-        : 0;
+    const reviews =
+      Array.isArray(reviewsState.productReviews) && reviewsState.productReviews.length > 0
+        ? reviewsState.productReviews
+        : Array.isArray(productFromState?.reviews)
+        ? productFromState.reviews
+        : [];
+
+    const validReviews = reviews.filter((r) => r.rating !== null);
+    const averageRating = validReviews.length > 0 ? validReviews.reduce((a, r) => a + r.rating, 0) / validReviews.length : 0;
 
     return {
       ...productFromState,
@@ -202,7 +183,12 @@ const ProductInfo = () => {
       reviews,
       average_rating: averageRating,
     };
-  }, [productFromState]);
+  }, [productFromState, reviewsState.productReviews]);
+  const refreshReviews = useCallback(() => {
+    if (productFromState?.product_uuid) {
+      dispatch(getReviewsByProduct(productFromState.product_uuid));
+    }
+  }, [dispatch, productFromState?.product_uuid]);
 
   // Get available colors from variants
   const colorsList = useMemo(() => {
@@ -350,9 +336,6 @@ const ProductInfo = () => {
           },
         });
         window.dispatchEvent(event);
-        
-        // Optional: Navigate to cart
-        // navigate("/cart");
       })
       .catch((err) => {
         console.error(err);
@@ -369,57 +352,33 @@ const ProductInfo = () => {
   // Review Handlers
   const handleSubmitReview = () => {
     if (!rating || !comment) {
-      const event = new CustomEvent("showToast", {
-        detail: {
-          message: "❌ Please provide both rating and comment",
-          type: "error",
-        },
-      });
-      window.dispatchEvent(event);
+      alert("Rating and comment required");
       return;
     }
 
-    if (!isAuthenticated) {
-      setAuthMode("login");
-      setAuthOpen(true);
-      return;
-    }
+    const formData = new FormData();
+    formData.append("product", product.product_uuid);
+    formData.append("rating", rating);
+    formData.append("comment", comment);
 
-    const data = {
-      product: product.product_uuid,
-      rating,
-      comment,
-    };
+    imageFiles.forEach((img) => formData.append("uploaded_images", img));
+
+    videoFiles.forEach((vid) => formData.append("uploaded_videos", vid));
 
     dispatch(
       createReview({
         product_uuid: product.product_uuid,
-        data,
-        isMultipart: false,
+        data: formData,
+        isMultipart: true,
       })
     )
       .unwrap()
       .then(() => {
         setRating(0);
         setComment("");
-        const event = new CustomEvent("showToast", {
-          detail: {
-            message: "✅ Review submitted successfully!",
-            type: "success",
-          },
-        });
-        window.dispatchEvent(event);
-      })
-      .catch((error) => {
-        const event = new CustomEvent("showToast", {
-          detail: {
-            message: `❌ Failed to submit review: ${
-              error.message || "Unknown error"
-            }`,
-            type: "error",
-          },
-        });
-        window.dispatchEvent(event);
+        setImageFiles([]);
+        setVideoFiles([]);
+        refreshReviews();
       });
   };
 
@@ -430,42 +389,21 @@ const ProductInfo = () => {
   };
 
   const handleUpdateReview = () => {
-    if (!editRating || !editComment) return;
-
-    const data = {
-      product: product.product_uuid,
-      rating: editRating,
-      comment: editComment,
-    };
+    const formData = new FormData();
+    formData.append("rating", editRating);
+    formData.append("comment", editComment);
 
     dispatch(
       updateReview({
         review_id: editingReview.review_id,
-        product_uuid: product.product_uuid,
-        data,
+        data: formData,
+        isMultipart: true,
       })
     )
       .unwrap()
       .then(() => {
         setEditingReview(null);
-        const event = new CustomEvent("showToast", {
-          detail: {
-            message: "✅ Review updated successfully!",
-            type: "success",
-          },
-        });
-        window.dispatchEvent(event);
-      })
-      .catch((error) => {
-        const event = new CustomEvent("showToast", {
-          detail: {
-            message: `❌ Failed to update review: ${
-              error.message || "Unknown error"
-            }`,
-            type: "error",
-          },
-        });
-        window.dispatchEvent(event);
+        refreshReviews(); // ✅ refresh list
       });
   };
 
@@ -479,6 +417,7 @@ const ProductInfo = () => {
       )
         .unwrap()
         .then(() => {
+          refreshReviews();
           const event = new CustomEvent("showToast", {
             detail: {
               message: "✅ Review deleted successfully!",
@@ -500,6 +439,59 @@ const ProductInfo = () => {
         });
     }
   };
+
+  // Check if review belongs to current user using profile slice
+  const isCurrentUserReview = (review) => {
+    const currentEmail = profileData?.email || user?.email;
+    return review?.user_name === currentEmail;
+  };
+
+  // Get reviews to display
+  const displayReviews = useMemo(() => {
+    return Array.isArray(reviewsState.productReviews) && reviewsState.productReviews.length > 0
+      ? reviewsState.productReviews
+      : Array.isArray(productFromState?.reviews)
+      ? productFromState.reviews
+      : [];
+  }, [reviewsState.productReviews, productFromState?.reviews]);
+
+  // Helpers for image modal/carousel
+  const extractImageUrl = (img) => img?.image_url || img?.url || img;
+
+  const openImageModal = (images, startIndex = 0) => {
+    const urls = Array.isArray(images) ? images.map(extractImageUrl) : [];
+    setModalImages(urls);
+    setModalIndex(startIndex);
+    setReviewImageModalOpen(true);
+  };
+
+  const closeImageModal = () => setReviewImageModalOpen(false);
+
+  const prevImage = () =>
+    setModalIndex((i) => (i - 1 + modalImages.length) % modalImages.length);
+
+  const nextImage = () =>
+    setModalIndex((i) => (i + 1) % modalImages.length);
+
+  // Keyboard navigation & body scroll lock for modal
+  useEffect(() => {
+    if (!reviewImageModalOpen) return;
+
+    const handleKey = (e) => {
+      if (e.key === "Escape") closeImageModal();
+      if (e.key === "ArrowLeft") prevImage();
+      if (e.key === "ArrowRight") nextImage();
+    };
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    window.addEventListener("keydown", handleKey);
+    return () => {
+      window.removeEventListener("keydown", handleKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [reviewImageModalOpen, modalImages.length]);
 
   // Reference model data based on product type
   const referenceModel = useMemo(() => {
@@ -595,7 +587,9 @@ const ProductInfo = () => {
           <button
             key={star}
             type="button"
-            className={`transition-transform ${readonly ? "cursor-default" : "hover:scale-110 cursor-pointer"}`}
+            className={`transition-transform ${
+              readonly ? "cursor-default" : "hover:scale-110 cursor-pointer"
+            }`}
             onClick={() => !readonly && setRating(star)}
             onMouseEnter={() => !readonly && setHoverRating(star)}
             onMouseLeave={() => !readonly && setHoverRating(0)}
@@ -624,34 +618,37 @@ const ProductInfo = () => {
   );
 
   // Enhanced product data with actual values
-  const SportsWear9Product = useMemo(() => ({
-    title: product?.title || "",
-    price: product?.price ? formatPrice(product.price) : "₹0",
-    original:
-      product?.original && product.original > product.price
-        ? formatPrice(product.original)
-        : null,
-    discount: product?.discount ? `${product.discount}% OFF` : null,
-    description: product?.description || "",
-    features: product?.features || [],
-    specifications: product?.specifications || {},
-    inStock: product?.inStock || false,
-    totalStock: product?.totalStock || 0,
-    rating: product?.average_rating || 0,
-    reviewCount: product?.reviews?.length || 0,
-    deliveryDate: "3-10 days",
-    brand: product?.brand?.name || "SportsWear9",
-    madeIn: "India",
-    sustainability: "Top Quality materials",
-    usage: "Professional & Casual",
-    skillLevel: "Beginner to Advanced",
-    material: product?.specifications?.material || "100% Recycled Polyester",
-    weight: product?.specifications?.weight || "450g",
-    care: product?.specifications?.care || "Machine Washable",
-    activityType:
-      product?.specifications?.activityType || "Running, Training, Outdoor",
-    bestFor: product?.specifications?.bestFor || "All weather conditions",
-  }), [product]);
+  const SportsWear9Product = useMemo(
+    () => ({
+      title: product?.title || "",
+      price: product?.price ? formatPrice(product.price) : "₹0",
+      original:
+        product?.original && product.original > product.price
+          ? formatPrice(product.original)
+          : null,
+      discount: product?.discount ? `${product.discount}% OFF` : null,
+      description: product?.description || "",
+      features: product?.features || [],
+      specifications: product?.specifications || {},
+      inStock: product?.inStock || false,
+      totalStock: product?.totalStock || 0,
+      rating: product?.average_rating || 0,
+      reviewCount: displayReviews.length || 0,
+      deliveryDate: "3-10 days",
+      brand: product?.brand?.name || "SportsWear9",
+      madeIn: "India",
+      sustainability: "Top Quality materials",
+      usage: "Professional & Casual",
+      skillLevel: "Beginner to Advanced",
+      material: product?.specifications?.material || "100% Recycled Polyester",
+      weight: product?.specifications?.weight || "450g",
+      care: product?.specifications?.care || "Machine Washable",
+      activityType:
+        product?.specifications?.activityType || "Running, Training, Outdoor",
+      bestFor: product?.specifications?.bestFor || "All weather conditions",
+    }),
+    [product, displayReviews]
+  );
 
   // Trust badges data
   const trustBadges = [
@@ -662,15 +659,18 @@ const ProductInfo = () => {
   ];
 
   // Product highlights
-  const productHighlights = useMemo(() => [
-    "Designed and tested by sports experts",
-    "Suitable for multiple sports activities",
-    "Durable construction for long-lasting use",
-    "Comfort fit for extended wear",
-    "Moisture-wicking technology",
-    "Anti-odor treatment",
-    ...(product?.features || []),
-  ], [product]);
+  const productHighlights = useMemo(
+    () => [
+      "Designed and tested by sports experts",
+      "Suitable for multiple sports activities",
+      "Durable construction for long-lasting use",
+      "Comfort fit for extended wear",
+      "Moisture-wicking technology",
+      "Anti-odor treatment",
+      ...(product?.features || []),
+    ],
+    [product]
+  );
 
   const handleWishlist = () => {
     if (!isAuthenticated) {
@@ -725,11 +725,41 @@ const ProductInfo = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {[
-                  { size: "S", chest: "34-36", waist: "30-32", height: "5'4-5'7", weight: "55-65" },
-                  { size: "M", chest: "38-40", waist: "34-36", height: "5'7-5'10", weight: "65-75" },
-                  { size: "L", chest: "42-44", waist: "38-40", height: "5'10-6'1", weight: "75-85" },
-                  { size: "XL", chest: "46-48", waist: "42-44", height: "6'1-6'3", weight: "85-95" },
-                  { size: "XXL", chest: "50-52", waist: "46-48", height: "6'3-6'5", weight: "95-105" },
+                  {
+                    size: "S",
+                    chest: "34-36",
+                    waist: "30-32",
+                    height: "5'4-5'7",
+                    weight: "55-65",
+                  },
+                  {
+                    size: "M",
+                    chest: "38-40",
+                    waist: "34-36",
+                    height: "5'7-5'10",
+                    weight: "65-75",
+                  },
+                  {
+                    size: "L",
+                    chest: "42-44",
+                    waist: "38-40",
+                    height: "5'10-6'1",
+                    weight: "75-85",
+                  },
+                  {
+                    size: "XL",
+                    chest: "46-48",
+                    waist: "42-44",
+                    height: "6'1-6'3",
+                    weight: "85-95",
+                  },
+                  {
+                    size: "XXL",
+                    chest: "50-52",
+                    waist: "46-48",
+                    height: "6'3-6'5",
+                    weight: "95-105",
+                  },
                 ].map((row) => (
                   <tr key={row.size}>
                     <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -757,8 +787,9 @@ const ProductInfo = () => {
               <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-sm text-blue-800">
-                  <strong>Note:</strong> Sizes may vary slightly based on the specific product. 
-                  Refer to the product description for exact measurements.
+                  <strong>Note:</strong> Sizes may vary slightly based on the
+                  specific product. Refer to the product description for exact
+                  measurements.
                 </p>
               </div>
             </div>
@@ -767,17 +798,6 @@ const ProductInfo = () => {
       </div>
     </div>
   );
-
-  // Check if review belongs to current user using profile slice
-  const isCurrentUserReview = (review) => {
-    if (!isAuthenticated || !profile) return false;
-    
-    // Check if user's email matches review's user_name or user field
-    const userEmail = profile.email;
-    const reviewUsername = review.user_name || review.user?.email || "";
-    
-    return userEmail === reviewUsername;
-  };
 
   if (loading) {
     return (
@@ -835,7 +855,11 @@ const ProductInfo = () => {
         title={`${product.title} - SportsWear9`}
         description={product.description.substring(0, 160)}
         keywords={`${product.title}, sports wear, fitness gear`}
-        image={galleryImages[0]?.url ? `http://127.0.0.1:8000${galleryImages[0].url}` : null}
+        image={
+          galleryImages[0]?.url
+            ? `http://127.0.0.1:8000${galleryImages[0].url}`
+            : null
+        }
       />
       <div className="pt-20 bg-white min-h-screen">
         {/* Main Product Section */}
@@ -1059,11 +1083,12 @@ const ProductInfo = () => {
                             <div className="w-full h-px bg-gray-400 transform rotate-45"></div>
                           </div>
                         )}
-                        {size.stock_quantity > 0 && size.stock_quantity < 10 && (
-                          <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                            {size.stock_quantity}
-                          </div>
-                        )}
+                        {size.stock_quantity > 0 &&
+                          size.stock_quantity < 10 && (
+                            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                              {size.stock_quantity}
+                            </div>
+                          )}
                       </button>
                     ))}
                   </div>
@@ -1463,131 +1488,341 @@ const ProductInfo = () => {
                   </h3>
 
                   {/* Submit Review Form */}
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-6 mb-8">
-                    <h3 className="font-semibold text-gray-900 text-lg mb-4">
-                      {isAuthenticated
-                        ? "Write Your Review"
-                        : "Login to Write a Review"}
+                  <div className="bg-gray-50 border rounded-lg p-6 mb-8">
+                    <h3 className="font-semibold text-lg mb-4">
+                      Write a Review
                     </h3>
 
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Rating
-                        </label>
-                        <StarRatingInput
-                          rating={rating}
-                          setRating={setRating}
-                          hoverRating={hoverRating}
-                          setHoverRating={setHoverRating}
-                          size={28}
-                        />
-                      </div>
+                    <StarRatingInput
+                      rating={rating}
+                      setRating={setRating}
+                      hoverRating={hoverRating}
+                      setHoverRating={setHoverRating}
+                    />
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Your Review
-                        </label>
-                        <textarea
-                          className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition disabled:bg-gray-100 disabled:cursor-not-allowed"
-                          rows="4"
-                          placeholder="Share your experience with this product..."
-                          value={comment}
-                          onChange={(e) => setComment(e.target.value)}
-                          disabled={!isAuthenticated}
-                        />
-                      </div>
+                    <textarea
+                      className="w-full mt-4 border rounded-lg p-3"
+                      rows="4"
+                      placeholder="Share your experience with this product..."
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                    />
 
-                      <button
-                        onClick={
-                          isAuthenticated
-                            ? handleSubmitReview
-                            : () => {
-                                setAuthMode("login");
-                                setAuthOpen(true);
+                    {/* File Upload Section */}
+                    <div className="mt-6 space-y-4">
+                      {/* Photo Upload */}
+                      <div className="border border-gray-300 rounded-lg p-4 bg-white">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-blue-600 font-medium">
+                              Upload Photos
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              (Optional)
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {imageFiles.length > 0
+                              ? `${imageFiles.length} file(s) selected`
+                              : "No files selected"}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <label className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 cursor-pointer transition-colors">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            <span className="font-medium">Choose Photos</span>
+                            <input
+                              type="file"
+                              multiple
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) =>
+                                setImageFiles([...e.target.files])
                               }
-                        }
-                        className={`w-full sm:w-auto px-6 py-3 rounded-lg font-semibold transition-colors ${
-                          isAuthenticated
-                            ? "bg-blue-600 hover:bg-blue-700 text-white disabled:bg-blue-400"
-                            : "bg-gray-800 hover:bg-gray-900 text-white"
-                        }`}
-                        disabled={isAuthenticated && (!rating || !comment)}
-                      >
-                        {isAuthenticated ? "Submit Review" : "Login to Review"}
-                      </button>
+                            />
+                          </label>
+                          <span className="text-sm text-gray-600">
+                            JPG, PNG, GIF (Max 5MB each)
+                          </span>
+                        </div>
+
+                        {/* Preview selected images */}
+                        {imageFiles.length > 0 && (
+                          <div className="mt-4">
+                            <div className="flex flex-wrap gap-2">
+                              {Array.from(imageFiles).map((file, index) => (
+                                <div key={index} className="relative group">
+                                  <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden">
+                                    {file.type.startsWith("image/") && (
+                                      <img
+                                        src={URL.createObjectURL(file)}
+                                        alt={`Preview ${index + 1}`}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    )}
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const newFiles = [...imageFiles];
+                                      newFiles.splice(index, 1);
+                                      setImageFiles(newFiles);
+                                    }}
+                                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                    <X size={12} />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Video Upload */}
+                      <div className="border border-gray-300 rounded-lg p-4 bg-white">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-blue-600 font-medium">
+                              Upload Videos
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              (Optional)
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {videoFiles.length > 0
+                              ? `${videoFiles.length} file(s) selected`
+                              : "No files selected"}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <label className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 cursor-pointer transition-colors">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            <span className="font-medium">Choose Videos</span>
+                            <input
+                              type="file"
+                              multiple
+                              accept="video/*"
+                              className="hidden"
+                              onChange={(e) =>
+                                setVideoFiles([...e.target.files])
+                              }
+                            />
+                          </label>
+                          <span className="text-sm text-gray-600">
+                            MP4, MOV (Max 50MB each)
+                          </span>
+                        </div>
+
+                        {/* Preview selected videos */}
+                        {videoFiles.length > 0 && (
+                          <div className="mt-4">
+                            <div className="flex flex-wrap gap-2">
+                              {Array.from(videoFiles).map((file, index) => (
+                                <div key={index} className="relative group">
+                                  <div className="w-16 h-16 bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
+                                    <div className="text-white text-xs text-center p-2">
+                                      <div className="font-bold">VIDEO</div>
+                                      <div className="truncate max-w-[60px]">
+                                        {file.name.split(".")[0]}
+                                      </div>
+                                      <div className="text-gray-400">
+                                        .{file.name.split(".").pop()}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const newFiles = [...videoFiles];
+                                      newFiles.splice(index, 1);
+                                      setVideoFiles(newFiles);
+                                    }}
+                                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                    <X size={12} />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
+
+                    <button
+                      onClick={handleSubmitReview}
+                      disabled={!rating || !comment}
+                      className={`mt-6 w-full py-3 rounded-lg font-semibold transition-colors ${
+                        !rating || !comment
+                          ? "bg-gray-400 cursor-not-allowed text-white"
+                          : "bg-blue-600 hover:bg-blue-700 text-white"
+                      }`}
+                    >
+                      Submit Review
+                    </button>
                   </div>
 
                   {/* Reviews List */}
                   <div className="space-y-6">
-                    {product.reviews && product.reviews.length > 0 ? (
-                      product.reviews.map((review) => (
-                        <div
-                          key={review.review_id}
-                          className="border border-gray-200 rounded-lg p-4 sm:p-6 bg-white"
-                        >
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                                <User className="w-5 h-5 text-gray-500" />
-                              </div>
+                    {displayReviews.length > 0 ? (
+                      displayReviews.map((review) => {
+                        // Skip reviews with null rating if you want
+                        if (review.rating === null) return null;
+
+                        return (
+                          <div
+                            key={review.review_id || review.id}
+                            className="border rounded-lg p-5 bg-white shadow-sm"
+                          >
+                            <div className="flex justify-between items-start mb-3">
                               <div>
                                 <p className="font-medium text-gray-900">
-                                  {review.user_name || "Anonymous"}
+                                  {review.user_name || "Anonymous User"}
                                 </p>
-                                <p className="text-sm text-gray-500">
-                                  {formatDate(review.created_at)}
+                                <p className="text-sm text-gray-500 mt-1">
+                                  {formatDate(review.created_at || review.date)}
                                 </p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <StarRatingInput
+                                  rating={review.rating || 0}
+                                  readonly
+                                  size={16}
+                                />
                               </div>
                             </div>
 
-                            {/* Star Rating - Handle null ratings */}
-                            <div className="flex items-center gap-1">
-                              {review.rating !== null ? (
-                                <StarRatingInput
-                                  rating={review.rating}
-                                  setRating={() => {}}
-                                  hoverRating={0}
-                                  setHoverRating={() => {}}
-                                  size={16}
-                                  readonly={true}
-                                />
-                              ) : (
-                                <span className="text-sm text-gray-500">
-                                  No rating
-                                </span>
-                              )}
-                            </div>
+                            {review.comment && review.comment.trim() !== "" && (
+                              <p className="mt-3 text-gray-700 leading-relaxed">
+                                {review.comment}
+                              </p>
+                            )}
+
+                            {/* Review Images */}
+                            {review.images && review.images.length > 0 && (
+                              <div className="mt-4 pt-4 border-t border-gray-100">
+                                <p className="text-sm font-medium text-gray-700 mb-3">
+                                  Customer Photos:
+                                </p>
+                                <div className="flex gap-3 flex-wrap">
+                                  {review.images.map((img, i) => {
+                                    const imageUrl = extractImageUrl(img);
+                                    return (
+                                      <div key={img.image_uuid || img.id || imageUrl} className="relative">
+                                        <button
+                                          type="button"
+                                          onClick={() => openImageModal(review.images, i)}
+                                          className="block p-0 rounded-lg overflow-hidden"
+                                        >
+                                          <img
+                                            src={imageUrl}
+                                            className="w-24 h-24 object-cover rounded-lg border border-gray-200 hover:border-blue-300 transition-colors"
+                                            alt="Customer review photo"
+                                            loading="lazy"
+                                            onError={(e) => {
+                                              e.target.onerror = null;
+                                              e.target.src =
+                                                "https://via.placeholder.com/96?text=Image+Error";
+                                            }}
+                                          />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => window.open(imageUrl, "_blank")}
+                                          className="absolute -top-1 -right-1 bg-white p-1 rounded-full shadow text-gray-600 hover:text-gray-800"
+                                          title="Open full image in new tab"
+                                        >
+                                          <ZoomIn className="w-4 h-4" />
+                                        </button>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Review Videos */}
+                            {review.videos && review.videos.length > 0 && (
+                              <div className="mt-4 pt-4 border-t border-gray-100">
+                                <p className="text-sm font-medium text-gray-700 mb-3">
+                                  Customer Videos:
+                                </p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  {review.videos.map((vid, i) => {
+                                    const videoUrl =
+                                      vid.video_url || vid.url || vid;
+                                    return (
+                                      <div key={i} className="relative">
+                                        <video
+                                          controls
+                                          className="w-full rounded-lg border border-gray-200"
+                                          src={videoUrl}
+                                          poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f3f4f6'/%3E%3Cpath d='M40 30 L70 50 L40 70 Z' fill='%239ca3af'/%3E%3C/svg%3E"
+                                        >
+                                          <source
+                                            src={videoUrl}
+                                            type="video/mp4"
+                                          />
+                                          Your browser does not support the
+                                          video tag.
+                                        </video>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* EDIT / DELETE - only if user is authenticated and owns review */}
+                            {isAuthenticated && isCurrentUserReview(review) && (
+                              <div className="flex gap-4 mt-4 pt-3 border-t border-gray-200">
+                                <button
+                                  onClick={() => startEdit(review)}
+                                  className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
+                                >
+                                  <Edit2 size={14} />
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleDeleteReview(
+                                      review.review_id || review.id
+                                    )
+                                  }
+                                  className="flex items-center gap-1 text-red-600 hover:text-red-800 text-sm"
+                                >
+                                  <Trash2 size={14} />
+                                  Delete
+                                </button>
+                              </div>
+                            )}
                           </div>
-
-                          <p className="text-gray-700 mt-3 whitespace-pre-line">
-                            {review.comment || "No comment provided"}
-                          </p>
-
-                          {/* Use profile slice to check if review belongs to current user */}
-                          {isAuthenticated && isCurrentUserReview(review) && (
-                            <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
-                              <button
-                                onClick={() => startEdit(review)}
-                                className="flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
-                              >
-                                <Edit2 size={14} />
-                                Edit
-                              </button>
-                              <button
-                                onClick={() =>
-                                  handleDeleteReview(review.review_id)
-                                }
-                                className="flex items-center gap-2 text-red-600 hover:text-red-700 text-sm font-medium"
-                              >
-                                <Trash2 size={14} />
-                                Delete
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      ))
+                        );
+                      })
                     ) : (
                       <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
                         <Star className="w-12 h-12 text-gray-300 mx-auto mb-4" />
@@ -1597,17 +1832,6 @@ const ProductInfo = () => {
                         <p className="text-gray-500 mb-4">
                           Be the first to share your experience!
                         </p>
-                        {!isAuthenticated && (
-                          <button
-                            onClick={() => {
-                              setAuthMode("login");
-                              setAuthOpen(true);
-                            }}
-                            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                          >
-                            Login to Write Review
-                          </button>
-                        )}
                       </div>
                     )}
                   </div>
@@ -1725,16 +1949,10 @@ const ProductInfo = () => {
 
         {/* Auth Modal */}
         {authOpen && (
-          <AuthModal
-            isOpen={authOpen}
-            onClose={() => setAuthOpen(false)}
-            mode={authMode}
-            setMode={setAuthMode}
-          />
+          <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} mode={authMode} setMode={setAuthMode} />
         )}
       </div>
     </>
   );
 };
-
 export default ProductInfo;

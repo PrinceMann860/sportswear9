@@ -122,7 +122,7 @@ const RecommendedProducts = () => {
   return (
     <section className="py-16">
       <div className="">
-          <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
+          <h3 className="text-3xl md:text-2xl font-bold text-gray-900 mb-8">
             Recommended for you
           </h3>
 
