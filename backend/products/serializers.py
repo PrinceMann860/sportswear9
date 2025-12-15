@@ -15,6 +15,7 @@ from datetime import timedelta
 from django.utils import timezone
 from django.db import models
 from attributes.serializers import ProductVariantListSerializer
+from django.db.models import Avg, Count
 
 
 class VariantSizeSerializer(serializers.Serializer):
@@ -102,14 +103,15 @@ class ProductListSerializer(serializers.ModelSerializer):
     brand = BrandSerializer()
     category = CategorySerializer()
     is_in_cart = serializers.SerializerMethodField()
-
+    average_rating = serializers.DecimalField(max_digits=3, decimal_places=1, read_only=True)
+    total_reviews = serializers.IntegerField(read_only=True)
     class Meta:
         model = Product
         fields = [
             "product_uuid", "title", "img", "img2", "price", "original", "discount",
             "category", "gender", "is_new", "is_popular",
-            "is_in_cart",
-            "name", "brand", "is_featured"
+            "is_in_cart", "name", "brand", "is_featured",
+            "average_rating", "total_reviews"  # ✅ Add these
         ]
 
     def get_is_in_cart(self, obj):

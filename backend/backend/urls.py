@@ -41,6 +41,8 @@ urlpatterns = [
     path('api/v1/', include('ProductSpecification.urls')),
     path('api/v1/', include('orders.urls')),
     path('api/v1/', include('reviews.urls')),
+    path('api/v1/', include('recommendations.urls')),
+    path('api/v1/', include('payment.urls')),
 ]
 
 # (optional) serve static and media files in dev mode

@@ -1,8 +1,8 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
-from django.db import models
-from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+from django.db import models
 
 from .models import RecentlyViewed, ProductBundle
 from .serializers import (
@@ -13,68 +13,98 @@ from .serializers import (
 from products.models import Product
 from products.serializers import ProductListSerializer
 
-# AI + Redis imports
-from .vector_store import get_all_embeddings
+from .vector_store import get_all_embeddings, get_embedding
 from .embeddings import get_product_embedding
+from django.core.cache import cache
 
+# Constants
+AI_TOP_K = 9  # return top 9 similar (excluding self)
+AI_COMPLETE_LOOK_K = 5
 
 # -----------------------------
-# RECENTLY VIEWED API
+# RECENTLY VIEWED API (auth only)
 # -----------------------------
 class RecentlyViewedListAPIView(generics.ListAPIView):
-    serializer_class = RecentlyViewedSerializer
-    permission_classes = [permissions.AllowAny]
+    serializer_class = ProductListSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user if self.request.user.is_authenticated else None
-        session_key = self.request.session.session_key or self.request.session.create()
-
-        if user:
-            qs = RecentlyViewed.objects.filter(user=user)
-        else:
-            qs = RecentlyViewed.objects.filter(session_key=session_key)
-
-        return qs.select_related("product").order_by("-viewed_at")[:20]
-
+        return (
+            RecentlyViewed.objects
+            .filter(user=self.request.user)
+            .select_related("product__brand", "product__category")
+            .only(
+                "viewed_at",
+                "product__product_uuid",
+                "product__name",
+                "product__price",
+                "product__net",
+                "product__disc",
+                "product__brand__name",
+                "product__category__name",
+            )
+            .order_by("-viewed_at")[:20]
+        )
 
 # -----------------------------
 # AI-BASED SUGGESTIONS API
 # -----------------------------
 class AISuggestionListAPIView(generics.ListAPIView):
     """
-    AI-based recommendation system using semantic embeddings + Redis vector store.
-    Recommends similar products based on product meaning, not just category.
+    Recommends semantically similar products using embeddings.
     """
     serializer_class = AISuggestedProductSerializer
     permission_classes = [permissions.AllowAny]
 
     def list(self, request, *args, **kwargs):
-        product_id = self.kwargs.get("product_id")
-        all_embeddings = get_all_embeddings()
-
-        if not all_embeddings or int(product_id) not in all_embeddings:
+        try:
+            product_id = int(self.kwargs.get("product_id"))
+        except (TypeError, ValueError):
             return Response([])
 
-        # Target product vector
-        target_vec = all_embeddings[int(product_id)].reshape(1, -1)
-        product_ids = list(all_embeddings.keys())
-        vectors = np.stack(list(all_embeddings.values()))
+        # Try to fetch single embedding first (fast check)
+        target_emb = get_embedding(product_id)
+        if target_emb is None:
+            # fallback: load all embeddings (cached) and check
+            all_embeddings = get_all_embeddings()
+            if not all_embeddings or product_id not in all_embeddings:
+                return Response([])
+            product_ids = list(all_embeddings.keys())
+            vectors = np.vstack([all_embeddings[pid] for pid in product_ids])
+            target_emb = all_embeddings[product_id]
+        else:
+            # We still need the other vectors for similarity; load cached all embeddings
+            all_embeddings = get_all_embeddings()
+            if not all_embeddings or product_id not in all_embeddings:
+                return Response([])  # if cache empty or missing, bail; consider indexing
+            product_ids = list(all_embeddings.keys())
+            vectors = np.vstack([all_embeddings[pid] for pid in product_ids])
 
-        # Compute cosine similarity
+        # compute similarity
+        target_vec = target_emb.reshape(1, -1)
         similarities = cosine_similarity(target_vec, vectors)[0]
-        top_indices = np.argsort(similarities)[::-1][1:10]
-        top_ids = [product_ids[i] for i in top_indices]
 
-        products = Product.objects.filter(id__in=top_ids)
+        # top indices (descending), skip self
+        sorted_idx = np.argsort(similarities)[::-1]
+        top_indices = [i for i in sorted_idx if product_ids[i] != product_id][:AI_TOP_K]
+
+        top_ids = [product_ids[i] for i in top_indices]
+        top_scores = [float(similarities[i]) for i in top_indices]
+
+        # fetch products and build map
+        products = Product.objects.filter(id__in=top_ids).only(
+            "id", "product_uuid", "name", "net", "price", "brand_id", "category_id"
+        )
         product_map = {p.id: p for p in products}
 
-        data = [
-            {"product": product_map[pid], "score": float(similarities[i])}
-            for i, pid in enumerate(product_ids)
-            if pid in product_map
-        ]
-        data = sorted(data, key=lambda x: x["score"], reverse=True)[:10]
-        serializer = self.get_serializer(data, many=True)
+        # preserve order of top_ids
+        results = []
+        for pid, score in zip(top_ids, top_scores):
+            prod = product_map.get(pid)
+            if prod:
+                results.append({"product": prod, "score": score})
+
+        serializer = self.get_serializer(results, many=True)
         return Response(serializer.data)
 
 
@@ -82,36 +112,42 @@ class AISuggestionListAPIView(generics.ListAPIView):
 # COMPLETE THE LOOK (AI + RULES)
 # -----------------------------
 class AICompleteLookListAPIView(generics.ListAPIView):
-    """
-    Hybrid AI + rule-based recommendations to suggest complementary products
-    that complete a purchase (e.g., shoes + socks + accessories).
-    """
     serializer_class = ProductListSerializer
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
-        product_id = self.kwargs.get("product_id")
-        all_embeddings = get_all_embeddings()
-
         try:
-            main = Product.objects.get(id=product_id)
+            product_id = int(self.kwargs.get("product_id"))
+        except (TypeError, ValueError):
+            return Product.objects.none()
+
+        # check product exists
+        try:
+            main = Product.objects.only("id", "category_id").get(id=product_id)
         except Product.DoesNotExist:
             return Product.objects.none()
 
+        all_embeddings = get_all_embeddings()
         if not all_embeddings or main.id not in all_embeddings:
             return Product.objects.none()
 
-        main_vec = all_embeddings[main.id].reshape(1, -1)
         product_ids = list(all_embeddings.keys())
-        vectors = np.stack(list(all_embeddings.values()))
+        vectors = np.vstack([all_embeddings[pid] for pid in product_ids])
+        main_vec = all_embeddings[main.id].reshape(1, -1)
         similarities = cosine_similarity(main_vec, vectors)[0]
 
-        # Filter out same product and same category for complementary items
-        diff_cat = Product.objects.exclude(category=main.category)
-        diff_ids = [p.id for p in diff_cat]
+        # if main has category, exclude same-category products; otherwise exclude only the product itself
+        if main.category_id:
+            candidate_qs = Product.objects.exclude(category_id=main.category_id).only("id")
+            diff_ids = set(candidate_qs.values_list("id", flat=True))
+        else:
+            diff_ids = set([pid for pid in product_ids if pid != main.id])
 
-        ranked = [(pid, sim) for pid, sim in zip(product_ids, similarities) if pid in diff_ids]
+        # build ranked list
+        ranked = [(pid, sim) for pid, sim in zip(product_ids, similarities) if pid in diff_ids and pid != main.id]
         ranked.sort(key=lambda x: x[1], reverse=True)
-        top_ids = [pid for pid, _ in ranked[:5]]
+        top_ids = [pid for pid, _ in ranked[:AI_COMPLETE_LOOK_K]]
 
-        return Product.objects.filter(id__in=top_ids)
+        return Product.objects.filter(id__in=top_ids).only(
+            "id", "product_uuid", "name", "net", "price", "brand_id", "category_id"
+        )
