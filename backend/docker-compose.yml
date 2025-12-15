@@ -47,7 +47,6 @@ services:
     env_file:
       - .env
     environment:
-      - DJANGO_SETTINGS_MODULE=backend.settings   # ✅ REQUIRED
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
 
@@ -62,9 +61,6 @@ services:
       - rabbitmq
     env_file:
       - .env
-    environment:
-      - DJANGO_SETTINGS_MODULE=backend.settings
-
 
 volumes:
   static_volume:

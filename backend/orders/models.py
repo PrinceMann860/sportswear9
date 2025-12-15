@@ -16,23 +16,17 @@ class Order(models.Model):
     ]
 
     order_uuid = ShortUUIDField(length=12, unique=True, editable=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders")
+    razorpay_order_id = models.CharField(max_length=255, blank=True, null=True)
+    razorpay_payment_id = models.CharField(max_length=255, blank=True, null=True)
+    razorpay_signature = models.CharField(max_length=255, blank=True, null=True)
 
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
-    total_items = models.PositiveIntegerField()
-
-    handling_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    rain_surge_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    other_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
-    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='PENDING')
 
-    shipping_address = models.JSONField(default=dict)
-    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default="PENDING")
-
+    shipping_address = models.JSONField(default=dict)  # name, phone, address, city, pincode, etc.
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Order {self.order_uuid} - {self.user.email}"

@@ -54,7 +54,8 @@ CART_OTHER_FEE = 5            # Optional additional service charge
 
 # If subtotal > this, delivery & other fees are waived
 CART_FREE_DELIVERY_THRESHOLD = 500
-RAZORPAY_WEBHOOK_SECRET  = ""
+
+
 INSTALLED_APPS = [
     # Default Django apps
     'django.contrib.admin',
@@ -99,8 +100,6 @@ INSTALLED_APPS = [
     'assets',
     'homepage',
     'orders',
-    'recommendations',
-    'payment',
 
 ]
 
