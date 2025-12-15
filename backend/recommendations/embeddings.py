@@ -1,10 +1,22 @@
-# recommendations/embeddings.py
 from sentence_transformers import SentenceTransformer
+from typing import Dict
+import numpy as np
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+_model = None
 
-def get_product_embedding(product):
-    """Generate vector embedding for a product based on its textual data."""
-    text = f"{product.name}. {product.description or ''}. {product.category.name if product.category else ''}"
-    return model.encode(text)
+def get_model():
+    global _model
+    if _model is None:
+        # lazy load the model once per process
+        _model = SentenceTransformer("all-MiniLM-L6-v2")
+    return _model
 
+def get_product_embedding(product) -> np.ndarray:
+    """
+    Generate vector embedding for a product based on its textual data.
+    Keep the text concise (name + category + short description).
+    """
+    model = get_model()
+    text = f"{product.name}. {product.description[:256] if product.description else ''}. {product.category.name if getattr(product, 'category', None) else ''}"
+    emb = model.encode(text)
+    return np.array(emb)

@@ -17,6 +17,11 @@ from .pagination import ProductCursorPagination
 from .tasks import cache_product_list, cache_product_detail, cache_product_variants
 import django_filters
 from categories.models import Category
+from django.db.models import Avg, Count
+from django.db.models import Q
+
+from recommendations.models import RecentlyViewed
+from django.utils.timezone import now
 
 
 # -----------------------
@@ -91,11 +96,17 @@ class ProductListAPIView(generics.ListAPIView):
     permission_classes = [AllowAny]
     authentication_classes = []
 
-    queryset = (
-        Product.objects.filter(is_active=True)
-        .select_related("brand", "category")
-        .prefetch_related("variants__images", "category")
-    )
+    def get_queryset(self):
+        return (
+            Product.objects.filter(is_active=True)
+            .select_related("brand", "category")
+            .prefetch_related("variants__images", "category")
+            .annotate(
+                average_rating=Avg("reviews__rating", filter=Q(reviews__rating__isnull=False)),
+                total_reviews=Count("reviews", filter=Q(reviews__rating__isnull=False))
+            )
+        )
+
 
     filter_backends = [
         DjangoFilterBackend,
@@ -133,13 +144,11 @@ class ProductListAPIView(generics.ListAPIView):
         return self.get_paginated_response(data)
 
 
-# -----------------------
-# PRODUCT DETAIL VIEW
-# -----------------------
+from django.utils.timezone import now
+from recommendations.models import RecentlyViewed
+
+
 class ProductDetailAPIView(generics.RetrieveAPIView):
-    """
-    Returns unified product detail view with variants, specifications, and reviews
-    """
     serializer_class = ProductDetailUnifiedSerializer
     permission_classes = [AllowAny]
     authentication_classes = []
@@ -149,43 +158,49 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
         Product.objects.filter(is_active=True)
         .select_related("brand", "category", "spec_content")
         .prefetch_related(
-            "variants__images",   # ✅ nested relation
+            "variants__images",
             "inventories",
             "reviews",
-            "variants"
+            "variants",
         )
     )
 
-
     def retrieve(self, request, *args, **kwargs):
-        product_uuid = kwargs.get("product_uuid")
-        # cache_key = f"product_detail_{product_uuid}"
-
-        # data = cache.get(cache_key)
-        # if data:
-        #     return Response(data)
-
         instance = self.get_object()
+
+        # ✅ SAVE RECENTLY VIEWED (JWT ONLY)
+        if request.user.is_authenticated:
+            RecentlyViewed.objects.update_or_create(
+                user=request.user,
+                product=instance,
+                defaults={"viewed_at": now()},
+            )
+
         serializer = self.get_serializer(instance)
-        data = serializer.data
-        # cache.set(cache_key, data, timeout=60 * 10)
-        cache_product_detail.delay(product_uuid)
-        return Response(data)
+        response_data = serializer.data
+
+        # ✅ ASYNC CACHE REFRESH
+        cache_product_detail.delay(instance.product_uuid)
+
+        return Response(response_data)
 
     def get_object(self):
         obj = super().get_object()
         color = self.request.query_params.get("color")
+
         if color:
-            variant = obj.variants.filter(attributes__value__iexact=color).first()
+            variant = obj.variants.filter(
+                attributes__value__iexact=color
+            ).first()
             if variant:
                 self.variant = variant
+
         return obj
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["variant"] = getattr(self, "variant", None)
         return context
-
 
 # -----------------------
 # PRODUCT VARIANTS MATRIX VIEW

@@ -1,25 +1,24 @@
 from django.db import models
 from django.conf import settings
-from products.models import Product  # assume you have this
+from products.models import Product
 
 class RecentlyViewed(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        null=True, blank=True,
         related_name="recently_viewed"
     )
-    session_key = models.CharField(max_length=100, null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    viewed_at = models.DateTimeField(auto_now_add=True)
+    viewed_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-viewed_at"]
         unique_together = ("user", "product")
+        indexes = [
+            models.Index(fields=["user", "-viewed_at"]),
+        ]
 
     def __str__(self):
-        return f"{self.user or self.session_key} viewed {self.product.name}"
-
+        return f"{self.user} viewed {self.product.name}"
 
 class ProductBundle(models.Model):
     """Manual/computed bundle for 'complete the look'."""
@@ -29,6 +28,11 @@ class ProductBundle(models.Model):
     related_products = models.ManyToManyField(
         Product, related_name="bundle_related"
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["main_product"], name="unique_main_product_bundle")
+        ]
 
     def __str__(self):
         return f"Bundle for {self.main_product.name}"
