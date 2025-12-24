@@ -24,7 +24,7 @@ const fallbackBanners = [
 
 // Product Card
 function ProductCard({ product }) {
-  const rating = product.rating?.rate;
+  const rating = product.average_rating || 4.5;
 
   return (
     <Link to={`/ProductInfo/${product.product_uuid || product.id}`}>
@@ -254,7 +254,7 @@ function FilterSection({
       {/* Filter Sidebar */}
       <div className={`
         ${showMobileFilters ? 'block' : 'hidden'} 
-        lg:block w-full lg:w-64 bg-white p-4 rounded-lg border border-gray-200 h-fit sticky top-4
+        lg:block w-full lg:w-64 bg-white p-4 rounded-lg border border-gray-200 h-fit sticky top-20
       `}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-bold">Filters</h2>
@@ -675,7 +675,7 @@ function Product() {
       </div>
 
       {/* Main Content with Sidebar Layout */}
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row gap-6 relative">
         {/* Left Sidebar - Filters */}
         <div className="lg:w-64 flex-shrink-0">
           {loading ? (

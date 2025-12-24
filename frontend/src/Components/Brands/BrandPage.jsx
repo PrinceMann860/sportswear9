@@ -34,12 +34,10 @@ const BrandPage = () => {
   discount: p.discount,
   brand: p.brand?.name,
   category: p.category?.name,
-  img:
-    `http://127.0.0.1:8000/${p.img}` ||
-    "https://static.nike.com/a/images/t_PDP_936_v1/f_auto,q_auto:eco/022814da-3098-4c8e-b6f9-3692dc1b4207/W+FLEX+EXPERIENCE+RN+12.png",
-  img2:
-    `http://127.0.0.1:8000/${p.img2}` ||
-    "https://acrossports.s3.amazonaws.com/productPhotos/NIKE/DV0746004/DV0746004_6.jpg",
+  img: p.img,
+    
+  img2: p.img2,
+    
   isFeatured: p.is_featured,
 });
 

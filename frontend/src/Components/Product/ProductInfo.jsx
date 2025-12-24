@@ -6,10 +6,40 @@ import { useAuth } from "../../context/AuthContext";
 import AuthModal from "../Auth/AuthModal";
 import { addToCart } from "../Cart/Cartslice";
 import SEO from "../Common/SEO.jsx";
-import { createReview, updateReview, deleteReview, getReviewsByProduct,
+import {
+  createReview,
+  updateReview,
+  deleteReview,
+  getReviewsByProduct,
 } from "./ReviewSlice";
 import { fetchProfile } from "../Profile/Profileslice.js";
-import {Star, Heart, Truck, Shield, RefreshCw, MapPin, Check, Ruler, Plus, Minus, ShoppingCart, Clock, Award, Leaf, Users, ArrowRight, ChevronLeft, ChevronRight, ZoomIn, Shirt, User, Edit2, Trash2, X, AlertCircle } from "lucide-react";
+import {
+  Star,
+  Heart,
+  Truck,
+  Shield,
+  RefreshCw,
+  MapPin,
+  Check,
+  Ruler,
+  Plus,
+  Minus,
+  ShoppingCart,
+  Clock,
+  Award,
+  Leaf,
+  Users,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  ZoomIn,
+  Shirt,
+  User,
+  Edit2,
+  Trash2,
+  X,
+  AlertCircle,
+} from "lucide-react";
 import { fetchProductDetail, clearProductDetail } from "./Productdetailslice";
 import RecommendedProducts from "../Home/RecommendedProducts";
 import ProductGallery from "./ProductGallery";
@@ -117,11 +147,15 @@ const ProductInfo = () => {
 
     const specifications =
       productFromState.specifications &&
-      typeof productFromState.specifications === "object" ? productFromState.specifications : {};
+      typeof productFromState.specifications === "object"
+        ? productFromState.specifications
+        : {};
 
     let images =
       Array.isArray(productFromState.default_images) &&
-      productFromState.default_images.length > 0 ? productFromState.default_images : [];
+      productFromState.default_images.length > 0
+        ? productFromState.default_images
+        : [];
 
     if (images.length === 0) {
       const imgs = [];
@@ -159,14 +193,18 @@ const ProductInfo = () => {
     // Get reviews from product data or review state
 
     const reviews =
-      Array.isArray(reviewsState.productReviews) && reviewsState.productReviews.length > 0
+      Array.isArray(reviewsState.productReviews) &&
+      reviewsState.productReviews.length > 0
         ? reviewsState.productReviews
         : Array.isArray(productFromState?.reviews)
         ? productFromState.reviews
         : [];
 
     const validReviews = reviews.filter((r) => r.rating !== null);
-    const averageRating = validReviews.length > 0 ? validReviews.reduce((a, r) => a + r.rating, 0) / validReviews.length : 0;
+    const averageRating =
+      validReviews.length > 0
+        ? validReviews.reduce((a, r) => a + r.rating, 0) / validReviews.length
+        : 0;
 
     return {
       ...productFromState,
@@ -336,6 +374,7 @@ const ProductInfo = () => {
           },
         });
         window.dispatchEvent(event);
+        navigate('/cart')
       })
       .catch((err) => {
         console.error(err);
@@ -448,7 +487,8 @@ const ProductInfo = () => {
 
   // Get reviews to display
   const displayReviews = useMemo(() => {
-    return Array.isArray(reviewsState.productReviews) && reviewsState.productReviews.length > 0
+    return Array.isArray(reviewsState.productReviews) &&
+      reviewsState.productReviews.length > 0
       ? reviewsState.productReviews
       : Array.isArray(productFromState?.reviews)
       ? productFromState.reviews
@@ -470,8 +510,7 @@ const ProductInfo = () => {
   const prevImage = () =>
     setModalIndex((i) => (i - 1 + modalImages.length) % modalImages.length);
 
-  const nextImage = () =>
-    setModalIndex((i) => (i + 1) % modalImages.length);
+  const nextImage = () => setModalIndex((i) => (i + 1) % modalImages.length);
 
   // Keyboard navigation & body scroll lock for modal
   useEffect(() => {
@@ -857,7 +896,7 @@ const ProductInfo = () => {
         keywords={`${product.title}, sports wear, fitness gear`}
         image={
           galleryImages[0]?.url
-            ? `http://127.0.0.1:8000${galleryImages[0].url}`
+            ? galleryImages[0].url
             : null
         }
       />
@@ -875,7 +914,7 @@ const ProductInfo = () => {
                 images={galleryImages}
                 brandLogo={
                   product.brand?.logo
-                    ? `http://127.0.0.1:8000${product.brand.logo}`
+                    ? product.brand.logo
                     : null
                 }
               />
@@ -1281,7 +1320,7 @@ const ProductInfo = () => {
                           <img
                             src={
                               galleryImages?.[0]?.url
-                                ? `http://127.0.0.1:8000${galleryImages[0].url}`
+                                ? galleryImages[0].url
                                 : "https://via.placeholder.com/120"
                             }
                             alt="Main product"
@@ -1488,203 +1527,218 @@ const ProductInfo = () => {
                   </h3>
 
                   {/* Submit Review Form */}
-                  <div className="bg-gray-50 border rounded-lg p-6 mb-8">
-                    <h3 className="font-semibold text-lg mb-4">
-                      Write a Review
-                    </h3>
+                  {isAuthenticated ? (
+                    <div className="bg-gray-50 border rounded-lg p-6 mb-8">
+                      <h3 className="font-semibold text-lg mb-4">
+                        Write a Review
+                      </h3>
 
-                    <StarRatingInput
-                      rating={rating}
-                      setRating={setRating}
-                      hoverRating={hoverRating}
-                      setHoverRating={setHoverRating}
-                    />
+                      <StarRatingInput
+                        rating={rating}
+                        setRating={setRating}
+                        hoverRating={hoverRating}
+                        setHoverRating={setHoverRating}
+                      />
 
-                    <textarea
-                      className="w-full mt-4 border rounded-lg p-3"
-                      rows="4"
-                      placeholder="Share your experience with this product..."
-                      value={comment}
-                      onChange={(e) => setComment(e.target.value)}
-                    />
+                      <textarea
+                        className="w-full mt-4 border rounded-lg p-3"
+                        rows="4"
+                        placeholder="Share your experience with this product..."
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                      />
 
-                    {/* File Upload Section */}
-                    <div className="mt-6 space-y-4">
-                      {/* Photo Upload */}
-                      <div className="border border-gray-300 rounded-lg p-4 bg-white">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            <span className="text-blue-600 font-medium">
-                              Upload Photos
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              (Optional)
-                            </span>
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {imageFiles.length > 0
-                              ? `${imageFiles.length} file(s) selected`
-                              : "No files selected"}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <label className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 cursor-pointer transition-colors">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            <span className="font-medium">Choose Photos</span>
-                            <input
-                              type="file"
-                              multiple
-                              accept="image/*"
-                              className="hidden"
-                              onChange={(e) =>
-                                setImageFiles([...e.target.files])
-                              }
-                            />
-                          </label>
-                          <span className="text-sm text-gray-600">
-                            JPG, PNG, GIF (Max 5MB each)
-                          </span>
-                        </div>
-
-                        {/* Preview selected images */}
-                        {imageFiles.length > 0 && (
-                          <div className="mt-4">
-                            <div className="flex flex-wrap gap-2">
-                              {Array.from(imageFiles).map((file, index) => (
-                                <div key={index} className="relative group">
-                                  <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden">
-                                    {file.type.startsWith("image/") && (
-                                      <img
-                                        src={URL.createObjectURL(file)}
-                                        alt={`Preview ${index + 1}`}
-                                        className="w-full h-full object-cover"
-                                      />
-                                    )}
-                                  </div>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      const newFiles = [...imageFiles];
-                                      newFiles.splice(index, 1);
-                                      setImageFiles(newFiles);
-                                    }}
-                                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                                  >
-                                    <X size={12} />
-                                  </button>
-                                </div>
-                              ))}
+                      {/* File Upload Section */}
+                      <div className="mt-6 space-y-4">
+                        {/* Photo Upload */}
+                        <div className="border border-gray-300 rounded-lg p-4 bg-white">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <span className="text-blue-600 font-medium">
+                                Upload Photos
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                (Optional)
+                              </span>
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {imageFiles.length > 0
+                                ? `${imageFiles.length} file(s) selected`
+                                : "No files selected"}
                             </div>
                           </div>
-                        )}
-                      </div>
-
-                      {/* Video Upload */}
-                      <div className="border border-gray-300 rounded-lg p-4 bg-white">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            <span className="text-blue-600 font-medium">
-                              Upload Videos
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              (Optional)
-                            </span>
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {videoFiles.length > 0
-                              ? `${videoFiles.length} file(s) selected`
-                              : "No files selected"}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <label className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 cursor-pointer transition-colors">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                                clipRule="evenodd"
+                          <div className="flex items-center gap-4">
+                            <label className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 cursor-pointer transition-colors">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              <span className="font-medium">Choose Photos</span>
+                              <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) =>
+                                  setImageFiles([...e.target.files])
+                                }
                               />
-                            </svg>
-                            <span className="font-medium">Choose Videos</span>
-                            <input
-                              type="file"
-                              multiple
-                              accept="video/*"
-                              className="hidden"
-                              onChange={(e) =>
-                                setVideoFiles([...e.target.files])
-                              }
-                            />
-                          </label>
-                          <span className="text-sm text-gray-600">
-                            MP4, MOV (Max 50MB each)
-                          </span>
+                            </label>
+                            <span className="text-sm text-gray-600">
+                              JPG, PNG, GIF (Max 5MB each)
+                            </span>
+                          </div>
+
+                          {/* Preview selected images */}
+                          {imageFiles.length > 0 && (
+                            <div className="mt-4">
+                              <div className="flex flex-wrap gap-2">
+                                {Array.from(imageFiles).map((file, index) => (
+                                  <div key={index} className="relative group">
+                                    <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden">
+                                      {file.type.startsWith("image/") && (
+                                        <img
+                                          src={URL.createObjectURL(file)}
+                                          alt={`Preview ${index + 1}`}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      )}
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const newFiles = [...imageFiles];
+                                        newFiles.splice(index, 1);
+                                        setImageFiles(newFiles);
+                                      }}
+                                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                      <X size={12} />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
 
-                        {/* Preview selected videos */}
-                        {videoFiles.length > 0 && (
-                          <div className="mt-4">
-                            <div className="flex flex-wrap gap-2">
-                              {Array.from(videoFiles).map((file, index) => (
-                                <div key={index} className="relative group">
-                                  <div className="w-16 h-16 bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
-                                    <div className="text-white text-xs text-center p-2">
-                                      <div className="font-bold">VIDEO</div>
-                                      <div className="truncate max-w-[60px]">
-                                        {file.name.split(".")[0]}
-                                      </div>
-                                      <div className="text-gray-400">
-                                        .{file.name.split(".").pop()}
+                        {/* Video Upload */}
+                        <div className="border border-gray-300 rounded-lg p-4 bg-white">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <span className="text-blue-600 font-medium">
+                                Upload Videos
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                (Optional)
+                              </span>
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {videoFiles.length > 0
+                                ? `${videoFiles.length} file(s) selected`
+                                : "No files selected"}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <label className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 cursor-pointer transition-colors">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              <span className="font-medium">Choose Videos</span>
+                              <input
+                                type="file"
+                                multiple
+                                accept="video/*"
+                                className="hidden"
+                                onChange={(e) =>
+                                  setVideoFiles([...e.target.files])
+                                }
+                              />
+                            </label>
+                            <span className="text-sm text-gray-600">
+                              MP4, MOV (Max 50MB each)
+                            </span>
+                          </div>
+
+                          {/* Preview selected videos */}
+                          {videoFiles.length > 0 && (
+                            <div className="mt-4">
+                              <div className="flex flex-wrap gap-2">
+                                {Array.from(videoFiles).map((file, index) => (
+                                  <div key={index} className="relative group">
+                                    <div className="w-16 h-16 bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
+                                      <div className="text-white text-xs text-center p-2">
+                                        <div className="font-bold">VIDEO</div>
+                                        <div className="truncate max-w-[60px]">
+                                          {file.name.split(".")[0]}
+                                        </div>
+                                        <div className="text-gray-400">
+                                          .{file.name.split(".").pop()}
+                                        </div>
                                       </div>
                                     </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const newFiles = [...videoFiles];
+                                        newFiles.splice(index, 1);
+                                        setVideoFiles(newFiles);
+                                      }}
+                                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                      <X size={12} />
+                                    </button>
                                   </div>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      const newFiles = [...videoFiles];
-                                      newFiles.splice(index, 1);
-                                      setVideoFiles(newFiles);
-                                    }}
-                                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                                  >
-                                    <X size={12} />
-                                  </button>
-                                </div>
-                              ))}
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
-                    </div>
 
-                    <button
-                      onClick={handleSubmitReview}
-                      disabled={!rating || !comment}
-                      className={`mt-6 w-full py-3 rounded-lg font-semibold transition-colors ${
-                        !rating || !comment
-                          ? "bg-gray-400 cursor-not-allowed text-white"
-                          : "bg-blue-600 hover:bg-blue-700 text-white"
-                      }`}
-                    >
-                      Submit Review
-                    </button>
-                  </div>
+                      <button
+                        onClick={handleSubmitReview}
+                        disabled={!rating || !comment}
+                        className={`mt-6 w-full py-3 rounded-lg font-semibold transition-colors ${
+                          !rating || !comment
+                            ? "bg-gray-400 cursor-not-allowed text-white"
+                            : "bg-blue-600 hover:bg-blue-700 text-white"
+                        }`}
+                      >
+                        Submit Review
+                      </button>
+                    </div>
+                  ):(
+                    <div className="my-10 text-center">
+                      <p>Please log in to submit a review and rate this product.</p>
+                      <button onClick={
+                      isAuthenticated
+                        ? handleAddToCart
+                        : () => {
+                            setAuthMode("login");
+                            setAuthOpen(true);
+                          }
+                    } className="mt-6 px-3 py-3 rounded-lg font-semibold transition-colors bg-blue-600 hover:bg-blue-700 text-white">Login</button>
+                    </div>
+                  )
+                  }
 
                   {/* Reviews List */}
                   <div className="space-y-6">
@@ -1732,10 +1786,17 @@ const ProductInfo = () => {
                                   {review.images.map((img, i) => {
                                     const imageUrl = extractImageUrl(img);
                                     return (
-                                      <div key={img.image_uuid || img.id || imageUrl} className="relative">
+                                      <div
+                                        key={
+                                          img.image_uuid || img.id || imageUrl
+                                        }
+                                        className="relative"
+                                      >
                                         <button
                                           type="button"
-                                          onClick={() => openImageModal(review.images, i)}
+                                          onClick={() =>
+                                            openImageModal(review.images, i)
+                                          }
                                           className="block p-0 rounded-lg overflow-hidden"
                                         >
                                           <img
@@ -1752,7 +1813,9 @@ const ProductInfo = () => {
                                         </button>
                                         <button
                                           type="button"
-                                          onClick={() => window.open(imageUrl, "_blank")}
+                                          onClick={() =>
+                                            window.open(imageUrl, "_blank")
+                                          }
                                           className="absolute -top-1 -right-1 bg-white p-1 rounded-full shadow text-gray-600 hover:text-gray-800"
                                           title="Open full image in new tab"
                                         >
@@ -1949,7 +2012,12 @@ const ProductInfo = () => {
 
         {/* Auth Modal */}
         {authOpen && (
-          <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} mode={authMode} setMode={setAuthMode} />
+          <AuthModal
+            isOpen={authOpen}
+            onClose={() => setAuthOpen(false)}
+            mode={authMode}
+            setMode={setAuthMode}
+          />
         )}
       </div>
     </>

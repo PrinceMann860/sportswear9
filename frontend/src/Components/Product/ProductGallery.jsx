@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 
-const BASE_URL = "http://127.0.0.1:8000";
+
 
 const ProductGallery = ({ images = [], brandLogo }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -21,9 +21,9 @@ const ProductGallery = ({ images = [], brandLogo }) => {
       ? images
           .map((img) => {
             if (typeof img === "string") {
-              return img.startsWith("http") ? img : `${BASE_URL}${img}`;
+              return img.startsWith("http") ? img : img;
             }
-            return img?.url ? `${BASE_URL}${img.url}` : null;
+            return img?.url ? img.url : null;
           })
           .filter(Boolean)
       : [];

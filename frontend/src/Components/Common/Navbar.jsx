@@ -186,7 +186,7 @@ function Navbar() {
               <img
                 src={logo}
                 alt="Brand Logo"
-                className="w-24 md:w-28 lg:w-30 h-auto"
+                className="w-24 md:w-28 lg:w-30 xl:w-40 h-auto"
               />
             </Link>
 
