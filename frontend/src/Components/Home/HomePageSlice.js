@@ -1,15 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import BASE_URL from "../../store/Baseurl";
 
 // ✅ Adjust according to your backend route
-const BASE_URL = "http://localhost:8000/api/main/levels";
+const URL = `${BASE_URL}/api/main/levels`;
 
 // ✅ Thunk for fetching homepage sections/levels
 export const fetchHomepageLevels = createAsyncThunk(
   "homepage/fetchHomepageLevels",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(BASE_URL);
+      const response = await axios.get(URL);
       return response.data;
     } catch (error) {
       return rejectWithValue(

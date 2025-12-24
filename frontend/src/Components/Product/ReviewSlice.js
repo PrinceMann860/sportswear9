@@ -2,8 +2,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { fetchProductDetail } from "./productslice";
+import BASE_URL from "../../store/Baseurl";
 
-const BASE_URL = "http://127.0.0.1:8000/api/v1/reviews/";
+const URL = `${BASE_URL}/api/v1/reviews/`;
 
 // Helper for token
 const getToken = () => localStorage.getItem("access_token");
@@ -15,7 +16,7 @@ export const getAllReviews = createAsyncThunk(
   "reviews/getAllReviews",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(BASE_URL);
+      const response = await axios.get(URL);
       // support paginated and non-paginated responses
       return response.data.results ? response.data.results : response.data;
     } catch (err) {
@@ -31,7 +32,7 @@ export const getReviewsByProduct = createAsyncThunk(
   "reviews/getReviewsByProduct",
   async (product_id, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}?product_id=${product_id}`);
+      const response = await axios.get(`${URL}?product_id=${product_id}`);
       // support paginated responses (DRF PageNumberPagination)
       return response.data.results ? response.data.results : response.data;
     } catch (err) {
@@ -47,7 +48,7 @@ export const getReviewById = createAsyncThunk(
   "reviews/getReviewById",
   async (review_id, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}${review_id}/`);
+      const response = await axios.get(`${URL}${review_id}/`);
       return response.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || "Failed to fetch review");
@@ -67,7 +68,7 @@ export const createReview = createAsyncThunk(
       let headers = { Authorization: `Bearer ${token}` };
       if (!isMultipart) headers["Content-Type"] = "application/json";
 
-      const response = await axios.post(BASE_URL, data, { headers });
+      const response = await axios.post(URL, data, { headers });
 
       // refresh product details
       dispatch(fetchProductDetail(product_uuid));
@@ -89,7 +90,7 @@ export const updateReview = createAsyncThunk(
       const token = getToken();
 
       const response = await axios.put(
-        `${BASE_URL}${review_id}/`,
+        `${URL}${review_id}/`,
         data,
         {
           headers: {
@@ -120,7 +121,7 @@ export const partialUpdateReview = createAsyncThunk(
       if (!isMultipart) headers["Content-Type"] = "application/json";
 
       const response = await axios.patch(
-        `${BASE_URL}${review_id}/`,
+        `${URL}${review_id}/`,
         data,
         { headers }
       );
@@ -142,7 +143,7 @@ export const deleteReview = createAsyncThunk(
     try {
       const token = getToken();
 
-      await axios.delete(`${BASE_URL}${review_id}/`, {
+      await axios.delete(`${URL}${review_id}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

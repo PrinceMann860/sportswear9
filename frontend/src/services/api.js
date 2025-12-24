@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://127.0.0.1:8000';
+import BASE_URL from "../store/Baseurl";
+
 
 const handleResponse = async (response) => {
   const data = await response.json().catch(() => ({}));
@@ -23,7 +24,7 @@ const makeRequest = async (endpoint, options = {}) => {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const response = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
     headers,
   });

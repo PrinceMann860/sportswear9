@@ -1,13 +1,14 @@
 // Searchslice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import BASE_URL from "../../store/Baseurl";
 
 export const fetchSearchResults = createAsyncThunk(
   "search/fetchSearchResults",
   async (query, { rejectWithValue }) => {
     try {
       const res = await axios.get(
-        `http://127.0.0.1:8000/api/products/?search=${encodeURIComponent(query)}`
+        `${BASE_URL}/api/products/?search=${encodeURIComponent(query)}`
       );
       return res.data; // array
     } catch (err) {

@@ -399,7 +399,7 @@ const ProductCarouselSkeleton = () => (
 );
 
 const ProductGridSkeleton = () => (
-  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5   gap-4">
     {[...Array(6)].map((_, i) => (
       <div key={i} className="h-[300px] bg-gray-200 rounded-lg animate-pulse"></div>
     ))}
@@ -568,7 +568,7 @@ function Home2() {
           {productsLoading ? (
             <ProductGridSkeleton />
           ) : featuredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5   gap-4">
               {featuredProducts.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
@@ -650,7 +650,7 @@ function Home2() {
           {productsLoading ? (
             <ProductGridSkeleton />
           ) : featuredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5  gap-4">
               {featuredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -717,7 +717,7 @@ function Home2() {
           {productsLoading ? (
             <ProductGridSkeleton />
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5   gap-4">
               {newArrivals.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

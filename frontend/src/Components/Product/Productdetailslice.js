@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios"
+import BASE_URL from "../../store/Baseurl";
 
 // Thunk to fetch product details by UUID
 export const fetchProductDetail = createAsyncThunk(
@@ -7,7 +8,7 @@ export const fetchProductDetail = createAsyncThunk(
   async (product_uuid, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8000/api/products/${product_uuid}/`
+        `${BASE_URL}/api/products/${product_uuid}/`
       );
       return response.data;
     } catch (error) {

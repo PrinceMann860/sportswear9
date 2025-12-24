@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import BASE_URL from "../../store/Baseurl";
 
-const BASE_URL = "http://127.0.0.1:8000/api/v1/cart/";
+const URL = `${BASE_URL}/api/v1/cart/`;
 
 // ⚠️ AUTH HEADERS — NEVER TOUCHED
 const getAuthHeader = () => {
@@ -17,7 +18,7 @@ export const fetchCartItems = createAsyncThunk(
   "cart/fetchCartItems",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.get(BASE_URL, getAuthHeader());
+      const res = await axios.get(URL, getAuthHeader());
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || "Failed to fetch cart");
@@ -33,7 +34,7 @@ export const addToCart = createAsyncThunk(
   async (cartData, { rejectWithValue }) => {
     try {
       const res = await axios.post(
-        `${BASE_URL}add/`,
+        `${URL}add/`,
         cartData,
         getAuthHeader()
       );
@@ -52,7 +53,7 @@ export const updateCartItem = createAsyncThunk(
   async ({ id, quantity }, { rejectWithValue }) => {
     try {
       const res = await axios.patch(
-        `http://127.0.0.1:8000/api/v1/cart-items/${id}/`,
+        `${BASE_URL}/api/v1/cart-items/${id}/`,
         { quantity: quantity.toString() },
         getAuthHeader()
       );
@@ -71,7 +72,7 @@ export const deleteCartItem = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       await axios.delete(
-        `http://127.0.0.1:8000/api/v1/cart-items/${id}/`,
+        `${BASE_URL}/api/v1/cart-items/${id}/`,
         getAuthHeader()
       );
       return id; // return id to remove locally

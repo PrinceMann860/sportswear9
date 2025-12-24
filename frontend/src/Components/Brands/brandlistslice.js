@@ -1,15 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import BASE_URL from "../../store/Baseurl";
 
 // ✅ Adjust API base URL as needed
-const BASE_URL = "http://localhost:8000/api/brands/";
+const URL = `${BASE_URL}/api/brands/`;
 
 // ✅ Thunk for fetching brands with pagination support
 export const fetchBrands = createAsyncThunk(
   "brandlist/fetchBrands",
   async (page = 1, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}?page=${page}`);
+      const response = await axios.get(`${URL}?page=${page}`);
       // backend likely returns paginated data { count, next, previous, results: [] }
       return response.data;
     } catch (error) {

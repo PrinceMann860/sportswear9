@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import BASE_URL from "../../store/Baseurl";
 
-const API_BASE_URL = "http://127.0.0.1:8000";
 
 // ✅ Fetch profile info
 export const fetchProfile = createAsyncThunk(
@@ -8,7 +8,7 @@ export const fetchProfile = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("access_token");
-      const response = await fetch(`${API_BASE_URL}/profile/me/`, {
+      const response = await fetch(`${BASE_URL}/profile/me/`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

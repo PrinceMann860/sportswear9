@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import BASE_URL from "../../store/Baseurl";
 
-const BASE_URL = "http://127.0.0.1:8000/api/products/";
+const URL = `${BASE_URL}/api/products/`;
 
 // ----------------------------------------------------
 // ✅ Fetch Products — Supports ALL Backend Filters
@@ -42,8 +43,8 @@ export const fetchProducts = createAsyncThunk(
       });
 
       const url = params.toString()
-        ? `${BASE_URL}?${params.toString()}`
-        : BASE_URL;
+        ? `${URL}?${params.toString()}`
+        : URL;
 
       console.log("📌 Fetching products:", url);
 
