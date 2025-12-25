@@ -97,7 +97,7 @@ const Footer = () => {
       <div className="lg:flex overflow-hidden">
         <div className="w-full lg:w-[80%] mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* SUPPORT */}
-          <div className="ml-2 md:ml-5 lg:ml-10">
+          <div className="lg:ml-10">
             <h3 className="font-bold mb-2">SUPPORT</h3>
             <Link to="https://wa.me/0000000000?text=Hello%20this%20is%20a%20test" className="block hover:underline">
               Contact our Stores
